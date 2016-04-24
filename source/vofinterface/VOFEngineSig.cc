@@ -61,7 +61,7 @@ namespace aspect
     template <int dim>
     void add_vof_var(std::vector<VariableDeclaration<dim>> &vars)
     {
-      vars.push_back(VariableDeclaration<dim>("VOF1",
+      vars.push_back(VariableDeclaration<dim>("vofs",
                                               std_cxx11::shared_ptr<FiniteElement<dim>>(
                                                 new FE_DGQ<dim>(0)),
                                               1,
