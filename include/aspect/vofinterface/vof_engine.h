@@ -33,16 +33,29 @@ namespace aspect
   {
     using namespace dealii;
 
+    template <int dim>
+    class VOFEngine
+    {
+      public:
+
+        VOFEngine();
+
+        static
+        void add_vof_vars(std::vector<VariableDeclaration<dim>> &vars);
+
+      private:
+    };
+
     // Parameter handling
-    void declare_parameters (const unsigned int dim,
-                             ParameterHandler &prm);
-    template<int dim>
-    void parse_parameters (const Parameters<dim> Parameters,
-                           ParameterHandler &prm);
-    void parameter_connector ();
+    void gen_declare_parameters (const unsigned int dim,
+                                 ParameterHandler &prm);
 
     template <int dim>
-    void add_vof_var(std::vector<VariableDeclaration<dim>> &vars);
+    void gen_parse_parameters(const Parameters<dim> &parameters,
+                              ParameterHandler &prm);
+
+    template<int dim>
+    void parameter_connector ();
 
     template <int dim>
     void signal_connector (SimulatorSignals<dim> &signals);
