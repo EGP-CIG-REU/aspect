@@ -711,6 +711,10 @@ namespace aspect
     }
     prm.leave_subsection ();
 
+    prm.declare_entry ("Use VoF tracking", "false",
+                       Patterns::Bool (),
+                       "When set to true, VoF interface tracking will be used");
+
     // also declare the parameters that the FreeSurfaceHandler needs
     Simulator<dim>::FreeSurfaceHandler::declare_parameters (prm);
 
@@ -1007,6 +1011,10 @@ namespace aspect
           (prm.get ("Material averaging"));
     }
     prm.leave_subsection ();
+
+    vof_tracking_enabled = prm.get_bool("Use VoF tracking");
+    if (vof_tracking_enabled)
+      Assert(dim==2,ExcMessage("VoF interface tracking not implemented for dim>2."));
 
 
     // then, finally, let user additions that do not go through the usual

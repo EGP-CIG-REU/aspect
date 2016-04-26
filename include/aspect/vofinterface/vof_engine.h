@@ -31,31 +31,17 @@ namespace aspect
 {
   namespace InterfaceTracker
   {
-    using namespace dealii;
-
     template <int dim>
     class VOFEngine
     {
       public:
 
-        VOFEngine();
-
         static
-        void add_vof_vars(std::vector<VariableDeclaration<dim>> &vars);
+        void add_vof_vars(const Parameters<dim> &parameters,
+                          std::vector<VariableDeclaration<dim>> &vars);
 
       private:
     };
-
-    // Parameter handling
-    void gen_declare_parameters (const unsigned int dim,
-                                 ParameterHandler &prm);
-
-    template <int dim>
-    void gen_parse_parameters(const Parameters<dim> &parameters,
-                              ParameterHandler &prm);
-
-    template<int dim>
-    void parameter_connector ();
 
     template <int dim>
     void signal_connector (SimulatorSignals<dim> &signals);

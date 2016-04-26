@@ -89,7 +89,7 @@ namespace aspect
       std::vector<VariableDeclaration<dim> > variables
         = construct_default_variables (parameters);
 
-      signals.edit_finite_element_variables(variables);
+      signals.edit_finite_element_variables(parameters, variables);
       return variables;
     }
   }
@@ -2050,6 +2050,7 @@ namespace aspect
         time_step = old_time_step = 0;
 
         set_initial_temperature_and_compositional_fields ();
+        set_initial_vofs ();
         compute_initial_pressure_field ();
         initialize_tracers ();
 

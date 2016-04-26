@@ -300,6 +300,16 @@ namespace aspect
      * @}
      */
 
+    /**
+     * @name Parameters that have to do with free surface
+     * @{
+     */
+    bool                           vof_tracking_enabled;
+    /**
+     * @}
+     */
+
+
   };
 
 }

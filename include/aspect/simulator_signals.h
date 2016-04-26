@@ -80,7 +80,8 @@ namespace aspect
      * that can be modified and will be used to construct the
      * final finite element system later.
      */
-    boost::signals2::signal<void (std::vector<VariableDeclaration<dim> > &)>
+    boost::signals2::signal<void (const Parameters<dim> &parameters,
+                                  std::vector<VariableDeclaration<dim> > &)>
     edit_finite_element_variables;
 
     /**

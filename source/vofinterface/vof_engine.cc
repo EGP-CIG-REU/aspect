@@ -28,35 +28,13 @@ namespace aspect
   {
     using namespace dealii;
 
-
-    // TODO: Find better way to store parameters than as general variables
-    bool vof_tracking_enabled;
-
-    // Handle general parameters
-    //
-    void gen_declare_parameters (const unsigned int dim,
-                                 ParameterHandler &prm)
-    {
-      prm.declare_entry ("Use VoF tracking", "false",
-                         Patterns::Bool (),
-                         "When set to true, VoF interface tracking will be used");
-    }
-
-    template <int dim>
-    void gen_parse_parameters (const Parameters<dim> &parameters,
-                               ParameterHandler &prm)
-    {
-      vof_tracking_enabled = prm.get_bool("Use VoF tracking");
-      if (vof_tracking_enabled)
-        Assert(dim==2,ExcMessage("VoF interface tracking not implemented for dim>2."));
-    }
-
     // Add required variables
 
     template <int dim>
-    void VOFEngine<dim>::add_vof_vars(std::vector<VariableDeclaration<dim>> &vars)
+    void VOFEngine<dim>::add_vof_vars(const Parameters<dim> &parameters,
+                                      std::vector<VariableDeclaration<dim>> &vars)
     {
-      if (!vof_tracking_enabled)
+      if (!parameters.vof_tracking_enabled)
         return;
 
       vars.push_back(VariableDeclaration<dim>("vofs",
@@ -66,29 +44,7 @@ namespace aspect
                                               1));
     }
 
-    // Engine constructor
-
-    template <int dim>
-    VOFEngine<dim>::VOFEngine()
-    {
-    }
-
     // ASPECT registration code
-
-    void parameter_connector ()
-    {
-      SimulatorSignals<2>::declare_additional_parameters
-      .connect(&gen_declare_parameters);
-      SimulatorSignals<3>::declare_additional_parameters
-      .connect(&gen_declare_parameters);
-
-      SimulatorSignals<2>::parse_additional_parameters
-      .connect(gen_parse_parameters<2>);
-      SimulatorSignals<3>::parse_additional_parameters
-      .connect(&gen_parse_parameters<3>);
-    }
-
-    ASPECT_REGISTER_SIGNALS_PARAMETER_CONNECTOR(parameter_connector)
 
     template <int dim>
     void signal_connector (SimulatorSignals<dim> &signals)
