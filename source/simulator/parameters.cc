@@ -1317,6 +1317,7 @@ namespace aspect
     GravityModel::declare_parameters<dim> (prm);
     InitialConditions::declare_parameters<dim> (prm);
     CompositionalInitialConditions::declare_parameters<dim> (prm);
+    VoFInitialConditions::declare_parameters<dim> (prm);
     PrescribedStokesSolution::declare_parameters<dim> (prm);
     BoundaryTemperature::declare_parameters<dim> (prm);
     BoundaryComposition::declare_parameters<dim> (prm);

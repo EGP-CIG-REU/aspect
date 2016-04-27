@@ -51,6 +51,7 @@
 #include <aspect/boundary_composition/interface.h>
 #include <aspect/initial_conditions/interface.h>
 #include <aspect/compositional_initial_conditions/interface.h>
+#include <aspect/vof_initial_conditions/interface.h>
 #include <aspect/prescribed_stokes_solution/interface.h>
 #include <aspect/velocity_boundary_conditions/interface.h>
 #include <aspect/traction_boundary_conditions/interface.h>
@@ -328,6 +329,25 @@ namespace aspect
        * <code>source/vofinterface/vof_init.cc</code>.
        */
       void set_initial_vofs ();
+
+      /**
+       * Helper function to do actual initialization for when VoF init is
+       * composition based.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_init.cc</code>.
+       */
+      void init_vof_compos ();
+
+      /**
+       * Helper function to do actual initialization for when VoF init is
+       * signed distance level set function based.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_init.cc</code>.
+       */
+      void init_vof_ls ();
+
 
       /**
        * A function that is responsible for initializing the
@@ -1132,6 +1152,7 @@ namespace aspect
       const std_cxx11::unique_ptr<InitialConditions::Interface<dim> >         initial_conditions;
       const std_cxx11::unique_ptr<PrescribedStokesSolution::Interface<dim> >  prescribed_stokes_solution;
       const std_cxx11::unique_ptr<CompositionalInitialConditions::Interface<dim> >                     compositional_initial_conditions;
+      const std_cxx11::unique_ptr<VoFInitialConditions::Interface<dim> >      vof_initial_conditions;
       const std_cxx11::unique_ptr<AdiabaticConditions::Interface<dim> >       adiabatic_conditions;
       std::map<types::boundary_id,std_cxx11::shared_ptr<VelocityBoundaryConditions::Interface<dim> > > velocity_boundary_conditions;
       std::map<types::boundary_id,std_cxx11::shared_ptr<TractionBoundaryConditions::Interface<dim> > > traction_boundary_conditions;
