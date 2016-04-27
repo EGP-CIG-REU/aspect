@@ -180,8 +180,10 @@ namespace aspect
                         xL = xU;
                         xH[di] += 0.5*h;
                         xL[di] -= 0.5*h;
-                        double dH = vof_initial_conditions->initial_value (cell->barycenter());
-                        double dL = vof_initial_conditions->initial_value (cell->barycenter());
+                        double dH = vof_initial_conditions
+                                    ->initial_value (cell->intermediate_point(xH));
+                        double dL = vof_initial_conditions
+                                    ->initial_value (cell->intermediate_point(xL));
                         grad[di] = (dL-dH);
                         d += (0.5/dim)*(dH+dL);
                       }
