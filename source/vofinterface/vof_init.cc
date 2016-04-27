@@ -52,7 +52,7 @@ namespace aspect
           Assert(false, ExcNotImplemented ());
       }
 
-    const unsigned int blockidx = introspection.variable("vofsN").block_index;
+    const unsigned int blockidx = introspection.variable("vofsLS").block_index;
     update_vof_normals (solution);
     old_solution.block(blockidx) = solution.block(blockidx);
     old_old_solution.block(blockidx) = solution.block(blockidx);

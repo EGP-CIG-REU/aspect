@@ -67,7 +67,7 @@ namespace aspect
       void
       VoFValues<dim>::
       compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                         const std::vector<std::vector<Tensor<1,dim> > > &,
+                                         const std::vector<std::vector<Tensor<1,dim> > > &duh,
                                          const std::vector<std::vector<Tensor<2,dim> > > &,
                                          const std::vector<Point<dim> > &,
                                          const std::vector<Point<dim> > &,
@@ -79,21 +79,28 @@ namespace aspect
 
         const FiniteElement<dim> &finite_element = this->get_fe();
 
-        std::vector<unsigned int> indicies;
-
         FEVariable<dim> vof_var = this->introspection().variable("vofs");
-        FEVariable<dim> vofN_var = this->introspection().variable("vofsN");
-        indicies.push_back(vof_var.first_component_index);
-        if (include_vofN)
-          {
-            for (unsigned int i=0; i<dim+1; ++i)
-              indicies.push_back(vofN_var.first_component_index+i);
-          }
+        const unsigned int vof_ind = vof_var.first_component_index;
+        FEVariable<dim> vofLS_var = this->introspection().variable("vofsLS");
+        const unsigned int vofLS_ind = vofLS_var.first_component_index;
 
         for (unsigned int q=0; q<n_quadrature_points; ++q)
           {
-            for (unsigned int i=0; i<indicies.size(); ++i)
-              computed_quantities[q][i] = uh[q][indicies[i]];
+            unsigned int out_ind = 0;
+            computed_quantities[q][out_ind] = uh[q][vof_ind];
+            ++out_ind;
+            if (include_vofLS)
+              {
+                computed_quantities[q][out_ind] = uh[q][vofLS_ind];
+                ++out_ind;
+              }
+
+            if (include_vofN)
+              {
+                Tensor<1, dim, double> normal = -duh[q][vofLS_ind];
+                for (unsigned int i = 0; i<dim; ++i)
+                  computed_quantities[q][out_ind] = normal[i];
+              }
           }
       }
 
@@ -111,6 +118,10 @@ namespace aspect
               prm.declare_entry("Names of vofs", "VOF1",
                                 Patterns::List (Patterns::Anything()),
                                 "Names of vectors as they will appear in the output.");
+
+              prm.declare_entry("Include internal reconstruction LS", "false",
+                                Patterns::Bool (),
+                                "Include the internal level set data use to save reconstructed interfaces");
 
               prm.declare_entry("Include normals", "false",
                                 Patterns::Bool (),
@@ -138,20 +149,25 @@ namespace aspect
             prm.enter_subsection("VoF values");
             {
               vof_names = Utilities::split_string_list(prm.get("Names of vofs"), ',');
+              interp.push_back(DataComponentInterpretation::component_is_scalar);
               AssertThrow(vof_names.size() == 1,
                           ExcMessage("Only 1 VoF supported"));
+
+              include_vofLS = prm.get_bool("Include internal reconstruction LS");
+              if (include_vofLS)
+                {
+                  vof_names.push_back("vofLS");
+                  interp.push_back(DataComponentInterpretation::component_is_scalar);
+                }
 
               include_vofN = prm.get_bool("Include normals");
               if (include_vofN)
                 {
-                  interp.push_back(DataComponentInterpretation::component_is_scalar);
                   for (unsigned int i=0; i<dim; ++i)
                     {
                       vof_names.push_back("vofINormal");
                       interp.push_back(DataComponentInterpretation::component_is_part_of_vector);
                     }
-                  vof_names.push_back("vofID");
-                  interp.push_back(DataComponentInterpretation::component_is_scalar);
                 }
             }
             prm.leave_subsection();

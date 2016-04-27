@@ -54,8 +54,12 @@ namespace aspect
     std::vector<double> errs (n_normals);
 
     // Normal holding vars
+    Point<dim> uReCen;
     Tensor<1, dim, double> normal;
     double d;
+
+    for (unsigned int i=0; i<dim; ++i)
+      uReCen[i] = 0.5;
 
     std::vector<types::global_dof_index> cell_dof_indicies (finite_element.dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indicies (finite_element.dofs_per_cell);
@@ -65,17 +69,10 @@ namespace aspect
     const unsigned int vof_ind
       = finite_element.component_to_system_index(vof_c_index, 0);
 
-    const FEVariable<dim> &vofN_var = introspection.variable("vofsN");
-    const unsigned int vofN_c_index = vofN_var.first_component_index;
-    const unsigned int blockidx = vofN_var.block_index;
-    std::vector<unsigned int> vofN_n_ind;
-    for (unsigned int i=0; i<dim; ++i)
-      {
-        vofN_n_ind.push_back(finite_element.component_to_system_index(vofN_c_index+i, 0));
-      }
-
-    const unsigned int vofN_d_ind
-      = finite_element.component_to_system_index(vofN_c_index+dim, 0);
+    const FEVariable<dim> &vofLS_var = introspection.variable("vofsLS");
+    const unsigned int vofLS_c_index = vofLS_var.first_component_index;
+    const unsigned int n_vofLS_dofs = vofLS_var.fe->dofs_per_cell;
+    const unsigned int blockidx = vofLS_var.block_index;
 
 
     //Iterate over cells
@@ -217,7 +214,7 @@ namespace aspect
             d = InterfaceTracker::d_from_vof<dim> (normal, cell_vof);
           }
 
-        double n2 = sqrt (normal * normal);
+        double n2 = normal.norm();
         if (n2 > parameters.voleps)
           {
             normal = (normal / n2);
@@ -229,11 +226,14 @@ namespace aspect
             normal[1] = 0.0;
           }
 
-        for (unsigned int i=0; i < dim; ++i)
+        for (unsigned int i=0; i<n_vofLS_dofs; ++i)
           {
-            initial_solution (local_dof_indicies[vofN_n_ind[i]]) = normal[i];
+            // Recenter unit cell on origin
+            Tensor<1, dim, double> uSupp = vofLS_var.fe->unit_support_point(i)-uReCen;
+            initial_solution (local_dof_indicies[finite_element
+                                                 .component_to_system_index(vofLS_c_index, i)])
+              = d-uSupp*normal;
           }
-        initial_solution (local_dof_indicies[vofN_d_ind]) = d;
       }
 
     initial_solution.compress(VectorOperation::insert);
