@@ -71,6 +71,8 @@ namespace aspect
 
         private:
           std::vector<std::string> vof_names;
+          std::vector<DataComponentInterpretation::DataComponentInterpretation> interp;
+          bool include_vofN;
       };
     }
   }

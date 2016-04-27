@@ -50,8 +50,7 @@ namespace aspect
       VoFValues<dim>::
       get_data_component_interpretation () const
       {
-        return std::vector<DataComponentInterpretation::DataComponentInterpretation>
-               (1, DataComponentInterpretation::component_is_scalar);
+        return interp;
       }
 
 
@@ -78,10 +77,23 @@ namespace aspect
         Assert (computed_quantities.size() == n_quadrature_points, ExcInternalError ());
         Assert (uh[0].size() == this->introspection().n_components, ExcInternalError ());
 
+        const FiniteElement<dim> &finite_element = this->get_fe();
+
+        std::vector<unsigned int> indicies;
+
+        FEVariable<dim> vof_var = this->introspection().variable("vofs");
+        FEVariable<dim> vofN_var = this->introspection().variable("vofsN");
+        indicies.push_back(vof_var.first_component_index);
+        if (include_vofN)
+          {
+            for (unsigned int i=0; i<dim+1; ++i)
+              indicies.push_back(vofN_var.first_component_index+i);
+          }
+
         for (unsigned int q=0; q<n_quadrature_points; ++q)
           {
-            computed_quantities[q][0] =
-              uh[q][this->introspection().variable("vofs").first_component_index];
+            for (unsigned int i=0; i<indicies.size(); ++i)
+              computed_quantities[q][i] = uh[q][indicies[i]];
           }
       }
 
@@ -99,6 +111,10 @@ namespace aspect
               prm.declare_entry("Names of vofs", "VOF1",
                                 Patterns::List (Patterns::Anything()),
                                 "Names of vectors as they will appear in the output.");
+
+              prm.declare_entry("Include normals", "false",
+                                Patterns::Bool (),
+                                "Include internal normal data in output (DEBUG)");
             }
             prm.leave_subsection();
           }
@@ -122,8 +138,21 @@ namespace aspect
             prm.enter_subsection("VoF values");
             {
               vof_names = Utilities::split_string_list(prm.get("Names of vofs"), ',');
-              AssertThrow(vof_names.size() == this->introspection().variable("vofs").n_components(),
-                          ExcMessage("You must define names for all VoF components"));
+              AssertThrow(vof_names.size() == 1,
+                          ExcMessage("Only 1 VoF supported"));
+
+              include_vofN = prm.get_bool("Include normals");
+              if (include_vofN)
+                {
+                  interp.push_back(DataComponentInterpretation::component_is_scalar);
+                  for (unsigned int i=0; i<dim; ++i)
+                    {
+                      vof_names.push_back("vofINormal");
+                      interp.push_back(DataComponentInterpretation::component_is_part_of_vector);
+                    }
+                  vof_names.push_back("vofID");
+                  interp.push_back(DataComponentInterpretation::component_is_scalar);
+                }
             }
             prm.leave_subsection();
           }
