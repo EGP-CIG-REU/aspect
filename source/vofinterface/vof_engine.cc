@@ -42,6 +42,12 @@ namespace aspect
                                                 new FE_DGQ<dim>(0)),
                                               1,
                                               1));
+
+      vars.push_back(VariableDeclaration<dim>("vofsN",
+                                              std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                                new FE_DGQ<dim>(0)),
+                                              3,
+                                              1));
     }
 
     // ASPECT registration code

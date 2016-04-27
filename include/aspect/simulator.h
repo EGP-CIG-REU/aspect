@@ -331,25 +331,6 @@ namespace aspect
       void set_initial_vofs ();
 
       /**
-       * Helper function to do actual initialization for when VoF init is
-       * composition based.
-       *
-       * This function is implemented in
-       * <code>source/vofinterface/vof_init.cc</code>.
-       */
-      void init_vof_compos ();
-
-      /**
-       * Helper function to do actual initialization for when VoF init is
-       * signed distance level set function based.
-       *
-       * This function is implemented in
-       * <code>source/vofinterface/vof_init.cc</code>.
-       */
-      void init_vof_ls ();
-
-
-      /**
        * A function that is responsible for initializing the
        * tracers and their properties before the first time step. We want this
        * to happen before the first timestep in case other properties depend
@@ -492,6 +473,34 @@ namespace aspect
        * <code>source/simulator/core.cc</code>.
        */
       void postprocess ();
+
+      // TODO: Identify whether and how the following functions can be moved
+      // out of the Simulator class
+
+      /**
+       * Helper function to do actual initialization for when VoF init is
+       * composition based.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_init.cc</code>.
+       */
+      void init_vof_compos ();
+
+      /**
+       * Helper function to do actual initialization for when VoF init is
+       * signed distance level set function based.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_init.cc</code>.
+       */
+      void init_vof_ls ();
+
+      /**
+       * Helper function to calculate local interface normals.
+       */
+      void update_vof_normals (LinearAlgebra::BlockVector &solution);
+
+      // End VOF functions
 
       /**
        * Refine the mesh according to error indicators calculated by

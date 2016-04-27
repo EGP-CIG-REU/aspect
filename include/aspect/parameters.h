@@ -305,7 +305,7 @@ namespace aspect
      * @{
      */
     bool                           vof_tracking_enabled;
-    unsigned int                   n_i_samp;
+    double                         voleps;
     /**
      * @}
      */

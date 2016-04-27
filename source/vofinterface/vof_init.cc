@@ -51,6 +51,11 @@ namespace aspect
         default:
           Assert(false, ExcNotImplemented ());
       }
+
+    const unsigned int blockidx = introspection.variable("vofsN").block_index;
+    update_vof_normals (solution);
+    old_solution.block(blockidx) = solution.block(blockidx);
+    old_old_solution.block(blockidx) = solution.block(blockidx);
   }
 
   template <int dim>
@@ -72,7 +77,6 @@ namespace aspect
     local_dof_indicies (finite_element.dofs_per_cell);
 
     const FEVariable<dim> &vof_var = introspection.variable("vofs");
-    const unsigned int base_element = vof_var.base_index;
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind
@@ -132,7 +136,6 @@ namespace aspect
     local_dof_indicies (finite_element.dofs_per_cell);
 
     const FEVariable<dim> &vof_var = introspection.variable("vofs");
-    const unsigned int base_element = vof_var.base_index;
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind

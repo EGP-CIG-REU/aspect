@@ -715,6 +715,14 @@ namespace aspect
                        Patterns::Bool (),
                        "When set to true, VoF interface tracking will be used");
 
+    prm.enter_subsection ("VoF config");
+    {
+      prm.declare_entry ("Small volume", "1e-6",
+                         Patterns::Double (0, 1),
+                         "Minimum significant volume. VOFs below this considered to be zero.");
+    }
+    prm.leave_subsection ();
+
     // also declare the parameters that the FreeSurfaceHandler needs
     Simulator<dim>::FreeSurfaceHandler::declare_parameters (prm);
 
@@ -1016,6 +1024,11 @@ namespace aspect
     if (vof_tracking_enabled)
       Assert(dim==2,ExcMessage("VoF interface tracking not implemented for dim>2."));
 
+    prm.enter_subsection ("VoF config");
+    {
+      voleps = prm.get_double("Small volume");
+    }
+    prm.leave_subsection ();
 
     // then, finally, let user additions that do not go through the usual
     // plugin mechanism, declare their parameters if they have subscribed
