@@ -75,11 +75,13 @@ namespace aspect
           phi_field (vof_element.dofs_per_cell, Utilities::signaling_nan<double>()),
           cell_l_ls_values (quadrature.size(), Utilities::signaling_nan<double> ()),
           cell_l_ls_gradients (quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> > ()),
+          old_field_values (quadrature.size(), Utilities::signaling_nan<double>()),
           face_current_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
           face_old_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
           face_old_old_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
           face_mesh_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >())
         {}
+
         template <int dim>
         VoFSystem<dim>::VoFSystem (const VoFSystem &scratch)
           :
@@ -103,10 +105,11 @@ namespace aspect
           phi_field (scratch.phi_field),
           cell_l_ls_values (scratch.cell_l_ls_values),
           cell_l_ls_gradients (scratch.cell_l_ls_gradients),
-          face_current_velocity_values(scratch.face_current_velocity_values),
-          face_old_velocity_values(scratch.face_old_velocity_values),
-          face_old_old_velocity_values(scratch.face_old_old_velocity_values),
-          face_mesh_velocity_values(scratch.face_mesh_velocity_values)
+          old_field_values (scratch.old_field_values),
+          face_current_velocity_values (scratch.face_current_velocity_values),
+          face_old_velocity_values (scratch.face_old_velocity_values),
+          face_old_old_velocity_values (scratch.face_old_old_velocity_values),
+          face_mesh_velocity_values (scratch.face_mesh_velocity_values)
         {}
       }
 
@@ -157,28 +160,32 @@ namespace aspect
 
     // Due to dimensionally split formulation, use strang splitting
     // TODO: Reformulate for unsplit (may require flux limiter)
+    bool update_from_old = true;
     for (unsigned int dir = 0; dir < dim; ++dir)
       {
         // Update base to intermediate solution
-        current_linearization_point.block(vof_block_idx) = solution(vof_block_idx);
-        current_linearization_point.block(vofN_block_idx) = solution(vofN_block_idx);
-        if (vof_dir_order_dsc)
+        if (!vof_dir_order_dsc)
           {
-            assemble_vof_system(dir);
+            assemble_vof_system(dir, update_from_old);
           }
         else
           {
-            assemble_vof_system(dim-dir-1);
+            assemble_vof_system(dim-dir-1, update_from_old);
           }
         solve_vof_system ();
         update_vof_normals (solution);
+
+        current_linearization_point.block(vof_block_idx) = solution(vof_block_idx);
+        current_linearization_point.block(vofN_block_idx) = solution(vofN_block_idx);
+
+        update_from_old = false;
       }
     // change dimension iteration order
     vof_dir_order_dsc = !vof_dir_order_dsc;
   }
 
   template <int dim>
-  void Simulator<dim>::assemble_vof_system (unsigned int dir)
+  void Simulator<dim>::assemble_vof_system (unsigned int dir, bool update_from_old)
   {
     computing_timer.enter_section ("   Assemble VoF system");
     const unsigned int block_idx = introspection.variable("vofs").block_index;
@@ -201,6 +208,7 @@ namespace aspect
                           local_assemble_vof_system,
                           this,
                           dir,
+                          update_from_old,
                           std_cxx11::_1,
                           std_cxx11::_2,
                           std_cxx11::_3),
@@ -241,6 +249,7 @@ namespace aspect
 
   template <int dim>
   void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir,
+                                                  bool update_from_old,
                                                   const typename DoFHandler<dim>::active_cell_iterator &cell,
                                                   internal::Assembly::Scratch::VoFSystem<dim> &scratch,
                                                   internal::Assembly::CopyData::VoFSystem<dim> &data)
@@ -280,10 +289,24 @@ namespace aspect
     data.local_matrix = 0;
     data.local_rhs = 0;
 
-    scratch.finite_element_values[vofLS].get_function_values (solution,
-                                                              scratch.cell_l_ls_values);
-    scratch.finite_element_values[vofLS].get_function_gradients (solution,
-                                                                 scratch.cell_l_ls_gradients);
+    if (update_from_old)
+      {
+        scratch.finite_element_values[solution_field].get_function_values (old_solution,
+                                                                           scratch.old_field_values);
+        scratch.finite_element_values[vofLS].get_function_values (old_solution,
+                                                                  scratch.cell_l_ls_values);
+        scratch.finite_element_values[vofLS].get_function_gradients (old_solution,
+                                                                     scratch.cell_l_ls_gradients);
+      }
+    else
+      {
+        scratch.finite_element_values[solution_field].get_function_values (solution,
+                                                                           scratch.old_field_values);
+        scratch.finite_element_values[vofLS].get_function_values (solution,
+                                                                  scratch.cell_l_ls_values);
+        scratch.finite_element_values[vofLS].get_function_gradients (solution,
+                                                                     scratch.cell_l_ls_gradients);
+      }
 
     const double cell_vol = cell->measure();
     Tensor<1, dim, double> cell_i_normal;
@@ -300,8 +323,7 @@ namespace aspect
 
         for (unsigned int i = 0; i<vof_dofs_per_cell; ++i)
           {
-            data.local_rhs[i] = solution(data.local_dof_indices[i]) *
-                                scratch.phi_field[i] *
+            data.local_rhs[i] = scratch.old_field_values[q] *
                                 scratch.finite_element_values.JxW(q);
             for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
               data.local_matrix (i, j) += scratch.phi_field[i] *
@@ -337,61 +359,54 @@ namespace aspect
           .get_function_values (free_surface->mesh_velocity,
                                 scratch.face_mesh_velocity_values);
 
+        face_flux = 0;
+
+        // Using VoF so need to accumulate flux through face
+        for (unsigned int q=0; q<n_q_points; ++q)
+          {
+
+            Tensor<1,dim> current_u = scratch.face_current_velocity_values[q];
+
+            //If old velocity available average to half timestep
+            if (old_velocity_avail)
+              current_u += 0.5*(scratch.face_old_velocity_values[q] -
+                                scratch.face_current_velocity_values[q]);
+
+            //Subtract off the mesh velocity for ALE corrections if necessary
+            if (parameters.free_surface_enabled)
+              current_u -= scratch.face_mesh_velocity_values[q];
+
+            face_flux += time_step *
+                         current_u *
+                         scratch.face_finite_element_values.normal_vector(q);
+          }
+
+        // Calculate outward flux
+        double flux_vof;
+        {
+          double adj = face_flux/cell_vol;
+          Tensor<1, dim> dir_t;
+          Tensor<1, dim> vflux;
+          dir_t[calc_dir] = (f_dir_pos ? 1.0 : -1.0);
+          vflux[calc_dir] = adj*dir_t[calc_dir];
+          flux_vof = InterfaceTracker::calc_vof_flux_edge<dim> (dir_t, vflux, cell_i_normal, cell_i_d);
+        }
+
+        // Add fluxes to RHS
+        for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+          {
+            data.local_rhs[i] -= flux_vof *
+                                 face_flux;
+
+            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
+              {
+                data.local_matrix(i,j) -= face_flux;
+              }
+          }
+
         if (face->at_boundary())
           {
             //TODO: Handle non-zero inflow VoF boundary conditions
-
-            face_flux = 0;
-
-            // Using VoF so need to process using flux through face
-            for (unsigned int q=0; q<n_q_points; ++q)
-              {
-
-                Tensor<1,dim> current_u = scratch.face_current_velocity_values[q];
-
-                //If old velocity available average to half timestep
-                if (old_velocity_avail)
-                  current_u += 0.5*(scratch.face_old_velocity_values[q] -
-                                    scratch.face_current_velocity_values[q]);
-
-                //Subtract off the mesh velocity for ALE corrections if necessary
-                if (parameters.free_surface_enabled)
-                  current_u -= scratch.face_mesh_velocity_values[q];
-
-                /**
-                 * The discontinuous Galerkin method uses 2 types of jumps over edges:
-                 * undirected and directed jumps. Undirected jumps are dependent only
-                 * on the order of the numbering of cells. Directed jumps are dependent
-                 * on the direction of the flow. Thus the flow-dependent terms below are
-                 * only calculated if the edge is an inflow edge.
-                 */
-
-                face_flux += time_step *
-                             current_u *
-                             scratch.face_finite_element_values.normal_vector(q);
-              }
-
-            // calculate
-            double flux_vof;
-            {
-              double adj = face_flux/cell_vol;
-              Tensor<1, dim> dir_t;
-              Tensor<1, dim> vflux;
-              dir_t[calc_dir] = (f_dir_pos ? 1.0 : -1.0);
-              vflux[calc_dir] = adj*dir_t[calc_dir];
-              flux_vof = InterfaceTracker::calc_vof_flux_edge<dim> (dir_t, vflux, cell_i_normal, cell_i_d);
-            }
-
-            for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-              {
-                data.local_rhs[i] -= flux_vof *
-                                     face_flux;
-
-                for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-                  {
-                    data.local_matrix(i,j) -= face_flux;
-                  }
-              }
           }
         else
           {
@@ -420,53 +435,11 @@ namespace aspect
 
                 data.assembled_rhs[f * GeometryInfo<dim>::max_children_per_face] = true;
 
-                face_flux = 0;
-
-                // Using VoF so need to process using flux through face
-                for (unsigned int q=0; q<n_q_points; ++q)
-                  {
-
-                    Tensor<1,dim> current_u = scratch.face_current_velocity_values[q];
-
-                    //If old velocity available average to half timestep
-                    if (old_velocity_avail)
-                      current_u += 0.5*(scratch.face_old_velocity_values[q] -
-                                        scratch.face_current_velocity_values[q]);
-
-                    //Subtract off the mesh velocity for ALE corrections if necessary
-                    if (parameters.free_surface_enabled)
-                      current_u -= scratch.face_mesh_velocity_values[q];
-
-                    face_flux += time_step *
-                                 current_u *
-                                 scratch.face_finite_element_values.normal_vector(q);
-                  }
-
-                double flux_vof;
-                {
-                  double adj = face_flux/cell_vol;
-                  Tensor<1, dim> dir_t;
-                  Tensor<1, dim> vflux;
-                  dir_t[calc_dir] = (f_dir_pos ? 1.0 : -1.0);
-                  vflux[calc_dir] = adj*dir_t[calc_dir];
-                  flux_vof = InterfaceTracker::calc_vof_flux_edge<dim> (dir_t, vflux, cell_i_normal, cell_i_d);
-                }
-
+                // Add outward flux to neighbor
                 for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
                   {
-                    data.local_rhs[i] -= flux_vof *
-                                         face_flux;
                     data.local_f_rhs[f][i] += flux_vof *
                                               face_flux;
-
-                    for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-                      {
-                        data.local_matrix(i,j) -= (face_flux >0
-                                                   ?
-                                                   0.
-                                                   :
-                                                   face_flux);
-                      }
                   }
               }
             else //face->has_children(), so always assemble from here.
@@ -584,8 +557,10 @@ namespace aspect
 {
 #define INSTANTIATE(dim) \
   template void Simulator<dim>::do_vof_update (); \
-  template void Simulator<dim>::assemble_vof_system (unsigned int dir); \
+  template void Simulator<dim>::assemble_vof_system (unsigned int dir, \
+                                                     bool update_from_old); \
   template void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir, \
+                                                           bool update_from_old, \
                                                            const typename DoFHandler<dim>::active_cell_iterator &cell, \
                                                            internal::Assembly::Scratch::VoFSystem<dim> &scratch, \
                                                            internal::Assembly::CopyData::VoFSystem<dim> &data); \

@@ -520,7 +520,8 @@ namespace aspect
        * This function is implemented in
        * <code>source/vofinterface/vof_system.cc</code>.
        */
-      void assemble_vof_system (unsigned int dir);
+      void assemble_vof_system (unsigned int dir,
+                                bool update_from_old);
 
       /**
        * Compute the integrals for the VoF matrix and right hand side on a
@@ -531,6 +532,7 @@ namespace aspect
        * <code>source/vofinterface/vof_system.cc</code>.
        */
       void local_assemble_vof_system (const unsigned int dir,
+                                      bool update_from_old,
                                       const typename DoFHandler<dim>::active_cell_iterator &cell,
                                       internal::Assembly::Scratch::VoFSystem<dim> &scratch,
                                       internal::Assembly::CopyData::VoFSystem<dim> &data);
