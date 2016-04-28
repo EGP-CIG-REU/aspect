@@ -350,7 +350,7 @@ namespace aspect
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
         unsigned int f_dim = f/2; // Obtain dimension
-        bool f_dir_pos = (f%2==0);
+        bool f_dir_pos = (f%2==1);
 
         if (f_dim != calc_dir)
           continue;
@@ -369,14 +369,14 @@ namespace aspect
 
         //scratch.face_finite_element_values[introspection.extractors.velocities]
         //.get_function_values (old_old_solution,
-        //                                                               scratch.face_old_old_velocity_values);
+        //scratch.face_old_old_velocity_values);
 
         if (parameters.free_surface_enabled)
           scratch.face_finite_element_values[introspection.extractors.velocities]
           .get_function_values (free_surface->mesh_velocity,
                                 scratch.face_mesh_velocity_values);
 
-        face_flux = 0;
+        double face_flux = 0;
 
         double face_ls_d = 0;
         double face_ls_time_grad = 0;
@@ -576,9 +576,6 @@ namespace aspect
           else
             throw QuietException();
       }
-
-    system_rhs.block(block_idx).print(std::cout);
-    distributed_solution.block(block_idx).print(std::cout);
 
     current_constraints.distribute (distributed_solution);
     solution.block(block_idx) = distributed_solution.block(block_idx);

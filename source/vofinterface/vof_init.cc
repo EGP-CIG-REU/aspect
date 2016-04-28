@@ -52,10 +52,13 @@ namespace aspect
           Assert(false, ExcNotImplemented ());
       }
 
-    const unsigned int blockidx = introspection.variable("vofsLS").block_index;
+    const unsigned int vofN_blockidx = introspection.variable("vofsN").block_index;
+    const unsigned int vofLS_blockidx = introspection.variable("vofsLS").block_index;
     update_vof_normals (solution);
-    old_solution.block(blockidx) = solution.block(blockidx);
-    old_old_solution.block(blockidx) = solution.block(blockidx);
+    old_solution.block(vofN_blockidx) = solution.block(vofN_blockidx);
+    old_old_solution.block(vofN_blockidx) = solution.block(vofN_blockidx);
+    old_solution.block(vofLS_blockidx) = solution.block(vofLS_blockidx);
+    old_old_solution.block(vofLS_blockidx) = solution.block(vofLS_blockidx);
   }
 
   template <int dim>

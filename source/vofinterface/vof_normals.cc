@@ -70,12 +70,13 @@ namespace aspect
       = finite_element.component_to_system_index(vof_c_index, 0);
 
     const FEVariable<dim> &vofN_var = introspection.variable("vofsN");
-    const unsigned int vofN_c_index = vof_var.first_component_index;
+    const unsigned int vofN_c_index = vofN_var.first_component_index;
+    const unsigned int vofN_blockidx = vofN_var.block_index;
 
     const FEVariable<dim> &vofLS_var = introspection.variable("vofsLS");
     const unsigned int vofLS_c_index = vofLS_var.first_component_index;
     const unsigned int n_vofLS_dofs = vofLS_var.fe->dofs_per_cell;
-    const unsigned int blockidx = vofLS_var.block_index;
+    const unsigned int vofLS_blockidx = vofLS_var.block_index;
 
 
     //Iterate over cells
@@ -251,7 +252,8 @@ namespace aspect
     compute_current_constraints();
     current_constraints.distribute(initial_solution);
 
-    solution.block(blockidx) = initial_solution.block(blockidx);
+    solution.block(vofN_blockidx) = initial_solution.block(vofN_blockidx);
+    solution.block(vofLS_blockidx) = initial_solution.block(vofLS_blockidx);
   }
 
 
