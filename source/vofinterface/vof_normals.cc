@@ -69,6 +69,9 @@ namespace aspect
     const unsigned int vof_ind
       = finite_element.component_to_system_index(vof_c_index, 0);
 
+    const FEVariable<dim> &vofN_var = introspection.variable("vofsN");
+    const unsigned int vofN_c_index = vof_var.first_component_index;
+
     const FEVariable<dim> &vofLS_var = introspection.variable("vofsLS");
     const unsigned int vofLS_c_index = vofLS_var.first_component_index;
     const unsigned int n_vofLS_dofs = vofLS_var.fe->dofs_per_cell;
@@ -214,7 +217,7 @@ namespace aspect
             d = InterfaceTracker::d_from_vof<dim> (normal, cell_vof);
           }
 
-        double n2 = normal.norm();
+        double n2 = (normal*normal);
         if (n2 > parameters.voleps)
           {
             normal = (normal / n2);
@@ -225,6 +228,13 @@ namespace aspect
             normal[0] = 0.0;
             normal[1] = 0.0;
           }
+
+        for (unsigned int i=0; i<dim; ++i)
+          initial_solution (local_dof_indicies[finite_element
+                                               .component_to_system_index(vofN_c_index+i, 0)]) = normal[i];
+
+        initial_solution (local_dof_indicies[finite_element
+                                             .component_to_system_index(vofN_c_index+dim, 0)]) = d;
 
         for (unsigned int i=0; i<n_vofLS_dofs; ++i)
           {

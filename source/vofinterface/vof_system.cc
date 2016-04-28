@@ -74,9 +74,8 @@ namespace aspect
           local_dof_indices(finite_element.dofs_per_cell),
           phi_field (vof_element.dofs_per_cell, Utilities::signaling_nan<double>()),
           old_field_values (quadrature.size(), Utilities::signaling_nan<double>()),
-          cell_l_ls_values (quadrature.size(), Utilities::signaling_nan<double> ()),
-          face_cell_l_ls_values (face_quadrature.size(), Utilities::signaling_nan<double> ()),
-          face_cell_l_ls_gradients (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> > ()),
+          cell_i_n_values (quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> > ()),
+          cell_i_d_values (quadrature.size(), Utilities::signaling_nan<double> ()),
           face_current_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
           face_old_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
           face_old_old_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
@@ -105,9 +104,8 @@ namespace aspect
           local_dof_indices (scratch.finite_element_values.get_fe().dofs_per_cell),
           phi_field (scratch.phi_field),
           old_field_values (scratch.old_field_values),
-          cell_l_ls_values (scratch.cell_l_ls_values),
-          face_cell_l_ls_values (scratch.face_cell_l_ls_values),
-          face_cell_l_ls_gradients (scratch.face_cell_l_ls_gradients),
+          cell_i_n_values (scratch.cell_i_n_values),
+          cell_i_d_values (scratch.cell_i_d_values),
           face_current_velocity_values (scratch.face_current_velocity_values),
           face_old_velocity_values (scratch.face_old_velocity_values),
           face_old_old_velocity_values (scratch.face_old_old_velocity_values),
@@ -259,7 +257,8 @@ namespace aspect
     const bool old_velocity_avail = (timestep_number > 0);
     const bool old_old_velocity_avail = (timestep_number > 1);
 
-    const unsigned int n_q_points    = scratch.face_finite_element_values.n_quadrature_points;
+    const unsigned int n_q_points    = scratch.finite_element_values.n_quadrature_points;
+    const unsigned int n_f_q_points    = scratch.face_finite_element_values.n_quadrature_points;
 
     // also have the number of dofs that correspond just to the element for
     // the system we are currently trying to assemble
@@ -269,7 +268,11 @@ namespace aspect
     Assert (vof_dofs_per_cell < scratch.face_finite_element_values.get_fe().dofs_per_cell, ExcInternalError());
     Assert (scratch.phi_field.size() == vof_dofs_per_cell, ExcInternalError());
 
-    FEValuesExtractors::Scalar vofLS = introspection.variable("vofsLS").extractor_scalar();
+    const FiniteElement<dim> &main_fe = scratch.finite_element_values.get_fe();
+
+    const unsigned int vofN_component = introspection.variable("vofsN").first_component_index;
+    const FEValuesExtractors::Vector vofN_n = FEValuesExtractors::Vector(vofN_component);
+    const FEValuesExtractors::Scalar vofN_d = FEValuesExtractors::Scalar(vofN_component+dim);
 
     const unsigned int solution_component = introspection.variable("vofs").first_component_index;
     const FEValuesExtractors::Scalar solution_field = introspection.variable("vofs").extractor_scalar();
@@ -286,33 +289,41 @@ namespace aspect
 
     cell->get_dof_indices (scratch.local_dof_indices);
     for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-      data.local_dof_indices[i] = scratch.local_dof_indices[scratch.finite_element_values.get_fe().component_to_system_index(solution_component, i)];
+      data.local_dof_indices[i] = scratch.local_dof_indices[main_fe.component_to_system_index(solution_component, i)];
 
     data.local_matrix = 0;
     data.local_rhs = 0;
+
+    // Interface reconstruction data
+    Tensor<1, dim, double> cell_i_normal;
+    double cell_i_d = 0;
 
     if (update_from_old)
       {
         scratch.finite_element_values[solution_field].get_function_values (old_solution,
                                                                            scratch.old_field_values);
-        scratch.finite_element_values[vofLS].get_function_values (old_solution,
-                                                                  scratch.cell_l_ls_values);
+
+        scratch.finite_element_values[vofN_n].get_function_values (old_solution,
+                                                                   scratch.cell_i_n_values);
+
+        scratch.finite_element_values[vofN_d].get_function_values (old_solution,
+                                                                   scratch.cell_i_d_values);
       }
     else
       {
         scratch.finite_element_values[solution_field].get_function_values (solution,
                                                                            scratch.old_field_values);
-        scratch.finite_element_values[vofLS].get_function_values (solution,
-                                                                  scratch.cell_l_ls_values);
+
+        scratch.finite_element_values[vofN_n].get_function_values (solution,
+                                                                   scratch.cell_i_n_values);
+
+        scratch.finite_element_values[vofN_d].get_function_values (solution,
+                                                                   scratch.cell_i_d_values);
       }
 
-    Point<dim> uReCen;
-
-    for (unsigned int i=0; i<dim; ++i)
-      uReCen[i] = 0.5;
-
-    Tensor<1, dim, double> cell_i_normal;
-    double cell_i_d = 0;
+    // interface values are constants, so can set from first value
+    cell_i_normal = scratch.cell_i_n_values[0];
+    cell_i_d = scratch.cell_i_d_values[0];
 
     const double cell_vol = cell->measure();
     // Obtain approximation to local interface
@@ -320,14 +331,7 @@ namespace aspect
       {
         // Init FE field vals
         for (unsigned int k=0; k<vof_dofs_per_cell; ++k)
-          scratch.phi_field[k] = scratch.finite_element_values[solution_field].value(scratch.finite_element_values.get_fe().component_to_system_index(solution_component, k), q);
-
-        cell_i_normal += scratch.cell_l_ls_values[q] *
-                         (quadrature.point(q)-uReCen) *
-                         quadrature.weight(q);
-
-        cell_i_d += scratch.cell_l_ls_values[q] *
-                    quadrature.weight(q);
+          scratch.phi_field[k] = scratch.finite_element_values[solution_field].value(main_fe.component_to_system_index(solution_component, k), q);
 
         // Init required local time
         for (unsigned int i = 0; i<vof_dofs_per_cell; ++i)
@@ -355,25 +359,6 @@ namespace aspect
 
         scratch.face_finite_element_values.reinit (cell, f);
 
-        if (update_from_old)
-          {
-            scratch.face_finite_element_values[vofLS]
-            .get_function_values (old_solution,
-                                  scratch.face_cell_l_ls_values);
-            scratch.face_finite_element_values[vofLS]
-            .get_function_gradients (old_solution,
-                                     scratch.face_cell_l_ls_gradients);
-          }
-        else
-          {
-            scratch.face_finite_element_values[vofLS]
-            .get_function_values (solution,
-                                  scratch.face_cell_l_ls_values);
-            scratch.face_finite_element_values[vofLS]
-            .get_function_gradients (solution,
-                                     scratch.face_cell_l_ls_gradients);
-          }
-
         scratch.face_finite_element_values[introspection.extractors.velocities]
         .get_function_values (solution,
                               scratch.face_current_velocity_values);
@@ -397,7 +382,7 @@ namespace aspect
         double face_ls_time_grad = 0;
 
         // Using VoF so need to accumulate flux through face
-        for (unsigned int q=0; q<n_q_points; ++q)
+        for (unsigned int q=0; q<n_f_q_points; ++q)
           {
 
             Tensor<1,dim> current_u = scratch.face_current_velocity_values[q];
@@ -416,15 +401,19 @@ namespace aspect
                          scratch.face_finite_element_values.normal_vector(q) *
                          scratch.face_finite_element_values.JxW(q);
 
-            face_ls_d += scratch.face_cell_l_ls_values[1] *
-                         scratch.face_finite_element_values.JxW(q);
+          }
 
-            face_ls_time_grad += time_step *
-                                 (current_u *
-                                  scratch.face_finite_element_values.normal_vector(q) )*
-                                 (scratch.face_cell_l_ls_gradients[q] *
-                                  scratch.face_finite_element_values.normal_vector(q) )*
-                                 scratch.face_finite_element_values.JxW(q);
+        // Due to inability to reference this cell's values at the interface,
+        // need to do explicit calculation
+        if (f_dir_pos)
+          {
+            face_ls_d = cell_i_d - 0.5*cell_i_normal[f_dim];
+            face_ls_time_grad = (face_flux/cell_vol)*cell_i_normal[f_dim];
+          }
+        else
+          {
+            face_ls_d = cell_i_d + 0.5*cell_i_normal[f_dim];
+            face_ls_time_grad = -(face_flux/cell_vol)*cell_i_normal[f_dim];
           }
 
         // Calculate outward flux
@@ -473,7 +462,7 @@ namespace aspect
                 //set up neighbor values
                 scratch.neighbor_face_finite_element_values.reinit (neighbor, neighbor2);
 
-                std::vector<types::global_dof_index> neighbor_dof_indices (scratch.face_finite_element_values.get_fe().dofs_per_cell);
+                std::vector<types::global_dof_index> neighbor_dof_indices (main_fe.dofs_per_cell);
                 // get all dof indices on the neighbor, then extract those
                 // that correspond to the solution_field we are interested in
                 neighbor->get_dof_indices (neighbor_dof_indices);
@@ -482,7 +471,7 @@ namespace aspect
 
                 for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
                   data.neighbor_dof_indices[f_rhs_ind][i]
-                    = neighbor_dof_indices[scratch.face_finite_element_values.get_fe().component_to_system_index(solution_component, i)];
+                    = neighbor_dof_indices[main_fe.component_to_system_index(solution_component, i)];
 
                 data.assembled_rhs[f_rhs_ind] = true;
 
@@ -587,6 +576,9 @@ namespace aspect
           else
             throw QuietException();
       }
+
+    system_rhs.block(block_idx).print(std::cout);
+    distributed_solution.block(block_idx).print(std::cout);
 
     current_constraints.distribute (distributed_solution);
     solution.block(block_idx) = distributed_solution.block(block_idx);

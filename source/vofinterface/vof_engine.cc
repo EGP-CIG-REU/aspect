@@ -43,6 +43,12 @@ namespace aspect
                                               1,
                                               1));
 
+      vars.push_back(VariableDeclaration<dim>("vofsN",
+                                              std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                                new FE_DGQ<dim>(0)),
+                                              dim+1,
+                                              1));
+
       vars.push_back(VariableDeclaration<dim>("vofsLS",
                                               std_cxx11::shared_ptr<FiniteElement<dim>>(
                                                 new FE_DGQ<dim>(1)),
