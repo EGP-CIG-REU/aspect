@@ -477,7 +477,8 @@ namespace aspect
       void postprocess ();
 
       // TODO: Identify whether and how the following functions can be moved
-      // out of the Simulator class
+      // out of the Simulator class, or which should be integrated as core
+      // functionality
 
       /**
        * Helper function to do actual initialization for when VoF init is
@@ -554,6 +555,8 @@ namespace aspect
       // End VoF functions
 
       bool vof_dir_order_dsc;
+      // Currently matrix is included in main matrix, if VoF removed from
+      // Simulator will need to allocate its own.
 
       // End VoF variables
 

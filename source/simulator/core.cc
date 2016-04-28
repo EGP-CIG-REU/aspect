@@ -990,6 +990,13 @@ namespace aspect
       for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
         coupling[x.compositional_fields[c]][x.compositional_fields[c]]
           = DoFTools::always;
+
+      // TODO: Handle VoF matrix better (move out of Simulator)
+      if (parameters.vof_tracking_enabled)
+        {
+          const unsigned int vof_c_index = introspection.variable("vofs").first_component_index;
+          coupling[vof_c_index][vof_c_index] = DoFTools::always;
+        }
     }
 
     LinearAlgebra::BlockCompressedSparsityPattern sp;

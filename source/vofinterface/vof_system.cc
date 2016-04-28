@@ -151,11 +151,9 @@ namespace aspect
   void Simulator<dim>::do_vof_update ()
   {
     const unsigned int vof_block_idx = introspection.variable("vofs").block_index;
-    const unsigned int vofN_block_idx = introspection.variable("vofs").block_index;
+    const unsigned int vofN_block_idx = introspection.variable("vofsLS").block_index;
 
     // Reset current base to values at beginning of timestep
-    solution.block(vof_block_idx) = old_solution(vof_block_idx);
-    solution.block(vofN_block_idx) = old_solution(vofN_block_idx);
 
     // Due to dimensionally split formulation, use strang splitting
     // TODO: Reformulate for unsplit (may require flux limiter)
@@ -282,9 +280,9 @@ namespace aspect
     data.local_matrix = 0;
     data.local_rhs = 0;
 
-    scratch.finite_element_values[vofLS].get_function_values(current_linearization_point,
-                                                             scratch.cell_l_ls_values);
-    scratch.finite_element_values[vofLS].get_function_gradients (current_linearization_point,
+    scratch.finite_element_values[vofLS].get_function_values (solution,
+                                                              scratch.cell_l_ls_values);
+    scratch.finite_element_values[vofLS].get_function_gradients (solution,
                                                                  scratch.cell_l_ls_gradients);
 
     const double cell_vol = cell->measure();
@@ -302,6 +300,9 @@ namespace aspect
 
         for (unsigned int i = 0; i<vof_dofs_per_cell; ++i)
           {
+            data.local_rhs[i] = solution(data.local_dof_indices[i]) *
+                                scratch.phi_field[i] *
+                                scratch.finite_element_values.JxW(q);
             for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
               data.local_matrix (i, j) += scratch.phi_field[i] *
                                           scratch.phi_field[j] *
@@ -323,7 +324,7 @@ namespace aspect
 
         scratch.face_finite_element_values.reinit (cell, f);
         scratch.face_finite_element_values[introspection.extractors.velocities]
-        .get_function_values (current_linearization_point,
+        .get_function_values (solution,
                               scratch.face_current_velocity_values);
         scratch.face_finite_element_values[introspection.extractors.velocities]
         .get_function_values (old_solution,
@@ -333,7 +334,7 @@ namespace aspect
         //                                                               scratch.face_old_old_velocity_values);
         if (parameters.free_surface_enabled)
           scratch.face_finite_element_values[introspection.extractors.velocities]
-          .get_function_values (current_linearization_point,
+          .get_function_values (free_surface->mesh_velocity,
                                 scratch.face_mesh_velocity_values);
 
         if (face->at_boundary())
@@ -383,16 +384,12 @@ namespace aspect
 
             for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
               {
-                data.local_rhs[i]-= flux_vof *
-                                    face_flux;
+                data.local_rhs[i] -= flux_vof *
+                                     face_flux;
 
                 for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
                   {
-                    data.local_matrix(i,j) -= (face_flux >0
-                                               ?
-                                               0.
-                                               :
-                                               face_flux);
+                    data.local_matrix(i,j) -= face_flux;
                   }
               }
           }
