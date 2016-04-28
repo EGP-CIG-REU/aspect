@@ -1986,6 +1986,8 @@ namespace aspect
         default:
           Assert (false, ExcNotImplemented());
       }
+
+    do_vof_update ();
   }
 
 

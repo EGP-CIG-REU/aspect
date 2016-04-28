@@ -79,9 +79,9 @@ namespace aspect
 
         const FiniteElement<dim> &finite_element = this->get_fe();
 
-        FEVariable<dim> vof_var = this->introspection().variable("vofs");
+        const FEVariable<dim> &vof_var = this->introspection().variable("vofs");
         const unsigned int vof_ind = vof_var.first_component_index;
-        FEVariable<dim> vofLS_var = this->introspection().variable("vofsLS");
+        const FEVariable<dim> &vofLS_var = this->introspection().variable("vofsLS");
         const unsigned int vofLS_ind = vofLS_var.first_component_index;
 
         for (unsigned int q=0; q<n_quadrature_points; ++q)
@@ -156,7 +156,7 @@ namespace aspect
               include_vofLS = prm.get_bool("Include internal reconstruction LS");
               if (include_vofLS)
                 {
-                  vof_names.push_back("vofLS");
+                  vof_names.push_back("vofsLS");
                   interp.push_back(DataComponentInterpretation::component_is_scalar);
                 }
 

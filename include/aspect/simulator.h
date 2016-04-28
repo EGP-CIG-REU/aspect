@@ -60,6 +60,8 @@
 #include <aspect/postprocess/interface.h>
 #include <aspect/adiabatic_conditions/interface.h>
 
+#include <aspect/vofinterface/vof_system.h>
+
 #include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
@@ -497,10 +499,63 @@ namespace aspect
 
       /**
        * Helper function to calculate local interface normals.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_normals.cc</code>.
        */
       void update_vof_normals (LinearAlgebra::BlockVector &solution);
 
-      // End VOF functions
+      /**
+       * Helper function to do vof update
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_system.cc</code>.
+       */
+      void do_vof_update ();
+
+      /**
+       * Initiate the assembly of the VoF matrix and right hand side.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_system.cc</code>.
+       */
+      void assemble_vof_system (unsigned int dir);
+
+      /**
+       * Compute the integrals for the VoF matrix and right hand side on a
+       * single cell.
+       *
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_system.cc</code>.
+       */
+      void local_assemble_vof_system (const unsigned int dir,
+                                      const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                      internal::Assembly::Scratch::VoFSystem<dim> &scratch,
+                                      internal::Assembly::CopyData::VoFSystem<dim> &data);
+
+      /**
+       * Copy the contribution to the VoF system from a single cell into the
+       * global matrix that stores these elements.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_system.cc</code>.
+       */
+      void copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
+
+      /**
+       * Solve the VoF linear system.
+       *
+       * This function is implemented in
+       * <code>source/vofinterface/vof_system.cc</code>.
+       */
+      void solve_vof_system ();
+
+      // End VoF functions
+
+      bool vof_dir_order_dsc;
+
+      // End VoF variables
 
       /**
        * Refine the mesh according to error indicators calculated by

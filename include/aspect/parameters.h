@@ -301,11 +301,12 @@ namespace aspect
      */
 
     /**
-     * @name Parameters that have to do with free surface
+     * @name Parameters that have to do with VoF calculations
      * @{
      */
     bool                           vof_tracking_enabled;
     double                         voleps;
+    double                         vof_solver_tolerance;
     /**
      * @}
      */
