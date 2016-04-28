@@ -32,18 +32,18 @@ namespace aspect
     // Utils
 
     template<int dim>
-    double vof_from_d (Tensor<1, dim, double> normal,
-                       double d);
+    double vof_from_d (const Tensor<1, dim, double> normal,
+                       const double d);
 
     template<int dim>
-    double d_from_vof (Tensor<1, dim, double> normal,
-                       double vol);
+    double d_from_vof (const Tensor<1, dim, double> normal,
+                       const double vol);
 
     template<int dim>
-    double calc_vof_flux_edge (Tensor<1, dim, double> dir,
-                               Tensor<1, dim, double> vflux,
-                               Tensor<1, dim, double> normal,
-                               double d);
+    double calc_vof_flux_edge (const unsigned int dir,
+                               const double timeGrad,
+                               const Tensor<1, dim, double> cell_normal,
+                               const double d_face);
   }
 }
 

@@ -69,10 +69,11 @@ namespace aspect
           std::vector<double>         phi_field;
           std::vector<double>         face_phi_field;
 
-          std::vector<double>                 cell_l_ls_values;
-          std::vector<Tensor<1,dim> >         cell_l_ls_gradients;
-
           std::vector<double>         old_field_values;
+          std::vector<double>         cell_l_ls_values;
+
+          std::vector<double>         face_cell_l_ls_values;
+          std::vector<Tensor<1,dim> > face_cell_l_ls_gradients;
           std::vector<Tensor<1,dim> > face_current_velocity_values;
           std::vector<Tensor<1,dim> > face_old_velocity_values;
           std::vector<Tensor<1,dim> > face_old_old_velocity_values;

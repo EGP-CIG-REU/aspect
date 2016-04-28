@@ -114,8 +114,8 @@ namespace aspect
     }
 
     template<>
-    double vof_from_d<3> (Tensor<1, 3, double> normal,
-                          double d)
+    double vof_from_d<3> (const Tensor<1, 3, double> normal,
+                          const double d)
     {
       // 3D vol calculation not yet implemented
       // Likely to require additional calculations
@@ -123,8 +123,8 @@ namespace aspect
     }
 
     template<>
-    double d_from_vof<3> (Tensor<1, 3, double> normal,
-                          double vol)
+    double d_from_vof<3> (const Tensor<1, 3, double> normal,
+                          const double vol)
     {
       // 3D interface location calculation not yet implemented
       // Almost certain to require iterative method
@@ -132,31 +132,18 @@ namespace aspect
     }
 
     template<int dim>
-    double calc_vof_flux_edge (Tensor<1, dim, double> dir,
-                               Tensor<1, dim, double> vflux,
-                               Tensor<1, dim, double> normal,
-                               double d)
+    double calc_vof_flux_edge (const unsigned int dir,
+                               const double timeGrad,
+                               const Tensor<1, dim, double> normal,
+                               const double d_face)
     {
-      // If flux outward, return 0
-      if (dir*vflux<=0.0)
-        {
-          return 0.0;
-        }
       Tensor<1, dim, double> i_normal;
       double i_d;
 
-      i_d = d+0.5*(normal*vflux-dir*normal);
-      for (unsigned int i = 0; i<dim; ++i)
-        {
-          if (dir[i] == 0.0)
-            {
-              i_normal[i] = normal[i];
-            }
-          else
-            {
-              i_normal[i] = normal*vflux;
-            }
-        }
+      i_d = d_face+0.5*timeGrad;
+      i_normal = normal;
+      i_normal[dir] = timeGrad;
+
       return vof_from_d (i_normal, i_d);
     }
   }
@@ -167,8 +154,8 @@ namespace aspect
   namespace InterfaceTracker
   {
 #define INSTANTIATE(dim) \
-  template double calc_vof_flux_edge<dim>(Tensor<1, dim, double> dir, \
-                                          Tensor<1, dim, double> vflux, \
+  template double calc_vof_flux_edge<dim>(unsigned int dir, \
+                                          double timeGrad, \
                                           Tensor<1, dim, double> normal, \
                                           double d);
 
