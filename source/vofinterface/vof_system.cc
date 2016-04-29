@@ -585,8 +585,10 @@ namespace aspect
     pcout << solver_control.last_step()
           << " iterations." << std::endl;
 
-    statistics.add_value("Iterations for VoF solver",
-                         solver_control.last_step());
+    // Do not add VoF solver iterations to statistics, duplicaiton due to
+    // splitting messes with file format
+    // statistics.add_value("Iterations for VoF solver",
+    //                      solver_control.last_step());
 
     computing_timer.exit_section();
   }
