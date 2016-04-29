@@ -82,12 +82,6 @@ namespace aspect
     void
     Function<dim>::parse_parameters (ParameterHandler &prm)
     {
-      // we need to get at the number of compositional fields here to
-      // initialize the function parser. unfortunately, we can't get it
-      // via SimulatorAccess from the simulator itself because at the
-      // current point the SimulatorAccess hasn't been initialized
-      // yet. so get it from the parameter file directly.
-
       prm.enter_subsection("VoF initial conditions");
       {
         prm.enter_subsection("Function");

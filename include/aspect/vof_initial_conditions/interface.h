@@ -34,7 +34,7 @@ namespace aspect
    * A namespace in which we define everything that has to do with defining
    * the initial conditions.
    *
-   * @ingroup InitialConditionsModels
+   * @ingroup VoFInitialConditionsModels
    */
   namespace VoFInitialConditions
   {
@@ -42,21 +42,31 @@ namespace aspect
 
     /**
      * A structure that contains enum values that identify type of
-     * initialization.
+     * initialization. Interpolation approach has less resolution than desired,
+     * and the nature of the data allows a more accurate approximation.
      */
     struct VoFInitType
     {
       enum Kind
       {
+        /**
+         * Initialization data is a composition value between 0 and 1 at all
+         * points and should be accumulated by integration.
+         */
         Compos,
+        /**
+         * Initialization data is an interface defined by a signed distance
+         * level set with positive value indicating fluid presence.
+         */
         SDist_LS
       };
     };
 
     /**
-     * A base class for parameterizations of initial conditions.
+     * A base class for parameterizations of volume-of-fluid initial
+     * conditions.
      *
-     * @ingroup InitialConditionsModels
+     * @ingroup VoFInitialConditionsModels
      */
     template <int dim>
     class Interface
@@ -79,12 +89,16 @@ namespace aspect
 
         /**
          * Return number of sample points to use for initialization.
+         * Initialization is done by iterated midpoint quadrature integration
+         * with a geometrically justified smoothing chosen to handle linear
+         * interfaces well for the signed distance function initialization
+         * data.
          */
         virtual
         unsigned int n_samp () const = 0;
 
         /**
-         * Return whether type of initialization.
+         * Return which type of initialization data is being used.
          */
         virtual
         typename VoFInitType::Kind init_type() const = 0;
@@ -122,10 +136,11 @@ namespace aspect
 
 
     /**
-     * Register an initial conditions model so that it can be selected from
-     * the parameter file.
+     * Register a volume-of-fluid initial conditions model so that it can be
+     * selected from the parameter file.
      *
-     * @param name A string that identifies the initial conditions model
+     * @param name A string that identifies the volume-of-fluid initial
+     * conditions model
      * @param description A text description of what this model does and that
      * will be listed in the documentation of the parameter file.
      * @param declare_parameters_function A pointer to a function that can be
@@ -134,7 +149,7 @@ namespace aspect
      * @param factory_function A pointer to a function that can create an
      * object of this initial conditions model.
      *
-     * @ingroup InitialConditionsModels
+     * @ingroup VoFInitialConditionsModels
      */
     template <int dim>
     void
@@ -151,7 +166,7 @@ namespace aspect
      * The model object returned is not yet initialized and has not read its
      * runtime parameters yet.
      *
-     * @ingroup InitialConditionsModels
+     * @ingroup VoFInitialConditionsModels
      */
     template <int dim>
     Interface<dim> *
@@ -159,10 +174,10 @@ namespace aspect
 
 
     /**
-     * Declare the runtime parameters of the registered initial conditions
-     * models.
+     * Declare the runtime parameters of the registered volume-of-fluid initial
+     * conditions models.
      *
-     * @ingroup InitialConditionsModels
+     * @ingroup VoFInitialConditionsModels
      */
     template <int dim>
     void
@@ -171,11 +186,11 @@ namespace aspect
 
 
     /**
-     * Given a class name, a name, and a description for the parameter file
-     * for a initial conditions model, register it with the functions that can
-     * declare their parameters and create these objects.
+     * Given a class name, a name, and a description for the parameter file for
+     * a volume-of-fluid initial conditions model, register it with the
+     * functions that can declare their parameters and create these objects.
      *
-     * @ingroup InitialConditionsModels
+     * @ingroup VoFInitialConditionsModels
      */
 #define ASPECT_REGISTER_VOF_INITIAL_CONDITIONS(classname,name,description) \
   template class classname<2>; \
