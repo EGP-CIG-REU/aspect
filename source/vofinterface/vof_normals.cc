@@ -1,4 +1,3 @@
-
 /*
  Copyright (C) 2016 by the authors of the ASPECT code.
 
@@ -33,6 +32,8 @@ namespace aspect
     const int dim = 2;
 
     LinearAlgebra::BlockVector initial_solution;
+
+    computing_timer.enter_section("   Reconstruct VoF interfaces");
 
     initial_solution.reinit(system_rhs, false);
 
@@ -254,6 +255,8 @@ namespace aspect
 
     solution.block(vofN_blockidx) = initial_solution.block(vofN_blockidx);
     solution.block(vofLS_blockidx) = initial_solution.block(vofLS_blockidx);
+
+    computing_timer.exit_section();
   }
 
 
