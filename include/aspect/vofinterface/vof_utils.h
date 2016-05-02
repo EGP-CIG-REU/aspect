@@ -31,14 +31,27 @@ namespace aspect
 
     // Utils
 
+    /**
+     * Function to calculate volume fraction contained by indicator function
+     * H(d-normal*x') on the [-0.5, 0.5]^dim unit cell
+     */
     template<int dim>
     double vof_from_d (const Tensor<1, dim, double> normal,
                        const double d);
 
+    /**
+     * Function to calculate required value of d to obtain given vlume fraction
+     * for indicator function H(d-normal*x') on the [-0.5, 0.5]^dim unit cell
+     */
     template<int dim>
     double d_from_vof (const Tensor<1, dim, double> normal,
                        const double vol);
 
+    /**
+     * Function to calculate flux volume fraction based on a method of
+     * characteristics approximation of the interface on the cell's face over
+     * the timestep.
+     */
     template<int dim>
     double calc_vof_flux_edge (const unsigned int dir,
                                const double timeGrad,
