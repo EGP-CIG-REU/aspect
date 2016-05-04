@@ -346,6 +346,7 @@ namespace aspect
       }
 
     double face_flux;
+    double dflux = 0;
 
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
@@ -376,8 +377,7 @@ namespace aspect
           .get_function_values (free_surface->mesh_velocity,
                                 scratch.face_mesh_velocity_values);
 
-        double face_flux = 0;
-
+        face_flux = 0;
         double face_ls_d = 0;
         double face_ls_time_grad = 0;
 
@@ -434,11 +434,6 @@ namespace aspect
         for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
           {
             data.local_rhs[i] -= flux_vof * face_flux;
-
-            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-              {
-                data.local_matrix(i,j) -= face_flux;
-              }
           }
 
         if (face->at_boundary())
