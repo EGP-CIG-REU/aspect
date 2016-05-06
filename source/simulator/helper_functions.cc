@@ -909,8 +909,142 @@ namespace aspect
 
     return (material_model->get_model_dependence().viscosity != MaterialModel::NonlinearDependence::none);
   }
-}
 
+
+
+// apply limiter for dg solutions
+  /*
+   * normalize the pressure by calculating the surface integral of the pressure on the outer
+   * shell and subtracting this from all pressure nodes.
+   */
+  template <int dim>
+  void Simulator<dim>::apply_limiter_to_dg_solutions(LinearAlgebra::BlockVector &vector)
+  {
+    // create a quadrature formula based on the compositional element alone.
+    // be defensive about determining that a compositional field actually exists
+    if ( parameters.n_compositional_fields== 0)
+      AssertThrow (introspection.base_elements.compositional_fields
+                   != numbers::invalid_unsigned_int,
+                   ExcMessage("This postprocessor cannot be used without compositional fields."));
+
+    const QGauss<1> quadrature_formula_x(parameters.composition_degree+1);
+    const QGaussLobatto<1> quadrature_formula_y(parameters.composition_degree+1);
+    //FIXME only for 2 dimentional problem now
+    const QAnisotropic<dim> quadrature_formula_xy(quadrature_formula_x,quadrature_formula_y);
+    const QAnisotropic<dim> quadrature_formula_yx(quadrature_formula_y,quadrature_formula_x);
+    const unsigned int n_q_points_xy = quadrature_formula_xy.size();
+    const unsigned int n_q_points_yx = quadrature_formula_yx.size();
+    FEValues<dim> fe_values_xy (mapping,
+                                finite_element,
+                                quadrature_formula_xy,
+                                update_values   |
+                                update_quadrature_points |
+                                update_JxW_values);
+    std::vector<double> compositional_values_xy(n_q_points_xy);
+    FEValues<dim> fe_values_yx (mapping,
+                                finite_element,
+                                quadrature_formula_yx,
+                                update_values   |
+                                update_quadrature_points |
+                                update_JxW_values);
+    std::vector<double> compositional_values_yx(n_q_points_yx);
+
+    std::vector<types::global_dof_index> local_dof_indices (finite_element.dofs_per_cell);
+
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    double local_area_integrals;
+    std::vector<double> local_compositional_integrals (parameters.n_compositional_fields);
+    std::vector<double> local_compositional_average_integrals (parameters.n_compositional_fields);
+    const double C_max=1.0;//FIXME need to add into the parameters list
+    const double C_min=0;
+    double min_composition=1.0;
+    double max_composition=0;
+
+#define MPI_DG
+
+#ifdef MPI_DG
+    LinearAlgebra::BlockVector distributed_vector (introspection.index_sets.system_partitioning,
+                                                   mpi_communicator);
+    distributed_vector = vector;
+#else
+    LinearAlgebra::BlockVector distributed_vector(vector);
+#endif
+
+    for (; cell != endc; ++cell)
+      {
+        if (cell->is_locally_owned())
+          {
+            cell->get_dof_indices (local_dof_indices);
+            fe_values_xy.reinit (cell);
+            fe_values_yx.reinit (cell);
+
+            local_area_integrals=0;
+
+            for (unsigned int q=0; q<n_q_points_xy; ++q)
+              {
+                local_area_integrals+= fe_values_xy.JxW(q);
+              }
+            for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
+              {
+                fe_values_xy[introspection.extractors.compositional_fields[c]].get_function_values(vector,
+                    compositional_values_xy);
+                fe_values_yx[introspection.extractors.compositional_fields[c]].get_function_values(vector,
+                    compositional_values_yx);
+
+                local_compositional_average_integrals[c]=0;
+
+                for (unsigned int q=0; q<n_q_points_xy; ++q)
+                  {
+                    local_compositional_average_integrals[c]+= compositional_values_xy[q]*fe_values_xy.JxW(q);
+                  }
+                local_compositional_average_integrals[c] /= local_area_integrals;
+
+                min_composition=compositional_values_xy[0];
+                max_composition=compositional_values_xy[0];
+                for (unsigned int q=0; q<n_q_points_xy; ++q)
+                  {
+                    min_composition = std::min<double> (min_composition,
+                                                        compositional_values_xy[q]);
+                    max_composition = std::max<double> (max_composition,
+                                                        compositional_values_xy[q]);
+                  }
+                for (unsigned int q=0; q<n_q_points_yx; ++q)
+                  {
+                    min_composition = std::min<double> (min_composition,
+                                                        compositional_values_yx[q]);
+                    max_composition = std::max<double> (max_composition,
+                                                        compositional_values_yx[q]);
+                  }
+                // find the trouble cell
+                if (min_composition <C_min || max_composition >C_max)
+                  {
+                    //Define theta
+                    double theta_T=std::min<double>(1,abs((C_max-local_compositional_average_integrals[c])
+                                                          /(max_composition-local_compositional_average_integrals[c])));
+                    theta_T=std::min<double>(theta_T,abs((C_min-local_compositional_average_integrals[c])
+                                                         /(min_composition-local_compositional_average_integrals[c])));
+                    //Modify the numerical solution at freedoms
+                    std::vector<double> t_tmp(finite_element.base_element(introspection.base_elements.compositional_fields).dofs_per_cell);
+                    for (unsigned int j=0; j<finite_element.base_element(introspection.base_elements.compositional_fields).dofs_per_cell; ++j)
+                      {
+                        unsigned int support_point_index
+                          = finite_element.component_to_system_index(introspection.component_indices.compositional_fields[c],
+                                                                     /*dof index within component=*/ j);
+                        t_tmp[j]=distributed_vector(local_dof_indices[support_point_index]);
+                        t_tmp[j]=theta_T*(t_tmp[j]-local_compositional_average_integrals[c])+local_compositional_average_integrals[c];
+                        distributed_vector(local_dof_indices[support_point_index])=t_tmp[j];
+                      }
+                  }
+              }
+          }
+      }
+    distributed_vector.compress(VectorOperation::insert);
+    // now get back to the original vector
+    vector = distributed_vector;
+  }
+}
 // explicit instantiation of the functions we implement in this file
 namespace aspect
 {
@@ -926,7 +1060,8 @@ namespace aspect
   template void Simulator<dim>::output_statistics(); \
   template double Simulator<dim>::compute_initial_stokes_residual(); \
   template bool Simulator<dim>::stokes_matrix_depends_on_solution() const; \
-  template void Simulator<dim>::interpolate_onto_velocity_system(const TensorFunction<1,dim> &func, LinearAlgebra::Vector &vec);
+  template void Simulator<dim>::interpolate_onto_velocity_system(const TensorFunction<1,dim> &func, LinearAlgebra::Vector &vec);\
+  template void Simulator<dim>::apply_limiter_to_dg_solutions(LinearAlgebra::BlockVector &vector);
 
   ASPECT_INSTANTIATE(INSTANTIATE)
 }
