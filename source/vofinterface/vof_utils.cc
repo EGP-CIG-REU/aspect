@@ -52,6 +52,10 @@ namespace aspect
         {
           return 1.0;
         }
+      if (norm1 == 0.0)
+        {
+          return 0.5;
+        }
       dtest = d / norm1;
       mpos = 1.0 - max/norm1;
       if (dtest < mpos - 0.5)

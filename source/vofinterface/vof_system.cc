@@ -336,8 +336,8 @@ namespace aspect
         // Init required local time
         for (unsigned int i = 0; i<vof_dofs_per_cell; ++i)
           {
-            data.local_rhs[i] = scratch.old_field_values[q] *
-                                scratch.finite_element_values.JxW(q);
+            data.local_rhs[i] += scratch.old_field_values[q] *
+                                 scratch.finite_element_values.JxW(q);
             for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
               data.local_matrix (i, j) += scratch.phi_field[i] *
                                           scratch.phi_field[j] *
