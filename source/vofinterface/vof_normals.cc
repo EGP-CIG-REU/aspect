@@ -50,7 +50,7 @@ namespace aspect
     const unsigned int n_sums = 3;
     std::vector<double> strip_sums (dim * n_sums);
 
-    const unsigned int n_normals = 6;
+    const unsigned int n_normals = 6+1;
     std::vector<Tensor<1, dim, double>> normals (n_normals);
     std::vector<double> errs (n_normals);
 
@@ -158,6 +158,8 @@ namespace aspect
             // for (unsigned int i = 0; i < dim * n_sums; ++i)
             //   std::cout << "    " << strip_sums[i] << std::endl;
 
+            // Calculate normal vectors for the 6 candidates from the efficient
+            // least squares approach
             for (unsigned int di = 0; di < dim; ++di)
               {
                 unsigned int di2 = (di + 1) % dim;
@@ -192,6 +194,26 @@ namespace aspect
                     if (strip_sums[3 * di2 + 2] > strip_sums[3 * di2 + 0])
                       normals[3 * di + i][di2] *= -1.0;
                   }
+              }
+
+            // Add time extrapolated local normal as candidate
+            // this is not expected to be the best candidate in general, but
+            // should result in exact reconstruction for linear interface
+            // translations
+            // Inclusion of this candidate will not reduce accuracy due to it
+            // only being selected if it produces a better interface
+            // approximation than the ELS candidates. Note that this will
+            // render linear translation problems less dependent on the
+            // interface reconstruction, so other tests will also be necessary.
+            for (unsigned int i=0; i<dim; ++i)
+              normals[6][i] = solution(local_dof_indicies[finite_element
+                                                          .component_to_system_index(vofN_c_index+i, 0)]);
+
+            // If candidate normal too small, remove from consideration
+            if (normals[6]*normals[6]< parameters.voleps)
+              {
+                normals[6][0] = 0;
+                normals[6][1] = 0;
               }
 
             unsigned int mn_ind = 0;
