@@ -361,7 +361,7 @@ namespace aspect
         scratch.face_finite_element_values.reinit (cell, f);
 
         scratch.face_finite_element_values[introspection.extractors.velocities]
-        .get_function_values (solution,
+        .get_function_values (current_linearization_point,
                               scratch.face_current_velocity_values);
 
         scratch.face_finite_element_values[introspection.extractors.velocities]

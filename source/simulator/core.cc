@@ -1708,6 +1708,8 @@ namespace aspect
               solve_advection(AdvectionField::composition(c));
             }
 
+          do_vof_update ();
+
           for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
             current_linearization_point.block(introspection.block_indices.compositional_fields[c])
               = solution.block(introspection.block_indices.compositional_fields[c]);
@@ -1810,6 +1812,8 @@ namespace aspect
                     = solve_advection(AdvectionField::composition(c));
                 }
 
+              do_vof_update ();
+
               // for consistency we update the current linearization point only after we have solved
               // all fields, so that we use the same point in time for every field when solving
               for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
@@ -1893,6 +1897,8 @@ namespace aspect
               solve_advection(AdvectionField::composition(c));
             }
 
+          do_vof_update ();
+
           for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
             current_linearization_point.block(introspection.block_indices.compositional_fields[c])
               = solution.block(introspection.block_indices.compositional_fields[c]);
@@ -1975,6 +1981,8 @@ namespace aspect
                                          T_preconditioner);
           solve_advection(AdvectionField::temperature());
 
+          do_vof_update ();
+
           current_linearization_point.block(introspection.block_indices.temperature)
             = solution.block(introspection.block_indices.temperature);
 
@@ -1994,8 +2002,6 @@ namespace aspect
         default:
           Assert (false, ExcNotImplemented());
       }
-
-    do_vof_update ();
   }
 
 
