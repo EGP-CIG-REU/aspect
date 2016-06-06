@@ -79,6 +79,20 @@ namespace aspect
     const unsigned int n_vofLS_dofs = vofLS_var.fe->dofs_per_cell;
     const unsigned int vofLS_blockidx = vofLS_var.block_index;
 
+    //
+    bool use_vof_composition = parameters.vof_composition_var!="";
+    const unsigned int c_var_index =
+      ( (!use_vof_composition) ? numbers::invalid_unsigned_int
+        : introspection.compositional_index_for_name(parameters.vof_composition_var));
+    AdvectionField advf =
+      ( (!use_vof_composition) ? AdvectionField::temperature()
+        : AdvectionField::composition(c_var_index));
+    const unsigned int base_element =
+      ( (!use_vof_composition) ? numbers::invalid_unsigned_int
+        : advf.base_element(introspection));
+    const std::vector<Point<dim> > support_points =
+      ( (!use_vof_composition) ? std::vector<Point<dim>>(0)
+        : finite_element.base_element(base_element).get_unit_support_points());
 
     //Iterate over cells
     for (auto cell : dof_handler.active_cell_iterators ())
@@ -267,6 +281,36 @@ namespace aspect
             initial_solution (local_dof_indicies[finite_element
                                                  .component_to_system_index(vofLS_c_index, i)])
               = d-uSupp*normal;
+          }
+
+        // If specified, write unit cell linear approximation to specified composition variable
+        if (use_vof_composition)
+          {
+            Tensor<1, dim, double> nnormal;
+            double nd=d;
+            double normall1n = 0.0;
+            for (unsigned int i=0; i<dim; ++i)
+              {
+                normall1n += numbers::NumberTraits<double>::abs(normal[i]);
+                nnormal[i] = 0.0;
+              }
+            if (normall1n > parameters.voleps)
+              {
+                nnormal = normal / normall1n;
+                nd = d / normall1n;
+              }
+            for (unsigned int i=0; i<finite_element.base_element(base_element).dofs_per_cell; ++i)
+              {
+                const unsigned int system_local_dof
+                  = finite_element.component_to_system_index(advf.component_index(introspection),
+                                                             /*dof index within component*/i);
+
+                Tensor<1, dim, double> uSupp = support_points[i]-uReCen;
+
+                const double value = 0.5*(1.0+nd-uSupp*nnormal);
+
+                initial_solution(local_dof_indicies[system_local_dof]) = value;
+              }
           }
       }
 

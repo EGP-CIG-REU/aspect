@@ -726,6 +726,11 @@ namespace aspect
                          "The relative tolerance up to which the linear system for "
                          "the VoF system gets solved. See 'linear solver "
                          "tolerance' for more details.");
+
+      prm.declare_entry ("VoF composition variable", "",
+                         Patterns::Anything(),
+                         "Name of compositional field to write VoF composition to.");
+
     }
     prm.leave_subsection ();
 
@@ -1035,6 +1040,27 @@ namespace aspect
       voleps = prm.get_double("Small volume");
 
       vof_solver_tolerance = prm.get_double("VoF solver tolerance");
+
+      vof_composition_var = prm.get("VoF composition variable");
+
+      if (!use_discontinuous_composition_discretization)
+        {
+          if (!use_discontinuous_composition_discretization)
+            {
+              Assert(false, ExcMessage("VoF composition field not implemented for continuous composition."));
+            }
+
+          bool field_exists=false;
+          for (unsigned int i=0; i<n_compositional_fields; ++i)
+            {
+              field_exists = field_exists ||
+                             (vof_composition_var==names_of_compositional_fields[i]);
+            }
+          Assert(field_exists, ExcMessage("VoF composition field variable " +
+                                          vof_composition_var +
+                                          " does not exist."));
+        }
+
     }
     prm.leave_subsection ();
 

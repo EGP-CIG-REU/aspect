@@ -307,6 +307,7 @@ namespace aspect
     bool                           vof_tracking_enabled;
     double                         voleps;
     double                         vof_solver_tolerance;
+    std::string                    vof_composition_var;
     /**
      * @}
      */
