@@ -105,11 +105,11 @@ namespace aspect
 
         normal[0] = 0.0;
         normal[1] = 0.0;
-        d = -0.5;
+        d = -1.0;
 
         if (cell_vof > 1.0 - parameters.voleps)
           {
-            d = 0.5;
+            d = 1.0;
           }
         else if (cell_vof > parameters.voleps)
           {
@@ -321,6 +321,11 @@ namespace aspect
 
     solution.block(vofN_blockidx) = initial_solution.block(vofN_blockidx);
     solution.block(vofLS_blockidx) = initial_solution.block(vofLS_blockidx);
+    if (use_vof_composition)
+      {
+        const unsigned int blockidx = advf.block_index(introspection);
+        solution.block(blockidx) = initial_solution.block(blockidx);
+      }
 
     computing_timer.exit_section();
   }

@@ -1981,8 +1981,6 @@ namespace aspect
                                          T_preconditioner);
           solve_advection(AdvectionField::temperature());
 
-          do_vof_update ();
-
           current_linearization_point.block(introspection.block_indices.temperature)
             = solution.block(introspection.block_indices.temperature);
 
@@ -1995,6 +1993,8 @@ namespace aspect
               current_linearization_point.block(introspection.block_indices.compositional_fields[c])
                 = solution.block(introspection.block_indices.compositional_fields[c]);
             }
+
+          do_vof_update ();
 
           break;
         }
