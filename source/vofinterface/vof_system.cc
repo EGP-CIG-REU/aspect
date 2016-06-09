@@ -115,12 +115,6 @@ namespace aspect
 
       namespace CopyData
       {
-        /**
-         * Constructor.
-         * @param finite_element The element that describes the field for which we
-         *    are trying to assemble a linear system. <b>Not</b> the global finite
-         *    element.
-         */
         template <int dim>
         VoFSystem<dim>::VoFSystem(const FiniteElement<dim> &finite_element)
           :
@@ -153,6 +147,10 @@ namespace aspect
   template <int dim>
   void Simulator<dim>::do_vof_update ()
   {
+    // Return if VoF tracking not enabled
+    if (!parameters.vof_tracking_enabled)
+      return;
+
     const unsigned int vof_block_idx = introspection.variable("vofs").block_index;
     const unsigned int vofN_block_idx = introspection.variable("vofsLS").block_index;
 
