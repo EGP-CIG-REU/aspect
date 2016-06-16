@@ -97,6 +97,9 @@ namespace aspect
     //Iterate over cells
     for (auto cell : dof_handler.active_cell_iterators ())
       {
+        if (!cell->is_locally_owned ())
+          continue;
+
         double cell_vof;
 
         // Obtain data for this cell and neighbors
