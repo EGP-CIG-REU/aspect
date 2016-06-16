@@ -75,9 +75,9 @@ namespace aspect
       std::ostringstream output;
       output.precision(3);
 
-      statistics.add_value ("Global VoF vol", vof_vol_sum);
+      statistics.add_value ("Global VoF vol", global_vof_sum);
 
-      output << vof_vol_sum
+      output << global_vof_sum
              << " m^3";
 
       // also make sure that the other columns filled by the this object
@@ -103,7 +103,7 @@ namespace aspect
                                 vof_vol_sum-init_vol);
 
           output << " Delta "
-                 << (vof_vol_sum-init_vol)
+                 << (global_vof_sum-init_vol)
                  << " m^3";
 
           // also make sure that the other columns filled by the this object
