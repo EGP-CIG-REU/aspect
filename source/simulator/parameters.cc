@@ -1043,7 +1043,7 @@ namespace aspect
 
       vof_composition_var = prm.get("VoF composition variable");
 
-      if (!use_discontinuous_composition_discretization)
+      if (vof_composition_var!="")
         {
           if (!use_discontinuous_composition_discretization)
             {
