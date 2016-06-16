@@ -97,7 +97,7 @@ namespace aspect
           if (!initial_vol_computed)
             {
               initial_vol_computed = true;
-              init_vol = vof_vol_sum;
+              init_vol = global_vof_sum;
             }
           statistics.add_value ("Delta VoF vol",
                                 vof_vol_sum-init_vol);
