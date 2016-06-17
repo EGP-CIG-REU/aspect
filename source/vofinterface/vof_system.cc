@@ -435,15 +435,15 @@ namespace aspect
                                                                   face_ls_d);
           }
 
-        // Add fluxes to RHS
-        for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-          {
-            data.local_rhs[i] -= flux_vof * face_flux;
-          }
-
         if (face->at_boundary())
           {
             //TODO: Handle non-zero inflow VoF boundary conditions
+
+            // Add fluxes to RHS
+            for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+              {
+                data.local_rhs[i] -= flux_vof * face_flux;
+              }
           }
         else
           {
@@ -453,6 +453,7 @@ namespace aspect
             const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(f); //note: NOT active_cell_iterator, so this includes cells that are refined.
             if (!(face->has_children()))
               {
+                // No children, so can do simple approach
                 Assert (cell->is_locally_owned(), ExcInternalError());
                 //cell and neighbor are equal-sized, and cell has been chosen to assemble this face, so calculate from cell
 
@@ -475,35 +476,40 @@ namespace aspect
 
                 data.assembled_rhs[f_rhs_ind] = true;
 
-                // Add outward flux to neighbor
+                // fluxes to RHS
                 for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
                   {
+                    data.local_rhs[i] -= flux_vof * face_flux;
                     data.local_f_rhs[f_rhs_ind][i] += flux_vof * face_flux;
                   }
               }
-            else //face->has_children(), so always assemble from here.
+            else
               {
                 // TODO: handle adaptive mesh
+                const unsigned int neighbor2 = cell->neighbor_face_no(f);
+
                 Assert(false, ExcNotImplemented());
               }
           }
       }
 
     // Split induced divergence correction
-    for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-      {
-        if (!update_from_old)
-          {
-            // Explicit discretization
-            data.local_rhs[i] += cell_vof * dflux;
-          }
-        else
-          {
-            // Implicit discretization
-            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-              data.local_matrix (i, j) -= dflux;
-          }
-      }
+    /*
+     * for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+     *  {
+     *    if (!update_from_old)
+     *      {
+     *        // Explicit discretization
+     *        data.local_rhs[i] += cell_vof * dflux;
+     *      }
+     *    else
+     *      {
+     *        // Implicit discretization
+     *        for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
+     *          data.local_matrix (i, j) -= dflux;
+     *      }
+     *  }
+     */
   }
 
   template <int dim>
