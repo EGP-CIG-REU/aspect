@@ -296,6 +296,7 @@ namespace aspect
     data.local_rhs = 0;
 
     // Interface reconstruction data
+    double cell_vof;
     Tensor<1, dim, double> cell_i_normal;
     double cell_i_d = 0;
 
@@ -322,7 +323,8 @@ namespace aspect
                                                                    scratch.cell_i_d_values);
       }
 
-    // interface values are constants, so can set from first value
+    // vol fraction and interface values are constants, so can set from first value
+    cell_vof = scratch.old_field_values[0];
     cell_i_normal = scratch.cell_i_n_values[0];
     cell_i_d = scratch.cell_i_d_values[0];
 
@@ -415,6 +417,22 @@ namespace aspect
           {
             face_ls_d = cell_i_d + 0.5*cell_i_normal[f_dim];
             face_ls_time_grad = -(face_flux/cell_vol)*cell_i_normal[f_dim];
+          }
+
+        // Split induced divergence correction
+        for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+          {
+            if (!update_from_old)
+              {
+                // Explicit discretization
+                data.local_rhs[i] += cell_vof * face_flux;
+              }
+            else
+              {
+                // Implicit discretization
+                for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
+                  data.local_matrix (i, j) -= cell_vof * face_flux;
+              }
           }
 
         // Calculate outward flux
