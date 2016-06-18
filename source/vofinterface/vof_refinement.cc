@@ -130,7 +130,7 @@ namespace aspect
                           n_face_vof = vof_q_values[0];
                         }
 
-                      if (abs(n_face_vof-cell_vof)>=0.5*voleps)
+                      if (abs(n_face_vof-cell_vof)>=voleps)
                         at_interface=true;
                     }
                   else
@@ -145,11 +145,10 @@ namespace aspect
                           fe_subface_values[vof_field].get_function_values (this->get_solution(),
                                                                             vof_q_values);
 
-                          if (abs(n_face_vof-cell_vof)>=1.0-voleps)
-                            at_interface=true;
-
                           n_face_vof = vof_q_values[0];
 
+                          if (abs(n_face_vof-cell_vof)>=voleps)
+                            at_interface=true;
                         }
                     }
                 }

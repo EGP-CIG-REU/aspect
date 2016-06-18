@@ -122,11 +122,21 @@ namespace aspect
               {
                 typename DoFHandler<dim>::active_cell_iterator cen;
                 if (i == 0)
-                  cen = cell->neighbor (0);
+                  {
+                    if (cell->neighbor(0)==endc||cell->neighbor_is_coarser(0)||cell->neighbor(0)->has_children())
+                      cen = endc;
+                    else
+                      cen = cell->neighbor(0);
+                  }
                 if (i == 1)
                   cen = cell;
                 if (i == 2)
-                  cen = cell->neighbor (1);
+                  {
+                    if (cell->neighbor(1)==endc||cell->neighbor_is_coarser(1)||cell->neighbor(1)->has_children())
+                      cen = endc;
+                    else
+                      cen = cell->neighbor(1);
+                  }
                 for (unsigned int j = 0; j < 3; ++j)
                   {
                     typename DoFHandler<dim>::active_cell_iterator curr;
@@ -137,13 +147,23 @@ namespace aspect
                     else
                       {
                         if (j == 0)
-                          curr = cen->neighbor (2);
+                          {
+                            if (cen->neighbor(2)==endc||cen->neighbor_is_coarser(2)||cen->neighbor(2)->has_children())
+                              curr = endc;
+                            else
+                              curr = cen->neighbor(2);
+                          }
                         if (j == 1)
                           curr = cen;
                         if (j == 2)
-                          curr = cen->neighbor (3);
+                          {
+                            if (cen->neighbor(3)==endc||cen->neighbor_is_coarser(3)||cen->neighbor(3)->has_children())
+                              curr = endc;
+                            else
+                              curr = cen->neighbor(3);
+                          }
                       }
-                    if (curr != endc)
+                    if (curr != endc && !curr->has_children())
                       {
                         curr->get_dof_indices (cell_dof_indicies);
                         resc_cell_centers[3 * j + i] = Point<dim> (-1.0 + i,

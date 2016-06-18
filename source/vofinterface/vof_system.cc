@@ -548,7 +548,6 @@ namespace aspect
                 // Temporarily limit to constant cases
                 if (cell_vof < voleps || cell_vof>1.0-voleps)
                   {
-
                     // fluxes to RHS
                     for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
                       {
