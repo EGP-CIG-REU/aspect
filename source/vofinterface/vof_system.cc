@@ -491,11 +491,11 @@ namespace aspect
 
                 scratch.subface_finite_element_values.reinit (cell, f, subface_no);
 
-                scratch.face_finite_element_values[introspection.extractors.velocities]
+                scratch.subface_finite_element_values[introspection.extractors.velocities]
                 .get_function_values (current_linearization_point,
                                       scratch.face_current_velocity_values);
 
-                scratch.face_finite_element_values[introspection.extractors.velocities]
+                scratch.subface_finite_element_values[introspection.extractors.velocities]
                 .get_function_values (old_solution,
                                       scratch.face_old_velocity_values);
 
@@ -504,7 +504,7 @@ namespace aspect
                 //scratch.face_old_old_velocity_values);
 
                 if (parameters.free_surface_enabled)
-                  scratch.face_finite_element_values[introspection.extractors.velocities]
+                  scratch.subface_finite_element_values[introspection.extractors.velocities]
                   .get_function_values (free_surface->mesh_velocity,
                                         scratch.face_mesh_velocity_values);
 
@@ -529,12 +529,12 @@ namespace aspect
 
                     face_flux += time_step *
                                  current_u *
-                                 scratch.face_finite_element_values.normal_vector(q) *
-                                 scratch.face_finite_element_values.JxW(q);
+                                 scratch.subface_finite_element_values.normal_vector(q) *
+                                 scratch.subface_finite_element_values.JxW(q);
 
                   }
 
-                std::vector<types::global_dof_index> neighbor_dof_indices (scratch.face_finite_element_values.get_fe().dofs_per_cell);
+                std::vector<types::global_dof_index> neighbor_dof_indices (scratch.subface_finite_element_values.get_fe().dofs_per_cell);
                 neighbor_child->get_dof_indices (neighbor_dof_indices);
 
                 const unsigned int f_rhs_ind = f * GeometryInfo<dim>::max_children_per_face+subface_no;
@@ -548,6 +548,8 @@ namespace aspect
                 // Temporarily limit to constant cases
                 if (cell_vof < voleps || cell_vof>1.0-voleps)
                   {
+                    if (face_flux<0.0)
+                      face_flux=0.0;
                     // fluxes to RHS
                     for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
                       {
@@ -558,6 +560,9 @@ namespace aspect
                   }
                 else
                   {
+                    pcout << "Cell at " << cell->center() << " " << cell_vof << std::endl;
+                    pcout << "\t" << face_flux/time_step/cell_vol << std::endl;
+                    pcout << "\t" << cell_i_normal << ".x=" << cell_i_d << std::endl;
                     Assert(false, ExcNotImplemented());
                   }
 
