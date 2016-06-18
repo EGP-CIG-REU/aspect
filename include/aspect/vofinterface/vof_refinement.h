@@ -49,7 +49,7 @@ namespace aspect
          */
         virtual
         void
-        tag_additional_cells () const;
+        execute (Vector<float> &indicators) const;
 
         static
         void
