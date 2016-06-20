@@ -135,15 +135,17 @@ namespace aspect
                     }
                   else
                     {
+                      const unsigned int neighbor2 = cell->neighbor_face_no(f);
+
                       for (unsigned int subface_no=0; subface_no<face->number_of_children(); ++subface_no)
                         {
                           const typename DoFHandler<dim>::active_cell_iterator neighbor_child
                             = cell->neighbor_child_on_subface (face_no, subface_no);
 
-                          fe_subface_values.reinit (cell, face_no, subface_no);
+                          fe_face_values.reinit (neighbor_child, neighbor2);
 
-                          fe_subface_values[vof_field].get_function_values (this->get_solution(),
-                                                                            vof_q_values);
+                          fe_face_values[vof_field].get_function_values (this->get_solution(),
+                                                                         vof_q_values);
 
                           n_face_vof = vof_q_values[0];
 
