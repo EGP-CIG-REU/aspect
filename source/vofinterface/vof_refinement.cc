@@ -135,7 +135,7 @@ namespace aspect
                     }
                   else
                     {
-                      const unsigned int neighbor2 = cell->neighbor_face_no(f);
+                      const unsigned int neighbor2 = cell->neighbor_face_no(face_no);
 
                       for (unsigned int subface_no=0; subface_no<face->number_of_children(); ++subface_no)
                         {
@@ -209,6 +209,6 @@ namespace aspect
     ASPECT_REGISTER_MESH_REFINEMENT_CRITERION(VoFBoundary,
                                               "vofboundary",
                                               "A class that implements a mesh refinement criterion, which "
-                                              "ensures a minimum level of refinement near the VoF interface boundary.");
+                                              "ensures a minimum level of refinement near the VoF interface boundary.")
   }
 }
