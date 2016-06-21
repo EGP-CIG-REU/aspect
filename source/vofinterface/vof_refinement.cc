@@ -76,6 +76,13 @@ namespace aspect
                                                     vof_q_values);
           cell_vof = vof_q_values[0];
 
+          // Handle overshoots
+          if (cell_vof > 1.0)
+            cell_vof = 1.0;
+
+          if (cell_vof < 0.0)
+            cell_vof = 0.0;
+
           // Check if at interface
           bool at_interface=false;
           double voleps = this->get_parameters().voleps;
@@ -130,6 +137,11 @@ namespace aspect
                           n_face_vof = vof_q_values[0];
                         }
 
+                      if (n_face_vof >1.0)
+                        n_face_vof = 1.0;
+                      if (n_face_vof < 0.0)
+                        n_face_vof = 0.0;
+
                       if (abs(n_face_vof-cell_vof)>=voleps)
                         at_interface=true;
                     }
@@ -146,6 +158,11 @@ namespace aspect
 
                           fe_face_values[vof_field].get_function_values (this->get_solution(),
                                                                          vof_q_values);
+
+                          if (n_face_vof >1.0)
+                            n_face_vof = 1.0;
+                          if (n_face_vof < 0.0)
+                            n_face_vof = 0.0;
 
                           n_face_vof = vof_q_values[0];
 
