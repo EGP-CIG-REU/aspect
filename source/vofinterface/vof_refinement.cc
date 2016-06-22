@@ -137,7 +137,7 @@ namespace aspect
                           n_face_vof = vof_q_values[0];
                         }
 
-                      if (n_face_vof >1.0)
+                      if (n_face_vof > 1.0)
                         n_face_vof = 1.0;
                       if (n_face_vof < 0.0)
                         n_face_vof = 0.0;
@@ -159,7 +159,7 @@ namespace aspect
                           fe_face_values[vof_field].get_function_values (this->get_solution(),
                                                                          vof_q_values);
 
-                          if (n_face_vof >1.0)
+                          if (n_face_vof > 1.0)
                             n_face_vof = 1.0;
                           if (n_face_vof < 0.0)
                             n_face_vof = 0.0;
