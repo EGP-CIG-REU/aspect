@@ -599,22 +599,22 @@ namespace aspect
       }
 
     // Split induced divergence correction
-    /*
-     * for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-     *  {
-     *    if (!update_from_old)
-     *      {
-     *        // Explicit discretization
-     *        data.local_rhs[i] += cell_vof * dflux;
-     *      }
-     *    else
-     *      {
-     *        // Implicit discretization
-     *        for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-     *          data.local_matrix (i, j) -= dflux;
-     *      }
-     *  }
-     */
+
+    for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+      {
+        if (!update_from_old)
+          {
+            // Explicit discretization
+            data.local_rhs[i] -= cell_vof * dflux;
+          }
+        else
+          {
+            // Implicit discretization
+            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
+              data.local_matrix (i, j) += dflux;
+          }
+      }
+
   }
 
   template <int dim>
