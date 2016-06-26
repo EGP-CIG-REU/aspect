@@ -545,6 +545,8 @@ namespace aspect
 
                 data.assembled_rhs[f_rhs_ind] = true;
 
+                dflux += face_flux;
+
                 // Temporarily limit to constant cases
                 if (cell_vof < voleps || cell_vof>1.0-voleps)
                   {
@@ -578,8 +580,6 @@ namespace aspect
                     face_ls_d = cell_i_d + 0.5*cell_i_normal[f_dim];
                     face_ls_time_grad = -(face_flux/cell_vol)*cell_i_normal[f_dim];
                   }
-
-                dflux += face_flux;
 
                 // Calculate outward flux
                 double flux_vof;
