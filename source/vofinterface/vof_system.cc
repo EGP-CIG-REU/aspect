@@ -349,7 +349,7 @@ namespace aspect
       }
 
     double face_flux;
-    double dflux = 0;
+    double dflux = 0.0;
     double voleps = parameters.voleps;
 
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -546,13 +546,18 @@ namespace aspect
                 data.assembled_rhs[f_rhs_ind] = true;
 
                 dflux += face_flux;
-                if (face_flux<0.0)
-                  face_flux=0.0;
                 // fluxes to RHS
+                double flux_vof = cell_vof;
+                if (face_flux<0.0)
+                  flux_vof=0.0;
+                if (flux_vof < 0.0)
+                  flux_vof = 0.0;
+                if (flux_vof > 1.0)
+                  flux_vof = 1.0;
                 for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
                   {
-                    data.local_rhs[i] -= cell_vof * face_flux;
-                    data.local_f_rhs[f_rhs_ind][i] += cell_vof * face_flux;
+                    data.local_rhs[i] -= flux_vof * face_flux;
+                    data.local_f_rhs[f_rhs_ind][i] += flux_vof * face_flux;
                   }
 
                 // Temporarily limit to constant cases
@@ -580,7 +585,6 @@ namespace aspect
                   }
 
                 // Calculate outward flux
-                double flux_vof;
                 if (face_flux < 0)
                   {
                     flux_vof = 0;
@@ -598,23 +602,18 @@ namespace aspect
 
     // Split induced divergence correction
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
       {
-        for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+        if (!update_from_old)
           {
-            if (!update_from_old)
-              {
-                // Explicit discretization
-                data.local_rhs[i] -= scratch.old_field_values[q] * dflux;
-              }
-            else
-              {
-                // Implicit discretization
-                for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-                  data.local_matrix (i, j) += scratch.phi_field[i] *
-                                              scratch.phi_field[j] *
-                                              dflux;
-              }
+            // Explicit discretization
+            data.local_rhs[i] -= cell_vof * dflux;
+          }
+        else
+          {
+            // Implicit discretization
+            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
+              data.local_matrix (i, j) += dflux;
           }
       }
 
@@ -663,8 +662,12 @@ namespace aspect
 
 #ifdef ASPECT_USE_PETSC
     SolverCG<LinearAlgebra::Vector> solver(solver_control);
+    const LinearAlgebra::PreconditionJacobi precondition;
+    precondition.initialize(system_matrix.block(block_idx, block_idx));
 #else
     TrilinosWrappers::SolverCG solver(solver_control);
+    TrilinosWrappers::PreconditionJacobi precondition;
+    precondition.initialize(system_matrix.block(block_idx, block_idx));
 #endif
 
     // Create distributed vector (we need all blocks here even though we only
@@ -680,17 +683,10 @@ namespace aspect
     // solve the linear system:
     try
       {
-#ifdef ASPECT_USE_PETSC
         solver.solve (system_matrix.block(block_idx,block_idx),
                       distributed_solution.block(block_idx),
                       system_rhs.block(block_idx),
-                      PreconditionIdentity());
-#else
-        solver.solve (system_matrix.block(block_idx,block_idx),
-                      distributed_solution.block(block_idx),
-                      system_rhs.block(block_idx),
-                      TrilinosWrappers::PreconditionIdentity());
-#endif
+                      precondition);
       }
     // if the solver fails, report the error from processor 0 with some additional
     // information about its location, and throw a quiet exception on all other
