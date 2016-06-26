@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -20,7 +20,6 @@
 
 
 #include <aspect/mesh_refinement/interface.h>
-#include <aspect/simulator_access.h>
 
 #include <typeinfo>
 

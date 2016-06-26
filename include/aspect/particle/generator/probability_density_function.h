@@ -25,7 +25,9 @@
 
 #include <deal.II/base/parsed_function.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 namespace aspect
 {
@@ -123,7 +125,7 @@ namespace aspect
            * for all locally owned active cells.
            * @param [in] local_start_id The starting ID to assign to generated particles of the local process.
            * @param [in] n_local_particles The local number of particles to generate.
-           * @return A map between cells and all generated particles.
+           * @param [out] particles A map between cells and all generated particles.
            *
            */
           void

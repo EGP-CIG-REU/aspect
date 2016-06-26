@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -229,15 +229,13 @@ namespace aspect
   unsigned int
   Introspection<dim>::compositional_index_for_name (const std::string &name) const
   {
-    std::vector<std::string>::const_iterator it = std::find(composition_names.begin(), composition_names.end(), name);
-    if (it == composition_names.end())
-      {
-        AssertThrow (false, ExcMessage ("The compositional field " + name +
-                                        " you asked for is not used in the simulation."));
-      }
-    else
-      return it - composition_names.begin();
-    return numbers::invalid_unsigned_int;
+    const std::vector<std::string>::const_iterator
+    it = std::find(composition_names.begin(), composition_names.end(), name);
+    AssertThrow (it != composition_names.end(),
+                 ExcMessage ("The compositional field " + name +
+                             " you asked for is not used in the simulation."));
+
+    return (it - composition_names.begin());
   }
 
   template <int dim>

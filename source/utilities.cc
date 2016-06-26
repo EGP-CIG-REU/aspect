@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -49,7 +49,10 @@ namespace aspect
   {
     using namespace dealii;
 
-
+    /**
+     * Split the set of DoFs (typically locally owned or relevant) in @p whole_set into blocks
+     * given by the @p dofs_per_block structure.
+     */
     void split_by_block (const std::vector<types::global_dof_index> &dofs_per_block,
                          const IndexSet &whole_set,
                          std::vector<IndexSet> &partitioned)
@@ -801,16 +804,9 @@ namespace aspect
         // Get the path to the data files. If it contains a reference
         // to $ASPECT_SOURCE_DIR, replace it by what CMake has given us
         // as a #define
-        data_directory    = prm.get ("Data directory");
-        {
-          const std::string      subst_text = "$ASPECT_SOURCE_DIR";
-          std::string::size_type position;
-          while (position = data_directory.find (subst_text),  position!=std::string::npos)
-            data_directory.replace (data_directory.begin()+position,
-                                    data_directory.begin()+position+subst_text.size(),
-                                    ASPECT_SOURCE_DIR);
-        }
-
+        data_directory = Utilities::replace_in_string(prm.get ("Data directory"),
+                                                      "$ASPECT_SOURCE_DIR",
+                                                      ASPECT_SOURCE_DIR);
         data_file_name    = prm.get ("Data file name");
         scale_factor      = prm.get_double ("Scale factor");
       }

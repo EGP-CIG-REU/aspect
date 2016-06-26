@@ -25,6 +25,7 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/work_stream.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -72,14 +73,14 @@ namespace aspect
                                          update_normal_vectors |
                                          update_JxW_values),
           local_dof_indices(finite_element.dofs_per_cell),
-          phi_field (vof_element.dofs_per_cell, Utilities::signaling_nan<double>()),
-          old_field_values (quadrature.size(), Utilities::signaling_nan<double>()),
-          cell_i_n_values (quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> > ()),
-          cell_i_d_values (quadrature.size(), Utilities::signaling_nan<double> ()),
-          face_current_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
-          face_old_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
-          face_old_old_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >()),
-          face_mesh_velocity_values (face_quadrature.size(), Utilities::signaling_nan<Tensor<1, dim> >())
+          phi_field (vof_element.dofs_per_cell, numbers::signaling_nan<double>()),
+          old_field_values (quadrature.size(), numbers::signaling_nan<double>()),
+          cell_i_n_values (quadrature.size(), numbers::signaling_nan<Tensor<1, dim> > ()),
+          cell_i_d_values (quadrature.size(), numbers::signaling_nan<double> ()),
+          face_current_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
+          face_old_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
+          face_old_old_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
+          face_mesh_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >())
         {}
 
         template <int dim>

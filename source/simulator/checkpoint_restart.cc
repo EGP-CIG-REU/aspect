@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -51,13 +51,17 @@ namespace aspect
               error = remove(new_name.c_str());
               AssertThrow (error == 0, ExcMessage(std::string ("Unable to remove file: "
                                                                + new_name
-                                                               + ", although it seems to exist.")));
+                                                               + ", although it seems to exist. "
+                                                               + "The error code is "
+                                                               + Utilities::to_string(error) + ".")));
             }
 
           error = rename(old_name.c_str(),new_name.c_str());
           AssertThrow (error == 0, ExcMessage(std::string ("Unable to rename files: ")
                                               +
-                                              old_name + " -> " + new_name));
+                                              old_name + " -> " + new_name
+                                              + ". The error code is "
+                                              + Utilities::to_string(error) + "."));
         }
     }
   }

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -85,9 +85,17 @@ namespace aspect
 
 
   template <int dim>
-  MPI_Comm SimulatorAccess<dim>::get_mpi_communicator () const
+  MPI_Comm
+  SimulatorAccess<dim>::get_mpi_communicator () const
   {
     return simulator->mpi_communicator;
+  }
+
+  template <int dim>
+  TimerOutput &
+  SimulatorAccess<dim>::get_computing_timer () const
+  {
+    return simulator->computing_timer;
   }
 
   template <int dim>
@@ -203,6 +211,13 @@ namespace aspect
   }
 
   template <int dim>
+  bool
+  SimulatorAccess<dim>::include_melt_transport () const
+  {
+    return simulator->parameters.include_melt_transport;
+  }
+
+  template <int dim>
   int
   SimulatorAccess<dim>::get_stokes_velocity_degree () const
   {
@@ -245,6 +260,13 @@ namespace aspect
   {
     const typename Simulator<dim>::AdvectionField advection_field = Simulator<dim>::AdvectionField::composition(compositional_variable);
     simulator->get_artificial_viscosity(viscosity_per_cell, advection_field);
+  }
+
+  template <int dim>
+  const LinearAlgebra::BlockVector &
+  SimulatorAccess<dim>::get_current_linearization_point () const
+  {
+    return simulator->current_linearization_point;
   }
 
   template <int dim>
@@ -311,6 +333,29 @@ namespace aspect
   }
 
 
+  template <int dim>
+  void
+  SimulatorAccess<dim>::compute_material_model_input_values (const LinearAlgebra::BlockVector                            &input_solution,
+                                                             const FEValuesBase<dim,dim>                                 &input_finite_element_values,
+                                                             const typename DoFHandler<dim>::active_cell_iterator        &cell,
+                                                             const bool                                                   compute_strainrate,
+                                                             MaterialModel::MaterialModelInputs<dim> &material_model_inputs) const
+  {
+    simulator->compute_material_model_input_values(input_solution,
+                                                   input_finite_element_values,
+                                                   cell,
+                                                   compute_strainrate,
+                                                   material_model_inputs);
+  }
+
+
+  template <int dim>
+  void
+  SimulatorAccess<dim>::create_additional_material_model_outputs (MaterialModel::MaterialModelOutputs<dim> &out) const
+  {
+    simulator->create_additional_material_model_outputs(out);
+  }
+
 
   template <int dim>
   const std::map<types::boundary_id,std_cxx11::shared_ptr<TractionBoundaryConditions::Interface<dim> > > &
@@ -333,9 +378,27 @@ namespace aspect
   const BoundaryTemperature::Interface<dim> &
   SimulatorAccess<dim>::get_boundary_temperature () const
   {
-    Assert (simulator->boundary_temperature.get() != 0,
-            ExcMessage("You can not call this function if no such model is actually available."));
+    AssertThrow (simulator->boundary_temperature.get() != 0,
+                 ExcMessage("You can not call this function if no such model is actually available."));
     return *simulator->boundary_temperature.get();
+  }
+
+
+  template <int dim>
+  bool
+  SimulatorAccess<dim>::has_boundary_composition () const
+  {
+    return (simulator->boundary_composition.get() != 0);
+  }
+
+
+  template <int dim>
+  const BoundaryComposition::Interface<dim> &
+  SimulatorAccess<dim>::get_boundary_composition () const
+  {
+    AssertThrow (simulator->boundary_composition.get() != 0,
+                 ExcMessage("You can not call this function if no such model is actually available."));
+    return *simulator->boundary_composition.get();
   }
 
 
@@ -427,6 +490,15 @@ namespace aspect
   }
 
   template <int dim>
+  const MeltHandler<dim> &
+  SimulatorAccess<dim>::get_melt_handler () const
+  {
+    Assert (simulator->melt_handler.get() != 0,
+            ExcMessage("You can not call this function if melt transport is not enabled."));
+    return *(simulator->melt_handler);
+  }
+
+  template <int dim>
   void
   SimulatorAccess<dim>::get_composition_values_at_q_point (const std::vector<std::vector<double> > &composition_values,
                                                            const unsigned int                      q,
@@ -449,6 +521,13 @@ namespace aspect
   SimulatorAccess<dim>::get_lateral_averaging() const
   {
     return simulator->lateral_averaging;
+  }
+
+  template <int dim>
+  const ConstraintMatrix &
+  SimulatorAccess<dim>::get_current_constraints() const
+  {
+    return simulator->current_constraints;
   }
 
 }

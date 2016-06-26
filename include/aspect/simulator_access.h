@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011, 2012, 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011, 2012, 2015, 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -22,6 +22,7 @@
 #ifndef __aspect__simulator_access_h
 #define __aspect__simulator_access_h
 
+#include <deal.II/base/timer.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -35,6 +36,7 @@
 #include <aspect/geometry_model/interface.h>
 #include <aspect/gravity_model/interface.h>
 #include <aspect/boundary_temperature/interface.h>
+#include <aspect/boundary_composition/interface.h>
 #include <aspect/initial_conditions/interface.h>
 #include <aspect/compositional_initial_conditions/interface.h>
 #include <aspect/velocity_boundary_conditions/interface.h>
@@ -57,6 +59,7 @@ namespace aspect
   {
     template <int dim> class Manager;
   }
+  template <int dim> class MeltHandler;
 
   /**
    * SimulatorAccess is base class for different plugins like postprocessors.
@@ -158,6 +161,15 @@ namespace aspect
       get_mpi_communicator () const;
 
       /**
+       * Return the timer object for this simulation. Since the timer is
+       * mutable in the Simulator class, this allows plugins to define their
+       * own sections in the timer to measure the time spent in sections of
+       * their code.
+       */
+      TimerOutput &
+      get_computing_timer () const;
+
+      /**
        * Return a reference to the stream object that only outputs something
        * on one processor in a parallel program and simply ignores output put
        * into it on all other processors.
@@ -229,11 +241,16 @@ namespace aspect
       include_latent_heat () const;
 
       /**
+       * Return whether we solve the equations for melt transport.
+       */
+      bool
+      include_melt_transport () const;
+
+      /**
        * Return the stokes velocity degree.
        */
       int
       get_stokes_velocity_degree () const;
-
 
       /**
        * Return the adiabatic surface temperature.
@@ -303,6 +320,19 @@ namespace aspect
       /** @name Accessing variables that identify the solution of the problem */
       /** @{ */
 
+      /**
+       * Return a reference to the vector that has the current linearization
+       * point of the entire system, i.e. the velocity and pressure variables
+       * as well as the temperature and compositional fields. This vector is
+       * associated with the DoFHandler object returned by get_dof_handler().
+       * This vector is only different from the one returned by get_solution()
+       * during the solver phase.
+       *
+       * @note In general the vector is a distributed vector; however, it
+       * contains ghost elements for all locally relevant degrees of freedom.
+       */
+      const LinearAlgebra::BlockVector &
+      get_current_linearization_point () const;
 
       /**
        * Return a reference to the vector that has the current solution of the
@@ -380,6 +410,24 @@ namespace aspect
       get_material_model () const;
 
       /**
+       * This function simply calls Simulator<dim>::compute_material_model_input_values()
+       * with the given arguments.
+       */
+      void
+      compute_material_model_input_values (const LinearAlgebra::BlockVector                            &input_solution,
+                                           const FEValuesBase<dim,dim>                                 &input_finite_element_values,
+                                           const typename DoFHandler<dim>::active_cell_iterator        &cell,
+                                           const bool                                                   compute_strainrate,
+                                           MaterialModel::MaterialModelInputs<dim> &material_model_inputs) const;
+
+      /**
+       * This function simply calls Simulator<dim>::create_additional_material_model_outputs()
+       * with the given arguments.
+       */
+      void
+      create_additional_material_model_outputs (MaterialModel::MaterialModelOutputs<dim> &) const;
+
+      /**
        * Return a pointer to the gravity model description.
        */
       const GravityModel::Interface<dim> &
@@ -415,6 +463,23 @@ namespace aspect
        */
       const BoundaryTemperature::Interface<dim> &
       get_boundary_temperature () const;
+
+      /**
+       * Return whether the current model has a boundary composition object
+       * set. This is useful because a simulation does not actually have to
+       * declare any boundary composition model, for example if all
+       * boundaries are reflecting. In such cases, there is no
+       * boundary composition model that can provide, for example,
+       * a minimal and maximal temperature on the boundary.
+       */
+      bool has_boundary_composition () const;
+
+      /**
+       * Return a reference to the object that describes the composition
+       * boundary values.
+       */
+      const BoundaryComposition::Interface<dim> &
+      get_boundary_composition () const;
 
       /**
        * Return a reference to the object that describes traction
@@ -474,12 +539,25 @@ namespace aspect
       get_heating_model_manager () const;
 
       /**
+       * Return a pointer to the melt handler.
+       */
+      const MeltHandler<dim> &
+      get_melt_handler () const;
+
+      /**
        * Return a reference to the lateral averaging object owned
        * by the simulator, which can be used to query lateral averages
        * of various quantities at depth slices.
        */
       const LateralAveraging<dim> &
       get_lateral_averaging () const;
+
+      /**
+       * Return a pointer to the object that describes the DoF
+       * constraints for the time step we are currently solving.
+       */
+      const ConstraintMatrix &
+      get_current_constraints() const;
 
       /**
        * A convenience function that copies the values of the compositional

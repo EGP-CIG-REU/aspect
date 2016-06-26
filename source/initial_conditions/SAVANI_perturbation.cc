@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -358,15 +358,9 @@ namespace aspect
       {
         prm.enter_subsection("SAVANI perturbation");
         {
-          datadirectory           = prm.get ("Data directory");
-          {
-            const std::string      subst_text = "$ASPECT_SOURCE_DIR";
-            std::string::size_type position;
-            while (position = datadirectory.find (subst_text),  position!=std::string::npos)
-              datadirectory.replace (datadirectory.begin()+position,
-                                     datadirectory.begin()+position+subst_text.size(),
-                                     ASPECT_SOURCE_DIR);
-          }
+          datadirectory = Utilities::replace_in_string(prm.get ("Data directory"),
+                                                       "$ASPECT_SOURCE_DIR",
+                                                       ASPECT_SOURCE_DIR);
           harmonics_coeffs_file_name = prm.get ("Initial condition file name");
           spline_depth_file_name  = prm.get ("Spline knots depth file name");
           vs_to_density           = prm.get_double ("Vs to density scaling");
@@ -404,7 +398,7 @@ namespace aspect
                                        "Research: Solid Earth 119.4 (2014): 3006-3034. "
                                        "The scaling between the shear wave perturbation and the "
                                        "temperature perturbation can be set by the user with the "
-                                       "'vs to density scaling' parameter and the 'Thermal "
+                                       "'Vs to density scaling' parameter and the 'Thermal "
                                        "expansion coefficient in initial temperature scaling' "
                                        "parameter. The scaling is as follows: $\\delta ln \\rho "
                                        "(r,\\theta,\\phi) = \\xi \\cdot \\delta ln v_s(r,\\theta, "

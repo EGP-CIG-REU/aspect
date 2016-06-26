@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -33,15 +33,6 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-/*
- * In some instances, using the Mac .dmg package to install deal.II, compilation
- * fails at the linker stage with an 'ld: symbol(s) not found for architecture x86_64'
- * error associated to VectorTools::compute_no_normal_flux_constraints. This is not
- * really understood, but the extra include makes it work for now.
- */
-#if DEAL_II_VERSION_GTE(8,3,0)
-#include <deal.II/numerics/vector_tools.templates.h>
-#endif
 
 using namespace dealii;
 
@@ -333,7 +324,7 @@ namespace aspect
     //set up the matrix
     LinearAlgebra::SparseMatrix mass_matrix;
 #ifdef ASPECT_USE_PETSC
-    CompressedSimpleSparsityPattern sp(mesh_locally_relevant);
+    LinearAlgebra::DynamicSparsityPattern sp(mesh_locally_relevant);
 
 #else
     TrilinosWrappers::SparsityPattern sp (mesh_locally_owned,
@@ -374,11 +365,7 @@ namespace aspect
           if (cell->face(face_no)->at_boundary())
             {
               const types::boundary_id boundary_indicator
-#if DEAL_II_VERSION_GTE(8,3,0)
                 = cell->face(face_no)->boundary_id();
-#else
-                = cell->face(face_no)->boundary_indicator();
-#endif
               if (sim.parameters.free_surface_boundary_indicators.find(boundary_indicator)
                   == sim.parameters.free_surface_boundary_indicators.end())
                 continue;
@@ -464,7 +451,7 @@ namespace aspect
       coupling[c][c] = DoFTools::always;
 
 #ifdef ASPECT_USE_PETSC
-    CompressedSimpleSparsityPattern sp(mesh_locally_relevant);
+    LinearAlgebra::DynamicSparsityPattern sp(mesh_locally_relevant);
 #else
     TrilinosWrappers::SparsityPattern sp (mesh_locally_owned,
                                           mesh_locally_owned,
@@ -733,11 +720,8 @@ namespace aspect
         if (cell->face(face_no)->at_boundary())
           {
             const types::boundary_id boundary_indicator
-#if DEAL_II_VERSION_GTE(8,3,0)
               = cell->face(face_no)->boundary_id();
-#else
-              = cell->face(face_no)->boundary_indicator();
-#endif
+
             if (sim.parameters.free_surface_boundary_indicators.find(boundary_indicator)
                 == sim.parameters.free_surface_boundary_indicators.end())
               continue;
