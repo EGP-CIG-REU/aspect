@@ -1,0 +1,22 @@
+# 1: Time step number
+# 2: Time (seconds)
+# 3: Number of mesh cells
+# 4: Number of Stokes degrees of freedom
+# 5: Number of temperature degrees of freedom
+# 6: Iterations for temperature solver
+# 7: Time step size (seconds)
+# 8: Global VoF vol
+# 9: Visualization file name
+ 0 0.0000e+00 64 659 289 0 8.8388e-02 5.00000000e-01 output-vof_linear/solution-00000 
+ 1 8.8388e-02 64 659 289 0 8.8388e-02 4.56782389e-01                               "" 
+ 2 1.7678e-01 64 659 289 0 8.8388e-02 4.15517902e-01 output-vof_linear/solution-00001 
+ 3 2.6517e-01 64 659 289 0 8.8388e-02 3.76206541e-01 output-vof_linear/solution-00002 
+ 4 3.5355e-01 64 659 289 0 8.8388e-02 3.38848305e-01 output-vof_linear/solution-00003 
+ 5 4.4194e-01 64 659 289 0 8.8388e-02 3.03443193e-01 output-vof_linear/solution-00004 
+ 6 5.3033e-01 64 659 289 0 8.8388e-02 2.69991207e-01 output-vof_linear/solution-00005 
+ 7 6.1872e-01 64 659 289 0 8.8388e-02 2.38492346e-01 output-vof_linear/solution-00006 
+ 8 7.0711e-01 64 659 289 0 8.8388e-02 2.08946609e-01 output-vof_linear/solution-00007 
+ 9 7.9550e-01 64 659 289 0 8.8388e-02 1.81353998e-01                               "" 
+10 8.8388e-01 64 659 289 0 8.8388e-02 1.55714512e-01 output-vof_linear/solution-00008 
+11 9.7227e-01 64 659 289 0 2.7728e-02 1.32028150e-01 output-vof_linear/solution-00009 
+12 1.0000e+00 64 659 289 0 8.8388e-02 1.25000000e-01 output-vof_linear/solution-00010 
