@@ -427,9 +427,9 @@ namespace aspect
 
             // Calculate outward flux
             double flux_vof;
-            if (face_flux < 0)
+            if (face_flux < 0.0)
               {
-                flux_vof = 0;
+                flux_vof = 0.0;
               }
             else
               {
@@ -546,27 +546,25 @@ namespace aspect
                 data.assembled_rhs[f_rhs_ind] = true;
 
                 dflux += face_flux;
+                if (face_flux<0.0)
+                  face_flux=0.0;
+                // fluxes to RHS
+                for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+                  {
+                    data.local_rhs[i] -= cell_vof * face_flux;
+                    data.local_f_rhs[f_rhs_ind][i] += cell_vof * face_flux;
+                  }
 
                 // Temporarily limit to constant cases
-                if (cell_vof < voleps || cell_vof>1.0-voleps)
-                  {
-                    if (face_flux<0.0)
-                      face_flux=0.0;
-                    // fluxes to RHS
-                    for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-                      {
-                        data.local_rhs[i] -= cell_vof * face_flux;
-                        data.local_f_rhs[f_rhs_ind][i] += cell_vof * face_flux;
-                      }
-                    continue;
-                  }
-                else
+                if (cell_vof > voleps && cell_vof<1.0-voleps)
                   {
                     pcout << "Cell at " << cell->center() << " " << cell_vof << std::endl;
                     pcout << "\t" << face_flux/time_step/cell_vol << std::endl;
                     pcout << "\t" << cell_i_normal << ".x=" << cell_i_d << std::endl;
                     Assert(false, ExcNotImplemented());
                   }
+                continue;
+
 
                 // Due to inability to reference this cell's values at the interface,
                 // need to do explicit calculation
@@ -600,18 +598,23 @@ namespace aspect
 
     // Split induced divergence correction
 
-    for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
+    for (unsigned int q=0; q<n_q_points; ++q)
       {
-        if (!update_from_old)
+        for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
           {
-            // Explicit discretization
-            data.local_rhs[i] -= cell_vof * dflux;
-          }
-        else
-          {
-            // Implicit discretization
-            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-              data.local_matrix (i, j) += dflux;
+            if (!update_from_old)
+              {
+                // Explicit discretization
+                data.local_rhs[i] -= scratch.old_field_values[q] * dflux;
+              }
+            else
+              {
+                // Implicit discretization
+                for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
+                  data.local_matrix (i, j) += scratch.phi_field[i] *
+                                              scratch.phi_field[j] *
+                                              dflux;
+              }
           }
       }
 
