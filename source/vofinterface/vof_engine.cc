@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#include <aspect/vofinterface/vof_engine.h>
-
+#include <aspect/global.h>
+#include <aspect/simulator_signals.h>
 #include <deal.II/fe/fe_dgq.h>
 
 namespace aspect
