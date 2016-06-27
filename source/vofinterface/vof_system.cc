@@ -371,6 +371,7 @@ namespace aspect
             if (face_flux < 0.0)
               {
                 flux_vof = 0.0;
+                face_flux = 0.0;
               }
             else
               {
@@ -386,6 +387,7 @@ namespace aspect
 
                 // Add fluxes to RHS
                 data.local_rhs[0] -= flux_vof * face_flux;
+                data.local_matrix(0, 0) -= face_flux;
               }
             else
               {
@@ -412,7 +414,9 @@ namespace aspect
 
                 // fluxes to RHS
                 data.local_rhs [0] -= flux_vof * face_flux;
-                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
+                data.local_matrix (0, 0) -= face_flux;
+                data.local_f_rhs[f_rhs_ind][0] = flux_vof * face_flux;
+                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) = face_flux;
               }
           }
         else
@@ -494,7 +498,9 @@ namespace aspect
                   flux_vof = 1.0;
 
                 data.local_rhs [0] -= flux_vof * face_flux;
-                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
+                data.local_matrix (0, 0) -= face_flux;
+                data.local_f_rhs[f_rhs_ind][0] = flux_vof * face_flux;
+                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) = face_flux;
 
                 // Temporarily limit to constant cases
                 if (cell_vof > voleps && cell_vof<1.0-voleps)
