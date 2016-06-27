@@ -77,6 +77,8 @@ namespace aspect
           std::vector<Tensor<1,dim> > face_old_velocity_values;
           std::vector<Tensor<1,dim> > face_old_old_velocity_values;
           std::vector<Tensor<1,dim> > face_mesh_velocity_values;
+
+          std::vector<double>         neighbor_old_values;
         };
       }
 
@@ -107,7 +109,8 @@ namespace aspect
            * GeometryInfo<dim>::faces_per_cell so as to hold one matrix for
            * each possible face or subface of the cell.
            **/
-          std::vector<Vector<double>> local_f_rhs;
+          std::vector<Vector<double>>     local_f_rhs;
+          std::vector<FullMatrix<double>> local_f_matrices_ext_ext;
 
           /**
            * Denotes which face's rhs have actually been assembled in the DG

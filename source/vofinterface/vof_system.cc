@@ -80,7 +80,8 @@ namespace aspect
           face_current_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
           face_old_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
           face_old_old_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
-          face_mesh_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >())
+          face_mesh_velocity_values (face_quadrature.size(), numbers::signaling_nan<Tensor<1, dim> >()),
+          neighbor_old_values (face_quadrature.size(), numbers::signaling_nan<double>())
         {}
 
         template <int dim>
@@ -110,7 +111,8 @@ namespace aspect
           face_current_velocity_values (scratch.face_current_velocity_values),
           face_old_velocity_values (scratch.face_old_velocity_values),
           face_old_old_velocity_values (scratch.face_old_old_velocity_values),
-          face_mesh_velocity_values (scratch.face_mesh_velocity_values)
+          face_mesh_velocity_values (scratch.face_mesh_velocity_values),
+          neighbor_old_values (scratch.neighbor_old_values)
         {}
       }
 
@@ -124,6 +126,8 @@ namespace aspect
           local_rhs (finite_element.dofs_per_cell),
           local_f_rhs (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
                        Vector<double>(finite_element.dofs_per_cell)),
+          local_f_matrices_ext_ext (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
+                                    FullMatrix<double>(finite_element.dofs_per_cell, finite_element.dofs_per_cell)),
           assembled_rhs (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
                          false),
           local_dof_indices (finite_element.dofs_per_cell),
@@ -137,6 +141,7 @@ namespace aspect
           local_matrix (data.local_matrix),
           local_rhs (data.local_rhs),
           local_f_rhs (data.local_f_rhs),
+          local_f_matrices_ext_ext (data.local_f_matrices_ext_ext),
           assembled_rhs (data.assembled_rhs),
           local_dof_indices (data.local_dof_indices),
           neighbor_dof_indices (data.neighbor_dof_indices)
@@ -361,8 +366,6 @@ namespace aspect
                 face_ls_time_grad = -(face_flux/cell_vol)*cell_i_normal[f_dim];
               }
 
-            dflux += face_flux;
-
             // Calculate outward flux
             double flux_vof;
             if (face_flux < 0.0)
@@ -382,10 +385,7 @@ namespace aspect
                 //TODO: Handle non-zero inflow VoF boundary conditions
 
                 // Add fluxes to RHS
-                for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-                  {
-                    data.local_rhs[i] -= flux_vof * face_flux;
-                  }
+                data.local_rhs[0] -= flux_vof * face_flux;
               }
             else
               {
@@ -411,11 +411,8 @@ namespace aspect
                 data.assembled_rhs[f_rhs_ind] = true;
 
                 // fluxes to RHS
-                for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-                  {
-                    data.local_rhs[i] -= flux_vof * face_flux;
-                    data.local_f_rhs[f_rhs_ind][i] += flux_vof * face_flux;
-                  }
+                data.local_rhs [0] -= flux_vof * face_flux;
+                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
               }
           }
         else
@@ -487,16 +484,17 @@ namespace aspect
                 // fluxes to RHS
                 double flux_vof = cell_vof;
                 if (face_flux<0.0)
-                  flux_vof=0.0;
+                  {
+                    flux_vof = 0.0;
+                    face_flux = 0.0;
+                  }
                 if (flux_vof < 0.0)
                   flux_vof = 0.0;
                 if (flux_vof > 1.0)
                   flux_vof = 1.0;
-                for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-                  {
-                    data.local_rhs[i] -= flux_vof * face_flux;
-                    data.local_f_rhs[f_rhs_ind][i] += flux_vof * face_flux;
-                  }
+
+                data.local_rhs [0] -= flux_vof * face_flux;
+                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
 
                 // Temporarily limit to constant cases
                 if (cell_vof > voleps && cell_vof<1.0-voleps)
@@ -504,7 +502,7 @@ namespace aspect
                     pcout << "Cell at " << cell->center() << " " << cell_vof << std::endl;
                     pcout << "\t" << face_flux/time_step/cell_vol << std::endl;
                     pcout << "\t" << cell_i_normal << ".x=" << cell_i_d << std::endl;
-                    Assert(false, ExcNotImplemented());
+                    // Assert(false, ExcNotImplemented());
                   }
                 continue;
 
@@ -537,24 +535,6 @@ namespace aspect
               }
           }
       }
-
-    // Split induced divergence correction
-
-    for (unsigned int i=0; i<vof_dofs_per_cell; ++i)
-      {
-        if (!update_from_old)
-          {
-            // Explicit discretization
-            data.local_rhs[i] -= cell_vof * dflux;
-          }
-        else
-          {
-            // Implicit discretization
-            for (unsigned int j=0; j<vof_dofs_per_cell; ++j)
-              data.local_matrix (i, j) += dflux;
-          }
-      }
-
   }
 
   template <int dim>
@@ -639,9 +619,15 @@ namespace aspect
       {
         if (data.assembled_rhs[f])
           {
-            for (unsigned int j=0; j<data.neighbor_dof_indices[f].size(); ++j)
+            for (unsigned int i=0; i<data.neighbor_dof_indices[f].size(); ++i)
               {
-                system_rhs(data.neighbor_dof_indices[f][j]) += data.local_f_rhs[f][j];
+                system_rhs(data.neighbor_dof_indices[f][i]) += data.local_f_rhs[f][i];
+                for (unsigned int j=0; j< data.neighbor_dof_indices[f].size(); ++j)
+                  {
+                    system_matrix.add(data.neighbor_dof_indices[f][i],
+                                      data.neighbor_dof_indices[f][j],
+                                      data.local_f_matrices_ext_ext[f](i,j));
+                  }
               }
           }
       }
