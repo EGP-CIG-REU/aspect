@@ -31,7 +31,7 @@ namespace aspect
     // Add required variables
 
     template <int dim>
-    void VOFEngine<dim>::add_vof_vars(const Parameters<dim> &parameters,
+    void VoFEngine<dim>::add_vof_vars(const Parameters<dim> &parameters,
                                       std::vector<VariableDeclaration<dim>> &vars)
     {
       if (!parameters.vof_tracking_enabled)
@@ -61,7 +61,7 @@ namespace aspect
     template <int dim>
     void signal_connector (SimulatorSignals<dim> &signals)
     {
-      signals.edit_finite_element_variables.connect(VOFEngine<dim>::add_vof_vars);
+      signals.edit_finite_element_variables.connect(VoFEngine<dim>::add_vof_vars);
     }
 
     ASPECT_REGISTER_SIGNALS_CONNECTOR(signal_connector<2>,

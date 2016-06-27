@@ -187,69 +187,6 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::assemble_vof_system (unsigned int dir, bool update_from_old)
-  {
-    computing_timer.enter_section ("   Assemble VoF system");
-    const unsigned int block_idx = introspection.variable("vofs").block_index;
-    system_matrix.block(block_idx, block_idx) = 0;
-    system_rhs = 0;
-
-    typedef
-    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    CellFilter;
-
-    // const unsigned int vof_base_element = introspection.variable("vofs").base_index;
-    const FiniteElement<dim> &vof_fe = (*introspection.variable("vofs").fe);
-
-    WorkStream::
-    run (CellFilter (IteratorFilters::LocallyOwnedCell(),
-                     dof_handler.begin_active()),
-         CellFilter (IteratorFilters::LocallyOwnedCell(),
-                     dof_handler.end()),
-         std_cxx11::bind (&Simulator<dim>::
-                          local_assemble_vof_system,
-                          this,
-                          dir,
-                          update_from_old,
-                          std_cxx11::_1,
-                          std_cxx11::_2,
-                          std_cxx11::_3),
-         std_cxx11::bind (&Simulator<dim>::
-                          copy_local_to_global_vof_system,
-                          this,
-                          std_cxx11::_1),
-         // we have to assemble the term u.grad phi_i * phi_j, which is
-         // of total polynomial degree
-         //   stokes_deg - 1
-         // (or similar for comp_deg). this suggests using a Gauss
-         // quadrature formula of order
-         //   stokes_deg/2
-         // rounded up. do so. (note that x/2 rounded up
-         // equals (x+1)/2 using integer division.)
-         //
-         // (note: we need to get at the advection element in
-         // use for the scratch and copy objects below. the
-         // base element for the compositional fields exists
-         // only once, with multiplicity, so only query
-         // introspection.block_indices.compositional_fields[0]
-         // instead of subscripting with the correct compositional
-         // field index.)
-         internal::Assembly::Scratch::
-         VoFSystem<dim> (finite_element,
-                         vof_fe,
-                         mapping,
-                         QGauss<dim>((parameters.stokes_velocity_degree+1)/2),
-                         QGauss<dim-1>((parameters.stokes_velocity_degree+1)/2)),
-         internal::Assembly::CopyData::
-         VoFSystem<dim> (vof_fe));
-
-    system_matrix.compress(VectorOperation::add);
-    system_rhs.compress(VectorOperation::add);
-
-    computing_timer.exit_section ();
-  }
-
-  template <int dim>
   void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir,
                                                   bool update_from_old,
                                                   const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -618,6 +555,69 @@ namespace aspect
           }
       }
 
+  }
+
+  template <int dim>
+  void Simulator<dim>::assemble_vof_system (unsigned int dir, bool update_from_old)
+  {
+    computing_timer.enter_section ("   Assemble VoF system");
+    const unsigned int block_idx = introspection.variable("vofs").block_index;
+    system_matrix.block(block_idx, block_idx) = 0;
+    system_rhs = 0;
+
+    typedef
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    CellFilter;
+
+    // const unsigned int vof_base_element = introspection.variable("vofs").base_index;
+    const FiniteElement<dim> &vof_fe = (*introspection.variable("vofs").fe);
+
+    WorkStream::
+    run (CellFilter (IteratorFilters::LocallyOwnedCell(),
+                     dof_handler.begin_active()),
+         CellFilter (IteratorFilters::LocallyOwnedCell(),
+                     dof_handler.end()),
+         std_cxx11::bind (&Simulator<dim>::
+                          local_assemble_vof_system,
+                          this,
+                          dir,
+                          update_from_old,
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&Simulator<dim>::
+                          copy_local_to_global_vof_system,
+                          this,
+                          std_cxx11::_1),
+         // we have to assemble the term u.grad phi_i * phi_j, which is
+         // of total polynomial degree
+         //   stokes_deg - 1
+         // (or similar for comp_deg). this suggests using a Gauss
+         // quadrature formula of order
+         //   stokes_deg/2
+         // rounded up. do so. (note that x/2 rounded up
+         // equals (x+1)/2 using integer division.)
+         //
+         // (note: we need to get at the advection element in
+         // use for the scratch and copy objects below. the
+         // base element for the compositional fields exists
+         // only once, with multiplicity, so only query
+         // introspection.block_indices.compositional_fields[0]
+         // instead of subscripting with the correct compositional
+         // field index.)
+         internal::Assembly::Scratch::
+         VoFSystem<dim> (finite_element,
+                         vof_fe,
+                         mapping,
+                         QGauss<dim>((parameters.stokes_velocity_degree+1)/2),
+                         QGauss<dim-1>((parameters.stokes_velocity_degree+1)/2)),
+         internal::Assembly::CopyData::
+         VoFSystem<dim> (vof_fe));
+
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
+
+    computing_timer.exit_section ();
   }
 
   template <int dim>

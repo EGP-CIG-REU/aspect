@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __aspect__vofinterface_VOFEngineSig_h
-#define __aspect__vofinterface_VOFEngineSig_h
+#ifndef __aspect__vofinterface_VoFEngineSig_h
+#define __aspect__vofinterface_VoFEngineSig_h
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -32,7 +32,7 @@ namespace aspect
   namespace InterfaceTracker
   {
     template <int dim>
-    class VOFEngine
+    class VoFEngine
     {
       public:
 
