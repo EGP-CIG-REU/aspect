@@ -43,13 +43,20 @@ namespace aspect
     {
       public:
         /**
-         * After cells have been marked for coarsening/refinement, apply
-         * additional criteria independent of the error estimate.
-         *
+         * Mark cells on or neighboring VoF Boundary for refinement
          */
         virtual
         void
         execute (Vector<float> &indicators) const;
+
+        /**
+         * Mark large unrefined neighboring cells for refinement and prevent
+         * coarsening
+         */
+        virtual
+        void
+        tag_additional_cells() const;
+
 
         static
         void

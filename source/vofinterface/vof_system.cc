@@ -222,13 +222,6 @@ namespace aspect
     const FEValuesExtractors::Scalar solution_field = introspection.variable("vofs").extractor_scalar();
     const Quadrature<dim> &quadrature = scratch.finite_element_values.get_quadrature();
 
-    //loop over all possible subfaces of the cell, and reset corresponding rhs
-    for (unsigned int f = 0; f < GeometryInfo<dim>::max_children_per_face * GeometryInfo<dim>::faces_per_cell; ++f)
-      {
-        data.local_f_rhs[f] = 0;
-        data.assembled_rhs[f] = false;
-      }
-
     scratch.finite_element_values.reinit (cell);
 
     cell->get_dof_indices (scratch.local_dof_indices);
@@ -237,6 +230,14 @@ namespace aspect
 
     data.local_matrix = 0;
     data.local_rhs = 0;
+
+    //loop over all possible subfaces of the cell, and reset corresponding rhs
+    for (unsigned int f = 0; f < GeometryInfo<dim>::max_children_per_face * GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+        data.local_f_rhs[f] = 0.0;
+        data.local_f_matrices_ext_ext[f] = 0.0;
+        data.assembled_rhs[f] = false;
+      }
 
     // Interface reconstruction data
     double cell_vof;
@@ -415,8 +416,8 @@ namespace aspect
                 // fluxes to RHS
                 data.local_rhs [0] -= flux_vof * face_flux;
                 data.local_matrix (0, 0) -= face_flux;
-                data.local_f_rhs[f_rhs_ind][0] = flux_vof * face_flux;
-                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) = face_flux;
+                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
+                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
               }
           }
         else
@@ -499,8 +500,8 @@ namespace aspect
 
                 data.local_rhs [0] -= flux_vof * face_flux;
                 data.local_matrix (0, 0) -= face_flux;
-                data.local_f_rhs[f_rhs_ind][0] = flux_vof * face_flux;
-                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) = face_flux;
+                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
+                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
 
                 // Temporarily limit to constant cases
                 if (cell_vof > voleps && cell_vof<1.0-voleps)

@@ -182,6 +182,15 @@ namespace aspect
 
     template <int dim>
     void
+    VoFBoundary<dim>::tag_additional_cells() const
+    {
+      // Skip if do not have any vof data to use
+      if (this->get_dof_handler().n_dofs()==0)
+        return;
+    }
+
+    template <int dim>
+    void
     VoFBoundary<dim>::
     declare_parameters (ParameterHandler &prm)
     {
