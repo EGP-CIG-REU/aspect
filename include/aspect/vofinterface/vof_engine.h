@@ -36,10 +36,6 @@ namespace aspect
     {
       public:
 
-        static
-        void add_vof_vars(const Parameters<dim> &parameters,
-                          std::vector<VariableDeclaration<dim>> &vars);
-
       private:
     };
 
