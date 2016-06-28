@@ -372,7 +372,6 @@ namespace aspect
             if (face_flux < 0.0)
               {
                 flux_vof = 0.0;
-                face_flux = 0.0;
               }
             else
               {
@@ -394,6 +393,11 @@ namespace aspect
               {
                 Assert (cell->neighbor(f).state() == IteratorState::valid,
                         ExcInternalError());
+
+                if (face_flux < 0.0)
+                  {
+                    face_flux = 0.0;
+                  }
 
                 const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(f); //note: NOT active_cell_iterator, so this includes cells that are refined.
                 // No children, so can do simple approach
