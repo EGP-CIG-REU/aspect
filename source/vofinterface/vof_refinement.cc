@@ -187,6 +187,9 @@ namespace aspect
       // Skip if do not have any vof data to use
       if (this->get_dof_handler().n_dofs()==0)
         return;
+
+      // Currently do not need to do strong enforcement of refinement, will
+      // consider at later point
     }
 
     template <int dim>
