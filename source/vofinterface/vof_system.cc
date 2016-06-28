@@ -179,11 +179,11 @@ namespace aspect
         solve_vof_system ();
         // Copy current candidate normals.
         // primarily useful for exact linear translation
-        solution.block(vofN_block_idx) = current_linearization_point.block(vofN_block_idx);
+        solution.block(vofN_block_idx) = old_solution.block(vofN_block_idx);
         update_vof_normals (solution);
 
-        current_linearization_point.block(vof_block_idx) = solution(vof_block_idx);
-        current_linearization_point.block(vofN_block_idx) = solution(vofN_block_idx);
+        current_linearization_point.block(vof_block_idx) = solution.block(vof_block_idx);
+        current_linearization_point.block(vofN_block_idx) = solution.block(vofN_block_idx);
 
         update_from_old = false;
       }
