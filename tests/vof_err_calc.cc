@@ -131,7 +131,7 @@ namespace aspect
               const double global_err
                 = Utilities::MPI::sum (l_err, this->get_mpi_communicator());
               err_str << " " << *it << "= ";
-              err_str << std::scientific << std::setprecision (15)
+              err_str << std::scientific << std::setprecision (8)
                       << global_err;
             }
           err_str << ".";

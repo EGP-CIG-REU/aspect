@@ -1,25 +1,23 @@
 -----------------------------------------------------------------------------
--- This is ASPECT, the Advanced Solver for Problems in Earth's ConvecTion.
---     . version 1.4.0-pre
---     . running in DEBUG mode
---     . running with 1 MPI process
---     . using Trilinos
 -----------------------------------------------------------------------------
+
+Loading shared library <./libvof_circle_1.so>
 
 Number of active cells: 256 (on 5 levels)
 Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
 
 *** Timestep 0:  t=0 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 0 iterations.
-   Solving VoF system... 1 iterations.
+   Solving VoF system... 0 iterations.
 
    Postprocessing:
      Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00000
+     VOF Calculation:           IEstL1= 9.87186594e-03 FEstL1= 0.00000000e+00.
+     Writing graphical output: output-vof_circle_1/solution-00000
 
 *** Timestep 1:  t=0.0441942 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -27,7 +25,7 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 2:  t=0.0883883 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -35,16 +33,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 3:  t=0.132583 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00001
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 4:  t=0.176777 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -52,33 +49,32 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 5:  t=0.220971 seconds
-   Solving temperature system... 0 iterations.
-   Solving VoF system... 1 iterations.
-   Solving VoF system... 1 iterations.
-
-   Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00002
-
-*** Timestep 6:  t=0.265165 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
      Global VoF vol: 0.785 m^3
 
-*** Timestep 7:  t=0.309359 seconds
-   Solving temperature system... 0 iterations.
+*** Timestep 6:  t=0.265165 seconds
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00003
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 4.12918475e-02 FEstL1= 3.47830976e-02.
+
+*** Timestep 7:  t=0.309359 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 8:  t=0.353553 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -86,7 +82,7 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 9:  t=0.397748 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -94,16 +90,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 10:  t=0.441942 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00004
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 11:  t=0.486136 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -111,16 +106,16 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 12:  t=0.53033 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00005
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 4.69997801e-02 FEstL1= 4.10984984e-02.
 
 *** Timestep 13:  t=0.574524 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -128,16 +123,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 14:  t=0.618718 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00006
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 15:  t=0.662913 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -145,24 +139,24 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 16:  t=0.707107 seconds
-   Solving temperature system... 0 iterations.
-   Solving VoF system... 1 iterations.
-   Solving VoF system... 1 iterations.
-
-   Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00007
-
-*** Timestep 17:  t=0.751301 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
      Global VoF vol: 0.785 m^3
 
+*** Timestep 17:  t=0.751301 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.16330384e-02 FEstL1= 4.96773699e-02.
+
 *** Timestep 18:  t=0.795495 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -170,16 +164,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 19:  t=0.839689 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00008
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 20:  t=0.883883 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -187,16 +180,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 21:  t=0.928078 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00009
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 22:  t=0.972272 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -204,16 +196,16 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 23:  t=1.01647 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00010
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.70399337e-02 FEstL1= 5.31627598e-02.
 
 *** Timestep 24:  t=1.06066 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -221,16 +213,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 25:  t=1.10485 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00011
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 26:  t=1.14905 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -238,7 +229,7 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 27:  t=1.19324 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -246,33 +237,32 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 28:  t=1.23744 seconds
-   Solving temperature system... 0 iterations.
-   Solving VoF system... 1 iterations.
-   Solving VoF system... 1 iterations.
-
-   Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00012
-
-*** Timestep 29:  t=1.28163 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
      Global VoF vol: 0.785 m^3
 
-*** Timestep 30:  t=1.32583 seconds
-   Solving temperature system... 0 iterations.
+*** Timestep 29:  t=1.28163 seconds
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00013
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.66862074e-02 FEstL1= 5.34560711e-02.
+
+*** Timestep 30:  t=1.32583 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 31:  t=1.37002 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -280,16 +270,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 32:  t=1.41421 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00014
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 33:  t=1.45841 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -297,16 +286,16 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 34:  t=1.5026 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00015
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 6.05017816e-02 FEstL1= 5.91980195e-02.
 
 *** Timestep 35:  t=1.5468 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -314,7 +303,7 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 36:  t=1.59099 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -322,16 +311,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 37:  t=1.63518 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00016
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 38:  t=1.67938 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -339,33 +327,32 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 39:  t=1.72357 seconds
-   Solving temperature system... 0 iterations.
-   Solving VoF system... 1 iterations.
-   Solving VoF system... 1 iterations.
-
-   Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00017
-
-*** Timestep 40:  t=1.76777 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
      Global VoF vol: 0.785 m^3
 
-*** Timestep 41:  t=1.81196 seconds
-   Solving temperature system... 0 iterations.
+*** Timestep 40:  t=1.76777 seconds
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00018
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 6.37823816e-02 FEstL1= 6.32100655e-02.
+
+*** Timestep 41:  t=1.81196 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 42:  t=1.85616 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -373,16 +360,15 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 43:  t=1.90035 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00019
+     Global VoF vol: 0.785 m^3
 
 *** Timestep 44:  t=1.94454 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -390,7 +376,7 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 45:  t=1.98874 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
@@ -398,30 +384,19 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
      Global VoF vol: 0.785 m^3
 
 *** Timestep 46:  t=2 seconds
-   Solving temperature system... 0 iterations.
+   Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
 
    Postprocessing:
      Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle/solution-00020
+     VOF Calculation:           IEstL1= 6.94127735e-02 FEstL1= 6.78825050e-02.
+     Writing graphical output: output-vof_circle_1/solution-00001
 
 Termination requested by criterion: end time
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      23.1s |            |
-|                                             |            |            |
-| Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble VoF system             |        94 |      6.48s |        28% |
-| Assemble temperature system     |        47 |      12.3s |        53% |
-| Build temperature preconditioner|        47 |     0.176s |      0.76% |
-| Reconstruct VoF interfaces      |        95 |     0.337s |       1.5% |
-| Solve VoF system                |        94 |     0.132s |      0.57% |
-| Solve temperature system        |        47 |    0.0846s |      0.37% |
-| Initialization                  |         2 |     0.998s |       4.3% |
-| Postprocessing                  |        47 |     0.817s |       3.5% |
-| Setup dof systems               |         1 |     0.153s |      0.66% |
 +---------------------------------+-----------+------------+------------+
 

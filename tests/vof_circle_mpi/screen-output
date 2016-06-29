@@ -1,0 +1,402 @@
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+Loading shared library <./libvof_circle_mpi.so>
+
+Number of active cells: 256 (on 5 levels)
+Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
+
+*** Timestep 0:  t=0 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+
+   Postprocessing:
+     Global VoF vol:           0.785 m^3
+     VOF Calculation:           IEstL1= 9.87186594e-03 FEstL1= 0.00000000e+00.
+     Writing graphical output: output-vof_circle_mpi/solution-00000
+
+*** Timestep 1:  t=0.0441942 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 2:  t=0.0883883 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 3:  t=0.132583 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 4:  t=0.176777 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 5:  t=0.220971 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 6:  t=0.265165 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 4.12918475e-02 FEstL1= 3.47830976e-02.
+
+*** Timestep 7:  t=0.309359 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 8:  t=0.353553 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 9:  t=0.397748 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 10:  t=0.441942 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 11:  t=0.486136 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 12:  t=0.53033 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 4.69997801e-02 FEstL1= 4.10984984e-02.
+
+*** Timestep 13:  t=0.574524 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 14:  t=0.618718 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 15:  t=0.662913 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 16:  t=0.707107 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 17:  t=0.751301 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.16330384e-02 FEstL1= 4.96773699e-02.
+
+*** Timestep 18:  t=0.795495 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 19:  t=0.839689 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 20:  t=0.883883 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 21:  t=0.928078 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 22:  t=0.972272 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 23:  t=1.01647 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.70399337e-02 FEstL1= 5.31627598e-02.
+
+*** Timestep 24:  t=1.06066 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 25:  t=1.10485 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 26:  t=1.14905 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 27:  t=1.19324 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 28:  t=1.23744 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 29:  t=1.28163 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.66862074e-02 FEstL1= 5.34560711e-02.
+
+*** Timestep 30:  t=1.32583 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 31:  t=1.37002 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 32:  t=1.41421 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 33:  t=1.45841 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 34:  t=1.5026 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 6.05017816e-02 FEstL1= 5.91980195e-02.
+
+*** Timestep 35:  t=1.5468 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 36:  t=1.59099 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 37:  t=1.63518 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 38:  t=1.67938 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 39:  t=1.72357 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 40:  t=1.76777 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 6.37823816e-02 FEstL1= 6.32100655e-02.
+
+*** Timestep 41:  t=1.81196 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 42:  t=1.85616 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 43:  t=1.90035 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 44:  t=1.94454 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 45:  t=1.98874 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+*** Timestep 46:  t=2 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:           0.785 m^3
+     VOF Calculation:           IEstL1= 6.94127735e-02 FEstL1= 6.78825050e-02.
+     Writing graphical output: output-vof_circle_mpi/solution-00001
+
+Termination requested by criterion: end time
+
+
++---------------------------------------------+------------+------------+
++---------------------------------+-----------+------------+------------+
++---------------------------------+-----------+------------+------------+
+
