@@ -7,7 +7,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 *** Timestep 0:  t=0 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 0 iterations.
-   Solving VoF system... 1 iterations.
+   Solving VoF system... 0 iterations.
 
    Postprocessing:
      Global VoF vol:           0.5 m^3
