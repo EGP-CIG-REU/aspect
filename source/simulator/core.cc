@@ -1044,12 +1044,6 @@ namespace aspect
       for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
         coupling[x.compositional_fields[c]][x.compositional_fields[c]]
           = DoFTools::always;
-
-      if (parameters.vof_tracking_enabled)
-        {
-          const unsigned int vof_c_index = introspection.variable("vofs").first_component_index;
-          coupling[vof_c_index][vof_c_index] = DoFTools::always;
-        }
     }
     bool need_flux_sparsity = false;
     {
@@ -1101,10 +1095,16 @@ namespace aspect
                                      this_mpi_process(mpi_communicator));
     if (need_flux_sparsity)
       {
-        DoFTools::make_flux_sparsity_pattern (dof_handler,
-                                              sp,
-                                              dgcell_coupling,
-                                              face_coupling);
+        // Non-working flux coupling
+        // DoFTools::make_flux_sparsity_pattern (dof_handler,
+        //                                       sp,
+        //                                       dgcell_coupling,
+        //                                       face_coupling);
+        DoFTools::make_flux_sparsity_pattern (dof_handler, sp,
+                                              constraints, false,
+                                              Utilities::MPI::
+                                              this_mpi_process(mpi_communicator));
+
       }
 
 #ifdef ASPECT_USE_PETSC
