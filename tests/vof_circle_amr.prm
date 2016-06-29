@@ -1,4 +1,4 @@
-# Set velocity field test parameter file
+# Test advecting a circle under a constant velocity field
 
 set Dimension                              = 2
 set Start time                             = 0
@@ -11,8 +11,8 @@ set Use VoF tracking = true
 
 subsection Mesh refinement
   set Minimum refinement level           = 2
-  set Initial global refinement          = 2
-  set Initial adaptive refinement        = 3
+  set Initial global refinement          = 3
+  set Initial adaptive refinement        = 2
   set Time steps between mesh refinement = 1
   set Run postprocessors on initial refinement = true
   set Strategy                                 = vofboundary
