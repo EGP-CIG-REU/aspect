@@ -1,6 +1,8 @@
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
+Loading shared library <./libvof_linear.so>
+
 Number of active cells: 64 (on 4 levels)
 Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
@@ -11,6 +13,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF vol:           0.5 m^3
+     VOF Calculation:           IEstL1= 2.133167774365309e-17 FEstL1= 0.000000000000000e+00.
      Writing graphical output: output-vof_linear/solution-00000
 
 *** Timestep 1:  t=0.0883883 seconds
@@ -35,7 +38,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol: 0.376 m^3
+     Global VoF vol:  0.376 m^3
+     VOF Calculation:  IEstL1= 2.869110696225904e-17 FEstL1= 2.168404344971009e-17.
 
 *** Timestep 4:  t=0.353553 seconds
    Skipping temperature solve because RHS is zero.
@@ -59,7 +63,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol: 0.27 m^3
+     Global VoF vol:  0.27 m^3
+     VOF Calculation:  IEstL1= 3.741733633782390e-17 FEstL1= 4.250072516143177e-17.
 
 *** Timestep 7:  t=0.618718 seconds
    Skipping temperature solve because RHS is zero.
@@ -83,7 +88,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF vol: 0.181 m^3
+     Global VoF vol:  0.181 m^3
+     VOF Calculation:  IEstL1= 5.244801539619026e-17 FEstL1= 4.770489558936220e-17.
 
 *** Timestep 10:  t=0.883883 seconds
    Skipping temperature solve because RHS is zero.
@@ -108,6 +114,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF vol:           0.125 m^3
+     VOF Calculation:           IEstL1= 4.353071722529411e-17 FEstL1= 4.370690007832187e-17.
      Writing graphical output: output-vof_linear/solution-00001
 
 Termination requested by criterion: end time
