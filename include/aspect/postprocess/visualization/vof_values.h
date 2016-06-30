@@ -31,6 +31,10 @@ namespace aspect
   {
     namespace VisualizationPostprocessors
     {
+      /**
+       * A class derived that implements a funciton that provides volume of
+       * fluid interface tracking data for graphical output.
+       */
       template <int dim>
       class VoFValues
         : public DataPostprocessor<dim>,

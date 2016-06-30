@@ -29,7 +29,7 @@ namespace aspect
     template <int dim>
     Function<dim>::Function ()
       :
-      n_i_samp (3),
+      n_samples (3),
       function (1)
     {}
 
@@ -90,7 +90,7 @@ namespace aspect
         if (is_dist_init)
           function_init_type = VoFInitType::signed_distance_level_set;
         else
-          f_init_type = VoFInitType::composition;
+          function_init_type = VoFInitType::composition;
 
         n_samples = prm.get_integer ("Number initialization samples");
 

@@ -38,12 +38,12 @@ namespace aspect
 
     switch (vof_initial_conditions->init_type())
       {
-        case VoFInitialConditions::VoFInitType::Compos:
+        case VoFInitialConditions::VoFInitType::composition:
         {
           init_vof_compos ();
           break;
         }
-        case VoFInitialConditions::VoFInitType::SDist_LS:
+        case VoFInitialConditions::VoFInitType::signed_distance_level_set:
         {
           init_vof_ls ();
           break;

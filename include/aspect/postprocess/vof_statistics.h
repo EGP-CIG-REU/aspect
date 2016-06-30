@@ -32,7 +32,7 @@ namespace aspect
   {
 
     /**
-     * A postprocessor that computes some statistics about the velocity.
+     * A postprocessor that computes some statistics about the volume of fluid fields
      *
      * @ingroup Postprocessing
      */
