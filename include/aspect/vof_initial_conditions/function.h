@@ -94,8 +94,8 @@ namespace aspect
          * Required information on initialization method.
          */
 
-        typename VoFInitType::Kind f_init_type;
-        unsigned int n_i_samp;
+        typename VoFInitType::Kind function_init_type;
+        unsigned int n_samples;
 
         /**
          * A function object representing the compositional fields.

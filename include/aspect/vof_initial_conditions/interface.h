@@ -53,12 +53,12 @@ namespace aspect
          * Initialization data is a composition value between 0 and 1 at all
          * points and should be accumulated by integration.
          */
-        Compos,
+        composition,
         /**
          * Initialization data is an interface defined by a signed distance
          * level set with positive value indicating fluid presence.
          */
-        SDist_LS
+        signed_distance_level_set
       };
     };
 

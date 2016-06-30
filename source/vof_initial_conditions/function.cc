@@ -36,13 +36,13 @@ namespace aspect
     template <int dim>
     unsigned int Function<dim>::n_samp () const
     {
-      return n_i_samp;
+      return n_samples;
     }
 
     template <int dim>
     typename VoFInitType::Kind Function<dim>::init_type () const
     {
-      return f_init_type;
+      return function_init_type;
     }
 
     template <int dim>
@@ -88,11 +88,11 @@ namespace aspect
         bool is_dist_init = prm.get_bool("Signed distance init");
 
         if (is_dist_init)
-          f_init_type = VoFInitType::SDist_LS;
+          function_init_type = VoFInitType::signed_distance_level_set;
         else
-          f_init_type = VoFInitType::Compos;
+          f_init_type = VoFInitType::composition;
 
-        n_i_samp = prm.get_integer ("Number initialization samples");
+        n_samples = prm.get_integer ("Number initialization samples");
 
         try
           {
