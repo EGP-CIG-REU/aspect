@@ -32,8 +32,7 @@ namespace aspect
 
     /**
      * A class that implements a mesh refinement criterion that refines the
-     * mesh in the uppermost nodes. This is useful for cases where one wants
-     * to accurately model processes at of close to the surface of the model.
+     * mesh near boundaries for the VoF interface tracking algorithm.
      *
      * @ingroup MeshRefinement
      */
