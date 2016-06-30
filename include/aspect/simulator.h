@@ -562,8 +562,6 @@ namespace aspect
       // End VoF functions
 
       bool vof_dir_order_dsc;
-      // Currently matrix is included in main matrix, if VoF removed from
-      // Simulator will need to allocate its own.
 
       // End VoF variables
 
@@ -1604,6 +1602,29 @@ namespace aspect
           friend class SimulatorAccess<dim>;
       };
 
+      /**
+       * A member class that isolates the functions and variables that deal
+       * with the volume of fluid implementation. If Volume of Fluid interface
+       * tracking is not active, there is no instantiation of this class at
+       * all.
+       */
+      class VoFHandler
+      {
+        public:
+          // Construtor
+          VoFHandler(Simulator<dim> &, ParameterHandler &prm);
+
+        private:
+          // Parent simulator
+          Simulator<dim> &sim;
+
+          // Order for split update
+          bool vof_dir_order_dsc;
+
+          friend class Simulator<dim>;
+          friend class SimulatorAccess<dim>;
+      };
+
     private:
 
       /**
@@ -1612,10 +1633,12 @@ namespace aspect
        * not even allocate it.
        */
       std_cxx11::shared_ptr<FreeSurfaceHandler> free_surface;
+      std_cxx11::shared_ptr<VoFHandler> vof_handler;
 
       friend class boost::serialization::access;
       friend class SimulatorAccess<dim>;
       friend class FreeSurfaceHandler;  //FreeSurfaceHandler needs access to the internals of the Simulator
+      friend class VoFHandler;          //VoFHandler needs access to the internals of the Simulator
       friend struct Parameters<dim>;
   };
 }
