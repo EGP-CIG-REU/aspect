@@ -33,8 +33,7 @@ namespace aspect
     namespace VoF
     {
       template <int dim>
-      void add_vof_vars(const Parameters<dim> &parameters,
-                        std::vector<VariableDeclaration<dim> > &vars)
+      void add_vof_vars(std::vector<VariableDeclaration<dim> > &vars)
       {
         vars.push_back(VariableDeclaration<dim>("vofs",
                                                 std_cxx11::shared_ptr<FiniteElement<dim>>(

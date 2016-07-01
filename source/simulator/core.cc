@@ -94,7 +94,7 @@ namespace aspect
       if (melt_handler)
         melt_handler->edit_finite_element_variables (parameters, variables);
 
-      signals.edit_finite_element_variables(parameters, variables);
+      signals.edit_finite_element_variables(variables);
       return variables;
     }
   }
