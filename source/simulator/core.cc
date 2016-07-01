@@ -171,7 +171,6 @@ namespace aspect
     initial_conditions (InitialConditions::create_initial_conditions<dim>(prm)),
     prescribed_stokes_solution (PrescribedStokesSolution::create_prescribed_stokes_solution<dim>(prm)),
     compositional_initial_conditions (CompositionalInitialConditions::create_initial_conditions<dim>(prm)),
-    vof_initial_conditions (VoFInitialConditions::create_initial_conditions<dim>(prm)),
     adiabatic_conditions (AdiabaticConditions::create_adiabatic_conditions<dim>(prm)),
 
     time (std::numeric_limits<double>::quiet_NaN()),
@@ -467,14 +466,6 @@ namespace aspect
         compositional_initial_conditions->initialize ();
       }
 
-    if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(vof_initial_conditions.get()))
-      sim->initialize_simulator (*this);
-    if (vof_initial_conditions.get())
-      {
-        vof_initial_conditions->parse_parameters (prm);
-        vof_initial_conditions->initialize ();
-      }
-
     // Make sure we only have a prescribed Stokes plugin if needed
     if (parameters.nonlinear_solver==NonlinearSolver::Advection_only)
       {
@@ -534,6 +525,7 @@ namespace aspect
 
     if (parameters.vof_tracking_enabled)
       {
+        vof_handler->initialize (prm);
       }
 
     postprocess_manager.initialize_simulator (*this);
@@ -2220,7 +2212,8 @@ namespace aspect
         time_step = old_time_step = 0;
 
         set_initial_temperature_and_compositional_fields ();
-        set_initial_vofs ();
+        if (parameters.vof_tracking_enabled)
+          vof_handler->set_initial_vofs ();
         compute_initial_pressure_field ();
         initialize_tracers ();
 

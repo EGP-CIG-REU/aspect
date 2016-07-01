@@ -21,6 +21,7 @@
 #include <aspect/global.h>
 #include <aspect/simulator.h>
 #include <aspect/vofinterface/vof_utils.h>
+#include <aspect/vof/handler.h>
 
 // #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_values.h>
@@ -31,11 +32,8 @@ namespace aspect
   using namespace dealii;
 
   template <int dim>
-  void Simulator<dim>::set_initial_vofs ()
+  void Simulator<dim>::VoFHandler::set_initial_vofs ()
   {
-    if (!parameters.vof_tracking_enabled)
-      return;
-
     switch (vof_initial_conditions->init_type())
       {
         case VoFInitialConditions::VoFInitType::composition:
@@ -52,41 +50,41 @@ namespace aspect
           Assert(false, ExcNotImplemented ());
       }
 
-    const unsigned int vofN_blockidx = introspection.variable("vofsN").block_index;
-    const unsigned int vofLS_blockidx = introspection.variable("vofsLS").block_index;
-    update_vof_normals (solution);
-    old_solution.block(vofN_blockidx) = solution.block(vofN_blockidx);
-    old_old_solution.block(vofN_blockidx) = solution.block(vofN_blockidx);
-    old_solution.block(vofLS_blockidx) = solution.block(vofLS_blockidx);
-    old_old_solution.block(vofLS_blockidx) = solution.block(vofLS_blockidx);
+    const unsigned int vofN_blockidx = sim.introspection.variable("vofsN").block_index;
+    const unsigned int vofLS_blockidx = sim.introspection.variable("vofsLS").block_index;
+    sim.update_vof_normals (sim.solution);
+    sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
+    sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
+    sim.old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
+    sim.old_old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
   }
 
   template <int dim>
-  void Simulator<dim>::init_vof_compos ()
+  void Simulator<dim>::VoFHandler::init_vof_compos ()
   {
-    unsigned int n_i_samp = vof_initial_conditions->n_samp ();
+    unsigned int n_samples = vof_initial_conditions->n_samples ();
 
     LinearAlgebra::BlockVector initial_solution;
 
-    initial_solution.reinit(system_rhs, false);
+    initial_solution.reinit(sim.solution, false);
 
-    const QIterated<dim> quadrature (QMidpoint<1>(), n_i_samp);
-    FEValues<dim, dim> fe_init (mapping, finite_element, quadrature,
+    const QIterated<dim> quadrature (QMidpoint<1>(), n_samples);
+    FEValues<dim, dim> fe_init (sim.mapping, sim.finite_element, quadrature,
                                 update_JxW_values | update_quadrature_points);
 
-    double h = 1.0/n_i_samp;
+    double h = 1.0/n_samples;
 
     std::vector<types::global_dof_index>
-    local_dof_indicies (finite_element.dofs_per_cell);
+    local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = introspection.variable("vofs");
+    const FEVariable<dim> &vof_var = sim.introspection.variable("vofs");
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind
-      = finite_element.component_to_system_index(component_index, 0);
+      = sim.finite_element.component_to_system_index(component_index, 0);
 
     // Initialize state based on provided function
-    for (auto cell : dof_handler.active_cell_iterators ())
+    for (auto cell : sim.dof_handler.active_cell_iterators ())
       {
         if (!cell->is_locally_owned ())
           continue;
@@ -112,40 +110,42 @@ namespace aspect
 
     initial_solution.compress(VectorOperation::insert);
 
-    compute_current_constraints();
-    current_constraints.distribute(initial_solution);
+    sim.compute_current_constraints();
+    sim.current_constraints.distribute(initial_solution);
 
-    solution.block(blockidx) = initial_solution.block(blockidx);
-    old_solution.block(blockidx) = initial_solution.block(blockidx);
-    old_old_solution.block(blockidx) = initial_solution.block(blockidx);
+    sim.solution.block(blockidx) = initial_solution.block(blockidx);
+    sim.old_solution.block(blockidx) = initial_solution.block(blockidx);
+    sim.old_old_solution.block(blockidx) = initial_solution.block(blockidx);
   }
 
   template <int dim>
-  void Simulator<dim>::init_vof_ls ()
+  void Simulator<dim>::VoFHandler::init_vof_ls ()
   {
-    unsigned int n_i_samp = vof_initial_conditions->n_samp ();
+    unsigned int n_samples = vof_initial_conditions->n_samples ();
 
     LinearAlgebra::BlockVector initial_solution;
 
-    initial_solution.reinit(system_rhs, false);
+    initial_solution.reinit(sim.solution, false);
 
-    const QIterated<dim> quadrature (QMidpoint<1>(), n_i_samp);
-    FEValues<dim, dim> fe_init (mapping, finite_element, quadrature,
+    const QIterated<dim> quadrature (QMidpoint<1>(), n_samples);
+    FEValues<dim, dim> fe_init (sim.mapping,
+                                sim.finite_element,
+                                quadrature,
                                 update_JxW_values | update_quadrature_points);
 
-    double h = 1.0/n_i_samp;
+    double h = 1.0/n_samples;
 
     std::vector<types::global_dof_index>
-    local_dof_indicies (finite_element.dofs_per_cell);
+    local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = introspection.variable("vofs");
+    const FEVariable<dim> &vof_var = sim.introspection.variable("vofs");
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind
-      = finite_element.component_to_system_index(component_index, 0);
+      = sim.finite_element.component_to_system_index(component_index, 0);
 
     // Initialize state based on provided function
-    for (auto cell : dof_handler.active_cell_iterators ())
+    for (auto cell : sim.dof_handler.active_cell_iterators ())
       {
         if (!cell->is_locally_owned ())
           continue;
@@ -204,21 +204,21 @@ namespace aspect
 
     initial_solution.compress(VectorOperation::insert);
 
-    compute_current_constraints();
-    current_constraints.distribute(initial_solution);
+    sim.compute_current_constraints();
+    sim.current_constraints.distribute(initial_solution);
 
-    solution.block(blockidx) = initial_solution.block(blockidx);
-    old_solution.block(blockidx) = initial_solution.block(blockidx);
-    old_old_solution.block(blockidx) = initial_solution.block(blockidx);
+    sim.solution.block(blockidx) = initial_solution.block(blockidx);
+    sim.old_solution.block(blockidx) = initial_solution.block(blockidx);
+    sim.old_old_solution.block(blockidx) = initial_solution.block(blockidx);
   }
 }
 
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void Simulator<dim>::set_initial_vofs ();\
-  template void Simulator<dim>::init_vof_ls (); \
-  template void Simulator<dim>::init_vof_compos ();
+  template void Simulator<dim>::VoFHandler::set_initial_vofs ();\
+  template void Simulator<dim>::VoFHandler::init_vof_ls (); \
+  template void Simulator<dim>::VoFHandler::init_vof_compos ();
 
   ASPECT_INSTANTIATE(INSTANTIATE)
 }

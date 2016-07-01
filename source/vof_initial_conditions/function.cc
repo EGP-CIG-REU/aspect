@@ -29,14 +29,14 @@ namespace aspect
     template <int dim>
     Function<dim>::Function ()
       :
-      n_samples (3),
+      n_init_samples (3),
       function (1)
     {}
 
     template <int dim>
-    unsigned int Function<dim>::n_samp () const
+    unsigned int Function<dim>::n_samples () const
     {
-      return n_samples;
+      return n_init_samples;
     }
 
     template <int dim>
@@ -92,7 +92,7 @@ namespace aspect
         else
           function_init_type = VoFInitType::composition;
 
-        n_samples = prm.get_integer ("Number initialization samples");
+        n_init_samples = prm.get_integer ("Number initialization samples");
 
         try
           {

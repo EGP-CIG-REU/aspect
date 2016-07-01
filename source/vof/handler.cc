@@ -33,7 +33,8 @@ namespace aspect
   template <int dim>
   Simulator<dim>::VoFHandler::VoFHandler (Simulator<dim> &simulator,
                                           ParameterHandler &prm)
-    : sim (simulator)
+    : sim (simulator),
+      vof_initial_conditions (VoFInitialConditions::create_initial_conditions<dim>(prm))
   {
     parse_parameters (prm);
 
@@ -121,6 +122,24 @@ namespace aspect
         }
     }
     prm.leave_subsection ();
+  }
+
+  template <int dim>
+  void
+  Simulator<dim>::VoFHandler::initialize (ParameterHandler &prm)
+  {
+    // Do checks on required assumptions
+
+
+    // Do initial conditions setup
+    if (SimulatorAccess<dim> *sim_a = dynamic_cast<SimulatorAccess<dim>*>(vof_initial_conditions.get()))
+      sim_a->initialize_simulator (sim);
+    if (vof_initial_conditions.get())
+      {
+        vof_initial_conditions->parse_parameters (prm);
+        vof_initial_conditions->initialize ();
+      }
+
   }
 }
 

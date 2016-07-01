@@ -54,7 +54,7 @@ namespace aspect
          * Return number of sample points to use for initialization.
          */
         virtual
-        unsigned int n_samp () const;
+        unsigned int n_samples () const;
 
         /**
          * Return whether initialization is a signed distance level set function.
@@ -95,7 +95,7 @@ namespace aspect
          */
 
         typename VoFInitType::Kind function_init_type;
-        unsigned int n_samples;
+        unsigned int n_init_samples;
 
         /**
          * A function object representing the compositional fields.

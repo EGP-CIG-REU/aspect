@@ -95,7 +95,7 @@ namespace aspect
          * data.
          */
         virtual
-        unsigned int n_samp () const = 0;
+        unsigned int n_samples () const = 0;
 
         /**
          * Return which type of initialization data is being used.

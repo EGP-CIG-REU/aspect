@@ -22,6 +22,7 @@
 #define __aspect_vof_handler_h
 
 #include <aspect/simulator.h>
+#include <aspect/vof_initial_conditions/interface.h>
 
 using namespace dealii;
 
@@ -43,14 +44,27 @@ namespace aspect
 
       void edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars);
 
+      // Parameter handling
       static
       void declare_parameters (ParameterHandler &prm);
 
       void parse_parameters (ParameterHandler &prm);
 
+      // initialiation
+      void initialize (ParameterHandler &prm);
+
+      // Functions for initialization of state
+      void set_initial_vofs ();
+      void init_vof_compos ();
+      void init_vof_ls ();
+
+
     private:
       // Parent simulator
       Simulator<dim> &sim;
+
+      //Initial conditions
+      const std_cxx11::unique_ptr<VoFInitialConditions::Interface<dim> >      vof_initial_conditions;
 
       // Minimal considered volume fraction
       double vof_epsilon;
