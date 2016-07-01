@@ -21,6 +21,7 @@
 
 #include <aspect/simulator.h>
 #include <aspect/global.h>
+#include <aspect/vof/handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

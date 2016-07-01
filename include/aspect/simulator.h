@@ -264,6 +264,7 @@ namespace aspect
         unsigned int base_element(const Introspection<dim> &introspection) const;
       };
 
+      class VoFHandler;
 
     private:
 
@@ -1192,9 +1193,6 @@ namespace aspect
        * if we do not need the machinery for doing melt stuff, we do
        * not even allocate it.
        */
-    public:
-      class VoFHandler; // Class Declaration near bottom of file
-    private:
       std_cxx11::shared_ptr<VoFHandler> vof_handler;
 
       const IntermediaryConstructorAction post_signal_creation;
@@ -1609,29 +1607,6 @@ namespace aspect
            * class is destroyed.
            */
           boost::signals2::scoped_connection assembler_connection;
-
-          friend class Simulator<dim>;
-          friend class SimulatorAccess<dim>;
-      };
-
-      /**
-       * A member class that isolates the functions and variables that deal
-       * with the volume of fluid implementation. If Volume of Fluid interface
-       * tracking is not active, there is no instantiation of this class at
-       * all.
-       */
-      class VoFHandler
-      {
-        public:
-          // Construtor
-          VoFHandler(Simulator<dim> &sim, ParameterHandler &prm);
-
-        private:
-          // Parent simulator
-          Simulator<dim> &sim;
-
-          // Order for split update
-          bool vof_dir_order_dsc;
 
           friend class Simulator<dim>;
           friend class SimulatorAccess<dim>;
