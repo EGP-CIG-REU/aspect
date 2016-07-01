@@ -60,7 +60,7 @@
 #include <aspect/postprocess/interface.h>
 #include <aspect/adiabatic_conditions/interface.h>
 
-#include <aspect/vofinterface/vof_system.h>
+#include <aspect/vof/assembly.h>
 
 #include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>

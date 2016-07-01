@@ -20,7 +20,7 @@
 
 #include <aspect/simulator.h>
 #include <aspect/utilities.h>
-#include <aspect/vofinterface/vof_system.h>
+#include <aspect/vof/assembly.h>
 #include <aspect/vofinterface/vof_utils.h>
 
 #include <deal.II/base/quadrature_lib.h>
