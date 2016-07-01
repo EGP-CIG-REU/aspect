@@ -124,28 +124,44 @@ namespace aspect
           local_matrix (finite_element.dofs_per_cell,
                         finite_element.dofs_per_cell),
           local_rhs (finite_element.dofs_per_cell),
-          local_f_rhs (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
-                       Vector<double>(finite_element.dofs_per_cell)),
-          local_f_matrices_ext_ext (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
-                                    FullMatrix<double>(finite_element.dofs_per_cell, finite_element.dofs_per_cell)),
-          assembled_rhs (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
-                         false),
-          local_dof_indices (finite_element.dofs_per_cell),
-          neighbor_dof_indices (GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell,
-                                std::vector<types::global_dof_index>(finite_element.dofs_per_cell))
-        {}
+          local_dof_indices (finite_element.dofs_per_cell)
+        {
+          TableIndices<2> mat_size(finite_element.dofs_per_cell,
+                                   finite_element.dofs_per_cell);
+          for (unsigned int i=0;
+               i < GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell;
+               ++i)
+            {
+              face_contributions_mask[i] = false;
+              local_face_rhs[i].reinit (finite_element.dofs_per_cell);
+              local_face_matrices_ext_ext[i].reinit(mat_size);
+              neighbor_dof_indices[i].resize(finite_element.dofs_per_cell);
+            }
+        }
 
         template<int dim>
         VoFSystem<dim>::VoFSystem(const VoFSystem &data)
           :
           local_matrix (data.local_matrix),
           local_rhs (data.local_rhs),
-          local_f_rhs (data.local_f_rhs),
-          local_f_matrices_ext_ext (data.local_f_matrices_ext_ext),
-          assembled_rhs (data.assembled_rhs),
+          local_face_rhs (data.local_face_rhs),
+          local_face_matrices_ext_ext (data.local_face_matrices_ext_ext),
           local_dof_indices (data.local_dof_indices),
           neighbor_dof_indices (data.neighbor_dof_indices)
-        {}
+        {
+          unsigned int dofs_per_cell = local_rhs.size();
+          TableIndices<2> mat_size(dofs_per_cell,
+                                   dofs_per_cell);
+          for (unsigned int i=0;
+               i < GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell;
+               ++i)
+            {
+              face_contributions_mask[i] = false;
+              local_face_rhs[i].reinit (dofs_per_cell);
+              local_face_matrices_ext_ext[i].reinit(mat_size);
+              neighbor_dof_indices[i].resize(dofs_per_cell);
+            }
+        }
       }
     }
   }
@@ -234,9 +250,9 @@ namespace aspect
     //loop over all possible subfaces of the cell, and reset corresponding rhs
     for (unsigned int f = 0; f < GeometryInfo<dim>::max_children_per_face * GeometryInfo<dim>::faces_per_cell; ++f)
       {
-        data.local_f_rhs[f] = 0.0;
-        data.local_f_matrices_ext_ext[f] = 0.0;
-        data.assembled_rhs[f] = false;
+        data.local_face_rhs[f] = 0.0;
+        data.local_face_matrices_ext_ext[f] = 0.0;
+        data.face_contributions_mask[f] = false;
       }
 
     // Interface reconstruction data
@@ -415,13 +431,13 @@ namespace aspect
                   data.neighbor_dof_indices[f_rhs_ind][i]
                     = neighbor_dof_indices[main_fe.component_to_system_index(solution_component, i)];
 
-                data.assembled_rhs[f_rhs_ind] = true;
+                data.face_contributions_mask[f_rhs_ind] = true;
 
                 // fluxes to RHS
                 data.local_rhs [0] -= flux_vof * face_flux;
                 data.local_matrix (0, 0) -= face_flux;
-                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
-                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
+                data.local_face_rhs[f_rhs_ind][0] += flux_vof * face_flux;
+                data.local_face_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
               }
           }
         else
@@ -487,7 +503,7 @@ namespace aspect
                   data.neighbor_dof_indices[f_rhs_ind][i]
                     = neighbor_dof_indices[main_fe.component_to_system_index(solution_component, i)];
 
-                data.assembled_rhs[f_rhs_ind] = true;
+                data.face_contributions_mask[f_rhs_ind] = true;
 
                 dflux += face_flux;
                 // fluxes to RHS
@@ -504,8 +520,8 @@ namespace aspect
 
                 data.local_rhs [0] -= flux_vof * face_flux;
                 data.local_matrix (0, 0) -= face_flux;
-                data.local_f_rhs[f_rhs_ind][0] += flux_vof * face_flux;
-                data.local_f_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
+                data.local_face_rhs[f_rhs_ind][0] += flux_vof * face_flux;
+                data.local_face_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
 
                 // Temporarily limit to constant cases
                 if (cell_vof > voleps && cell_vof<1.0-voleps)
@@ -628,16 +644,16 @@ namespace aspect
     for (unsigned int f=0; f<GeometryInfo<dim>::max_children_per_face
          * GeometryInfo<dim>::faces_per_cell; ++f)
       {
-        if (data.assembled_rhs[f])
+        if (data.face_contributions_mask[f])
           {
             for (unsigned int i=0; i<data.neighbor_dof_indices[f].size(); ++i)
               {
-                system_rhs(data.neighbor_dof_indices[f][i]) += data.local_f_rhs[f][i];
+                system_rhs(data.neighbor_dof_indices[f][i]) += data.local_face_rhs[f][i];
                 for (unsigned int j=0; j< data.neighbor_dof_indices[f].size(); ++j)
                   {
                     system_matrix.add(data.neighbor_dof_indices[f][i],
                                       data.neighbor_dof_indices[f][j],
-                                      data.local_f_matrices_ext_ext[f](i,j));
+                                      data.local_face_matrices_ext_ext[f](i,j));
                   }
               }
           }

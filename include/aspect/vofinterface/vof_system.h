@@ -109,8 +109,12 @@ namespace aspect
            * GeometryInfo<dim>::faces_per_cell so as to hold one matrix for
            * each possible face or subface of the cell.
            **/
-          std::vector<Vector<double>>     local_f_rhs;
-          std::vector<FullMatrix<double>> local_f_matrices_ext_ext;
+          std_cxx11::array<Vector<double>,
+                    GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell>
+                    local_face_rhs;
+          std_cxx11::array<FullMatrix<double>,
+                    GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell>
+                    local_face_matrices_ext_ext;
 
           /**
            * Denotes which face's rhs have actually been assembled in the DG
@@ -118,7 +122,7 @@ namespace aspect
            * to non-existent subfaces; or faces being assembled by the
            * neighboring cell) are set to false.
            **/
-          std::vector<bool>               assembled_rhs;
+          bool  face_contributions_mask [GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell];
 
           /**
            * Indices of those degrees of freedom that actually correspond to
@@ -137,7 +141,9 @@ namespace aspect
            * std::vector has length GeometryInfo<dim>::max_children_per_face *
            * GeometryInfo<dim>::faces_per_cell.
            **/
-          std::vector<std::vector<types::global_dof_index> >   neighbor_dof_indices;
+          std_cxx11::array<std::vector<types::global_dof_index>,
+                    GeometryInfo<dim>::max_children_per_face *GeometryInfo<dim>::faces_per_cell>
+                    neighbor_dof_indices;
         };
       }
     }
