@@ -18,30 +18,36 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __aspect__vofinterface_vof_utils_h
-#define __aspect__vofinterface_vof_utils_h
+#ifndef __aspect__vof_utilities_h
+#define __aspect__vof_utilities_h
 
 #include <aspect/global.h>
 
 namespace aspect
 {
-  namespace InterfaceTracker
+  namespace VolumeOfFluid
   {
     using namespace dealii;
 
-    // Utils
+    // Utilitiess
 
     /**
      * Function to calculate volume fraction contained by indicator function
-     * H(d-normal*x') on the [-0.5, 0.5]^dim unit cell
+     * H(d-normal*(x'-x_{cen}')) on the [0, 1]^dim unit cell where x_{cen} is
+     * the unit cell center.
+     *
+     * Currently only works assuming constant Jacobian determinant.
      */
     template<int dim>
     double vof_from_d (const Tensor<1, dim, double> normal,
                        const double d);
 
     /**
-     * Function to calculate required value of d to obtain given vlume fraction
-     * for indicator function H(d-normal*x') on the [-0.5, 0.5]^dim unit cell
+     * Function to calculate required value of d to obtain given volume
+     * fraction for indicator function H(d-normal*(x'-x_{cen}')) on the [0,
+     * 1]^dim unit cell where x_{cen} is the unit cell center.
+     *
+     * Currently only works assuming constant Jacobian determinant.
      */
     template<int dim>
     double d_from_vof (const Tensor<1, dim, double> normal,

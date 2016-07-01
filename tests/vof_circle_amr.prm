@@ -15,7 +15,7 @@ subsection Mesh refinement
   set Initial adaptive refinement        = 2
   set Time steps between mesh refinement = 1
   set Run postprocessors on initial refinement = true
-  set Strategy                                 = vofboundary
+  set Strategy                                 = vof boundary
 end
 
 subsection Geometry model

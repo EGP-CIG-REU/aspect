@@ -19,7 +19,7 @@
 */
 
 
-#include <aspect/vofinterface/vof_refinement.h>
+#include <aspect/mesh_refinement/vof_boundary.h>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/numerics/error_estimator.h>
@@ -215,6 +215,7 @@ namespace aspect
     void
     VoFBoundary<dim>::parse_parameters (ParameterHandler &prm)
     {
+      //TODO: Add check for vof active
       prm.enter_subsection("Mesh refinement");
       {
         prm.enter_subsection("VoF boundary");
@@ -236,7 +237,7 @@ namespace aspect
   namespace MeshRefinement
   {
     ASPECT_REGISTER_MESH_REFINEMENT_CRITERION(VoFBoundary,
-                                              "vofboundary",
+                                              "vof boundary",
                                               "A class that implements a mesh refinement criterion, which "
                                               "ensures a minimum level of refinement near the VoF interface boundary.")
   }

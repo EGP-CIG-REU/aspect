@@ -19,8 +19,8 @@
 */
 
 
-#ifndef __aspect__vofinterface_vof_refinement_h
-#define __aspect__vofinterface_vof_refinement_h
+#ifndef __aspect_mesh_refinement_vof_boundary_h
+#define __aspect_mesh_refinement_vof_boundary_h
 
 #include <aspect/mesh_refinement/interface.h>
 #include <aspect/simulator_access.h>

@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __aspect__vofinterface_vof_system_h
-#define __aspect__vofinterface_vof_system_h
+#ifndef __aspect__vof_assembly_h
+#define __aspect__vof_assembly_h
 
 #include <aspect/global.h>
 #include <aspect/simulator_access.h>

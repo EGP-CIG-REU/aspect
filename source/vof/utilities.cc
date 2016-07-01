@@ -18,11 +18,11 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#include <aspect/vofinterface/vof_utils.h>
+#include <aspect/vof/utilities.h>
 
 namespace aspect
 {
-  namespace InterfaceTracker
+  namespace VolumeOfFluid
   {
     using namespace dealii;
 
@@ -372,7 +372,7 @@ namespace aspect
 
 namespace aspect
 {
-  namespace InterfaceTracker
+  namespace VolumeOfFluid
   {
 #define INSTANTIATE(dim) \
   template double calc_vof_flux_edge<dim>(unsigned int dir, \

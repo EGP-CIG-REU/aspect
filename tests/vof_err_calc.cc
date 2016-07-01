@@ -23,7 +23,7 @@ along with ASPECT; see the file doc/COPYING.  If not see
 #include <aspect/global.h>
 #include <aspect/simulator_access.h>
 #include <aspect/postprocess/interface.h>
-#include <aspect/vofinterface/vof_utils.h>
+#include <aspect/vof/utilities.h>
 
 // Deal II includes
 #include <deal.II/base/parsed_function.h>
@@ -287,15 +287,15 @@ namespace aspect
                   grad_t[di] = (dL - dH);
                   d_t += (0.5 / dim) * (dH + dL);
                 }
-              double ptvof_t = InterfaceTracker::vof_from_d<dim> (grad_t, d_t);
+              double ptvof_t = VolumeOfFluid::vof_from_d<dim> (grad_t, d_t);
               vof_reinit += ptvof_t *(fe_err.JxW (i) / cell_vol);
               for (unsigned int di = 0; di < dim; ++di)
                 {
                   xU[di] -= 0.5;
                 }
               double dot = normal * xU;
-              double ptvof_e = InterfaceTracker::vof_from_d<dim> (h * normal,
-                                                                  (d - dot));
+              double ptvof_e = VolumeOfFluid::vof_from_d<dim> (h * normal,
+                                                               (d - dot));
               double diff = abs (ptvof_t - ptvof_e);
               val += diff * fe_err.JxW (i);
             }

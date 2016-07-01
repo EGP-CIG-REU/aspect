@@ -21,7 +21,7 @@
 #include <aspect/simulator.h>
 #include <aspect/utilities.h>
 #include <aspect/vof/assembly.h>
-#include <aspect/vofinterface/vof_utils.h>
+#include <aspect/vof/utilities.h>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/work_stream.h>
@@ -391,10 +391,10 @@ namespace aspect
               }
             else
               {
-                flux_vof = InterfaceTracker::calc_vof_flux_edge<dim> (f_dim,
-                                                                      face_ls_time_grad,
-                                                                      cell_i_normal,
-                                                                      face_ls_d);
+                flux_vof = VolumeOfFluid::calc_vof_flux_edge<dim> (f_dim,
+                                                                   face_ls_time_grad,
+                                                                   cell_i_normal,
+                                                                   face_ls_d);
               }
 
             if (face->at_boundary())
@@ -554,10 +554,10 @@ namespace aspect
                   }
                 else
                   {
-                    flux_vof = InterfaceTracker::calc_vof_flux_edge<dim> (f_dim,
-                                                                          face_ls_time_grad,
-                                                                          cell_i_normal,
-                                                                          face_ls_d);
+                    flux_vof = VolumeOfFluid::calc_vof_flux_edge<dim> (f_dim,
+                                                                       face_ls_time_grad,
+                                                                       cell_i_normal,
+                                                                       face_ls_d);
                   }
               }
           }

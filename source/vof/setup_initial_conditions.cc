@@ -20,8 +20,8 @@
 
 #include <aspect/global.h>
 #include <aspect/simulator.h>
-#include <aspect/vofinterface/vof_utils.h>
 #include <aspect/vof/handler.h>
+#include <aspect/vof/utilities.h>
 
 // #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_values.h>
@@ -193,7 +193,7 @@ namespace aspect
                         grad[di] = (dL-dH);
                         d += (0.5/dim)*(dH+dL);
                       }
-                    double ptvof = InterfaceTracker::vof_from_d<dim> (grad, d);
+                    double ptvof = VolumeOfFluid::vof_from_d<dim> (grad, d);
                     vof_val += ptvof * (fe_init.JxW (i) / cell_vol);
                   }
               }

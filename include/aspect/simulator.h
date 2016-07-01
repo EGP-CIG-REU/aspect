@@ -263,6 +263,10 @@ namespace aspect
         unsigned int base_element(const Introspection<dim> &introspection) const;
       };
 
+      /**
+       * Member class for handling VoF interface tracking. Definition is in
+       * <code>include/aspect/vof/handler.h</code>
+       */
       class VoFHandler;
 
     private:

@@ -20,7 +20,7 @@
 
 #include <aspect/global.h>
 #include <aspect/simulator.h>
-#include <aspect/vofinterface/vof_utils.h>
+#include <aspect/vof/utilities.h>
 
 namespace aspect
 {
@@ -257,15 +257,15 @@ namespace aspect
             for (unsigned int nind = 0; nind < n_normals; ++nind)
               {
                 errs[nind] = 0.0;
-                d = InterfaceTracker::d_from_vof<dim> (normals[nind], cell_vof);
+                d = VolumeOfFluid::d_from_vof<dim> (normals[nind], cell_vof);
                 for (unsigned int i = 0; i < n_local; ++i)
                   {
                     double dot = 0.0;
                     for (unsigned int di = 0; di < dim; ++di)
                       dot += normals[nind][di] * resc_cell_centers[i][di];
                     double val = local_vofs (i)
-                                 - InterfaceTracker::vof_from_d<dim> (normals[nind],
-                                                                      d - dot);
+                                 - VolumeOfFluid::vof_from_d<dim> (normals[nind],
+                                                                   d - dot);
                     errs[nind] += val * val;
                   }
                 if (errs[mn_ind] >= errs[nind])
@@ -275,14 +275,14 @@ namespace aspect
               }
 
             normal = normals[mn_ind];
-            d = InterfaceTracker::d_from_vof<dim> (normal, cell_vof);
+            d = VolumeOfFluid::d_from_vof<dim> (normal, cell_vof);
           }
 
         double n2 = (normal*normal);
         if (n2 > parameters.voleps)
           {
             normal = (normal / n2);
-            d = InterfaceTracker::d_from_vof<dim> (normal, cell_vof);
+            d = VolumeOfFluid::d_from_vof<dim> (normal, cell_vof);
           }
         else
           {
