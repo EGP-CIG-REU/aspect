@@ -29,33 +29,6 @@ using namespace dealii;
 
 namespace aspect
 {
-  namespace internal
-  {
-    namespace VoF
-    {
-      template <int dim>
-      void add_vof_vars(std::vector<VariableDeclaration<dim> > &vars)
-      {
-        vars.push_back(VariableDeclaration<dim>("vofs",
-                                                std_cxx11::shared_ptr<FiniteElement<dim>>(
-                                                  new FE_DGQ<dim>(0)),
-                                                1,
-                                                1));
-
-        vars.push_back(VariableDeclaration<dim>("vofsN",
-                                                std_cxx11::shared_ptr<FiniteElement<dim>>(
-                                                  new FE_DGQ<dim>(0)),
-                                                dim+1,
-                                                1));
-
-        vars.push_back(VariableDeclaration<dim>("vofsLS",
-                                                std_cxx11::shared_ptr<FiniteElement<dim>>(
-                                                  new FE_DGQ<dim>(1)),
-                                                1,
-                                                1));
-      }
-    }
-  }
 
   template <int dim>
   Simulator<dim>::VoFHandler::VoFHandler (Simulator<dim> &simulator,
@@ -64,7 +37,32 @@ namespace aspect
   {
     //parse_parameters (prm);
 
-    sim.signals.edit_finite_element_variables.connect(internal::VoF::add_vof_vars<dim>);
+    sim.signals.edit_finite_element_variables.connect(std_cxx11::bind(&aspect::Simulator<dim>::VoFHandler::edit_finite_element_variables,
+                                                                      std_cxx11::ref(*this),
+                                                                      std_cxx11::_1));
+  }
+
+  template <int dim>
+  void
+  Simulator<dim>::VoFHandler::edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars)
+  {
+    vars.push_back(VariableDeclaration<dim>("vofs",
+                                            std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                              new FE_DGQ<dim>(0)),
+                                            1,
+                                            1));
+
+    vars.push_back(VariableDeclaration<dim>("vofsN",
+                                            std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                              new FE_DGQ<dim>(0)),
+                                            dim+1,
+                                            1));
+
+    vars.push_back(VariableDeclaration<dim>("vofsLS",
+                                            std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                              new FE_DGQ<dim>(1)),
+                                            1,
+                                            1));
   }
 }
 

@@ -41,6 +41,8 @@ namespace aspect
       // Construtor
       VoFHandler(Simulator<dim> &sim, ParameterHandler &prm);
 
+      void edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars);
+
     private:
       // Parent simulator
       Simulator<dim> &sim;
