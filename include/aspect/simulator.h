@@ -1186,7 +1186,19 @@ namespace aspect
       std_cxx11::shared_ptr<MeltHandler<dim> > melt_handler;
 
       SimulatorSignals<dim>               signals;
+
+      /**
+       * Shared pointer for an instance of the VoFHandler. This way,
+       * if we do not need the machinery for doing melt stuff, we do
+       * not even allocate it.
+       */
+    public:
+      class VoFHandler; // Class Declaration near bottom of file
+    private:
+      std_cxx11::shared_ptr<VoFHandler> vof_handler;
+
       const IntermediaryConstructorAction post_signal_creation;
+
       Introspection<dim>                  introspection;
 
 
@@ -1612,7 +1624,7 @@ namespace aspect
       {
         public:
           // Construtor
-          VoFHandler(Simulator<dim> &, ParameterHandler &prm);
+          VoFHandler(Simulator<dim> &sim, ParameterHandler &prm);
 
         private:
           // Parent simulator
@@ -1633,7 +1645,6 @@ namespace aspect
        * not even allocate it.
        */
       std_cxx11::shared_ptr<FreeSurfaceHandler> free_surface;
-      std_cxx11::shared_ptr<VoFHandler> vof_handler;
 
       friend class boost::serialization::access;
       friend class SimulatorAccess<dim>;

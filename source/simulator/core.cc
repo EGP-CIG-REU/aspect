@@ -128,6 +128,7 @@ namespace aspect
     post_signal_creation(
       std_cxx11::bind (&internals::SimulatorSignals::call_connector_functions<dim>,
                        std_cxx11::ref(signals))),
+    vof_handler (parameters.vof_tracking_enabled ? new VoFHandler (*this, prm) : NULL),
     introspection (construct_variables<dim>(parameters, signals, melt_handler), parameters),
     mpi_communicator (Utilities::MPI::duplicate_communicator (mpi_communicator_)),
     iostream_tee_device(std::cout, log_file_stream),
@@ -528,6 +529,10 @@ namespace aspect
         AssertThrow( !parameters.free_surface_enabled,
                      ExcMessage("Melt transport together with a free surface has not been tested.") );
         melt_handler->initialize_simulator (*this);
+      }
+
+    if (parameters.vof_tracking_enabled)
+      {
       }
 
     postprocess_manager.initialize_simulator (*this);
