@@ -43,9 +43,21 @@ namespace aspect
 
       void edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars);
 
+      static
+      void declare_parameters (ParameterHandler &prm);
+
+      void parse_parameters (ParameterHandler &prm);
+
     private:
       // Parent simulator
       Simulator<dim> &sim;
+
+      // Minimal considered volume fraction
+      double vof_epsilon;
+
+      double vof_solver_tolerance;
+
+      std::string vof_composition_var;
 
       // Order for split update
       bool vof_dir_order_dsc;

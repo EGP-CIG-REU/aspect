@@ -23,6 +23,7 @@
 #include <aspect/global.h>
 #include <aspect/utilities.h>
 #include <aspect/melt.h>
+#include <aspect/vof/handler.h>
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -767,24 +768,8 @@ namespace aspect
                        Patterns::Bool (),
                        "When set to true, VoF interface tracking will be used");
 
-    prm.enter_subsection ("VoF config");
-    {
-      prm.declare_entry ("Small volume", "1e-6",
-                         Patterns::Double (0, 1),
-                         "Minimum significant volume. VOFs below this considered to be zero.");
-
-      prm.declare_entry ("VoF solver tolerance", "1e-12",
-                         Patterns::Double(0,1),
-                         "The relative tolerance up to which the linear system for "
-                         "the VoF system gets solved. See 'linear solver "
-                         "tolerance' for more details.");
-
-      prm.declare_entry ("VoF composition variable", "",
-                         Patterns::Anything(),
-                         "Name of compositional field to write VoF composition to.");
-
-    }
-    prm.leave_subsection ();
+    // declare the VoF parameters
+    Simulator<dim>::VoFHandler::declare_parameters(prm);
 
     // also declare the parameters that the FreeSurfaceHandler needs
     Simulator<dim>::FreeSurfaceHandler::declare_parameters (prm);

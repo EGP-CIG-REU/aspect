@@ -35,7 +35,7 @@ namespace aspect
                                           ParameterHandler &prm)
     : sim (simulator)
   {
-    //parse_parameters (prm);
+    parse_parameters (prm);
 
     sim.signals.edit_finite_element_variables.connect(std_cxx11::bind(&aspect::Simulator<dim>::VoFHandler::edit_finite_element_variables,
                                                                       std_cxx11::ref(*this),
@@ -63,6 +63,64 @@ namespace aspect
                                               new FE_DGQ<dim>(1)),
                                             1,
                                             1));
+  }
+
+  template <int dim>
+  void
+  Simulator<dim>::VoFHandler::declare_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection ("VoF config");
+    {
+      prm.declare_entry ("Small volume", "1e-6",
+                         Patterns::Double (0, 1),
+                         "Minimum significant volume. VOFs below this considered to be zero.");
+
+      prm.declare_entry ("VoF solver tolerance", "1e-12",
+                         Patterns::Double(0,1),
+                         "The relative tolerance up to which the linear system for "
+                         "the VoF system gets solved. See 'linear solver "
+                         "tolerance' for more details.");
+
+      prm.declare_entry ("VoF composition variable", "",
+                         Patterns::Anything(),
+                         "Name of compositional field to write VoF composition to.");
+    }
+    prm.leave_subsection ();
+  }
+
+  template <int dim>
+  void
+  Simulator<dim>::VoFHandler::parse_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection ("VoF config");
+    {
+      vof_epsilon = prm.get_double("Small volume");
+
+      vof_solver_tolerance = prm.get_double("VoF solver tolerance");
+
+      vof_composition_var = prm.get("VoF composition variable");
+
+      if (vof_composition_var!="")
+        {
+          if (!sim.parameters.use_discontinuous_composition_discretization)
+            {
+              Assert(false, ExcMessage("VoF composition field not implemented for continuous composition."));
+            }
+
+          bool field_exists=false;
+
+          for (unsigned int i=0; i<sim.parameters.n_compositional_fields; ++i)
+            {
+              field_exists = field_exists ||
+                             (vof_composition_var==sim.parameters.names_of_compositional_fields[i]);
+            }
+
+          Assert(field_exists, ExcMessage("VoF composition field variable " +
+                                          vof_composition_var +
+                                          " does not exist."));
+        }
+    }
+    prm.leave_subsection ();
   }
 }
 
