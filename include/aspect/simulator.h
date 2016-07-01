@@ -329,15 +329,6 @@ namespace aspect
       void set_initial_temperature_and_compositional_fields ();
 
       /**
-       * A function that is responsible for initializing the VoF values before
-       * the first timestep.
-       *
-       * This function is implemented in
-       * <code>source/vofinterface/vof_init.cc</code>.
-       */
-//      void set_initial_vofs ();
-
-      /**
        * A function that is responsible for initializing the
        * tracers and their properties before the first time step. We want this
        * to happen before the first timestep in case other properties depend
