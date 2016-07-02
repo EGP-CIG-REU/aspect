@@ -60,6 +60,7 @@ namespace aspect
 
       // Logic to handle dimensionally split update
       void do_vof_update ();
+      void solve_vof_system ();
 
 
     private:

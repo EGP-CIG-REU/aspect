@@ -520,14 +520,6 @@ namespace aspect
        */
       void copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
 
-      /**
-       * Solve the VoF linear system.
-       *
-       * This function is implemented in
-       * <code>source/vofinterface/vof_system.cc</code>.
-       */
-      void solve_vof_system ();
-
       // End VoF functions
 
       bool vof_dir_order_dsc;

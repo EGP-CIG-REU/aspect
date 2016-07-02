@@ -164,7 +164,7 @@ namespace aspect
           {
             sim.assemble_vof_system(dim-dir-1, update_from_old);
           }
-        sim.solve_vof_system ();
+        solve_vof_system ();
         // Copy current candidate normals.
         // primarily useful for exact linear translation
         sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
