@@ -59,6 +59,9 @@ namespace aspect
       void init_vof_compos ();
       void init_vof_ls ();
 
+      // Do interface reconstruction
+      void update_vof_normals (LinearAlgebra::BlockVector &solution);
+
       // Logic to handle dimensionally split update
       void do_vof_update ();
 

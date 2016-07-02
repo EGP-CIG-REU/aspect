@@ -474,20 +474,6 @@ namespace aspect
        */
       void postprocess ();
 
-      // TODO: Identify whether and how the following functions can be moved
-      // out of the Simulator class, or which should be integrated as core
-      // functionality
-
-      /**
-       * Helper function to calculate local interface normals.
-       *
-       * This function is implemented in
-       * <code>source/vofinterface/vof_normals.cc</code>.
-       */
-      void update_vof_normals (LinearAlgebra::BlockVector &solution);
-
-      // End VoF functions
-
       /**
        * Refine the mesh according to error indicators calculated by
        * compute_refinement_criterion(), set up all necessary data structures

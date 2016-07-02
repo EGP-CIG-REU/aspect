@@ -52,7 +52,7 @@ namespace aspect
 
     const unsigned int vofN_blockidx = sim.introspection.variable("vofsN").block_index;
     const unsigned int vofLS_blockidx = sim.introspection.variable("vofsLS").block_index;
-    sim.update_vof_normals (sim.solution);
+    update_vof_normals (sim.solution);
     sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);

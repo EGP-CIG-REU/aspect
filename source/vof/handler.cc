@@ -169,7 +169,7 @@ namespace aspect
         // Copy current candidate normals.
         // primarily useful for exact linear translation
         sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
-        sim.update_vof_normals (sim.solution);
+        update_vof_normals (sim.solution);
 
         sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
         sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);
