@@ -141,6 +141,42 @@ namespace aspect
       }
 
   }
+
+  template <int dim>
+  void Simulator<dim>::VoFHandler::do_vof_update ()
+  {
+    const unsigned int vof_block_idx = sim.introspection.variable("vofs").block_index;
+    const unsigned int vofN_block_idx = sim.introspection.variable("vofsLS").block_index;
+
+    // Reset current base to values at beginning of timestep
+
+    // Due to dimensionally split formulation, use strang splitting
+    // TODO: Reformulate for unsplit (may require flux limiter)
+    bool update_from_old = true;
+    for (unsigned int dir = 0; dir < dim; ++dir)
+      {
+        // Update base to intermediate solution
+        if (!vof_dir_order_dsc)
+          {
+            sim.assemble_vof_system(dir, update_from_old);
+          }
+        else
+          {
+            sim.assemble_vof_system(dim-dir-1, update_from_old);
+          }
+        sim.solve_vof_system ();
+        // Copy current candidate normals.
+        // primarily useful for exact linear translation
+        sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
+        sim.update_vof_normals (sim.solution);
+
+        sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
+        sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);
+        update_from_old = false;
+      }
+    // change dimension iteration order
+    vof_dir_order_dsc = !vof_dir_order_dsc;
+  }
 }
 
 namespace aspect

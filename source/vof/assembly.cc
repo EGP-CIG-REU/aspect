@@ -167,47 +167,6 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::do_vof_update ()
-  {
-    // Return if VoF tracking not enabled
-    if (!parameters.vof_tracking_enabled)
-      return;
-
-    const unsigned int vof_block_idx = introspection.variable("vofs").block_index;
-    const unsigned int vofN_block_idx = introspection.variable("vofsLS").block_index;
-
-    // Reset current base to values at beginning of timestep
-
-    // Due to dimensionally split formulation, use strang splitting
-    // TODO: Reformulate for unsplit (may require flux limiter)
-    bool update_from_old = true;
-    for (unsigned int dir = 0; dir < dim; ++dir)
-      {
-        // Update base to intermediate solution
-        if (!vof_dir_order_dsc)
-          {
-            assemble_vof_system(dir, update_from_old);
-          }
-        else
-          {
-            assemble_vof_system(dim-dir-1, update_from_old);
-          }
-        solve_vof_system ();
-        // Copy current candidate normals.
-        // primarily useful for exact linear translation
-        solution.block(vofN_block_idx) = old_solution.block(vofN_block_idx);
-        update_vof_normals (solution);
-
-        current_linearization_point.block(vof_block_idx) = solution.block(vof_block_idx);
-        current_linearization_point.block(vofN_block_idx) = solution.block(vofN_block_idx);
-
-        update_from_old = false;
-      }
-    // change dimension iteration order
-    vof_dir_order_dsc = !vof_dir_order_dsc;
-  }
-
-  template <int dim>
   void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir,
                                                   bool update_from_old,
                                                   const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -664,7 +623,6 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void Simulator<dim>::do_vof_update (); \
   template void Simulator<dim>::assemble_vof_system (unsigned int dir, \
                                                      bool update_from_old); \
   template void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir, \

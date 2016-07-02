@@ -489,14 +489,6 @@ namespace aspect
       void update_vof_normals (LinearAlgebra::BlockVector &solution);
 
       /**
-       * Helper function to do vof update
-       *
-       * This function is implemented in
-       * <code>source/vofinterface/vof_system.cc</code>.
-       */
-      void do_vof_update ();
-
-      /**
        * Initiate the assembly of the VoF matrix and right hand side.
        *
        * This function is implemented in

@@ -58,6 +58,9 @@ namespace aspect
       void init_vof_compos ();
       void init_vof_ls ();
 
+      // Logic to handle dimensionally split update
+      void do_vof_update ();
+
 
     private:
       // Parent simulator
