@@ -66,7 +66,7 @@ namespace aspect
 
     LinearAlgebra::BlockVector initial_solution;
 
-    initial_solution.reinit(sim.solution, false);
+    initial_solution.reinit(sim.system_rhs, false);
 
     const QIterated<dim> quadrature (QMidpoint<1>(), n_samples);
     FEValues<dim, dim> fe_init (sim.mapping, sim.finite_element, quadrature,
@@ -125,7 +125,7 @@ namespace aspect
 
     LinearAlgebra::BlockVector initial_solution;
 
-    initial_solution.reinit(sim.solution, false);
+    initial_solution.reinit(sim.system_rhs, false);
 
     const QIterated<dim> quadrature (QMidpoint<1>(), n_samples);
     FEValues<dim, dim> fe_init (sim.mapping,
