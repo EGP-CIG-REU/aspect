@@ -59,6 +59,9 @@ namespace aspect
       const FEValuesExtractors::Scalar vof_field = this->introspection().variable("vofs").extractor_scalar();
       std::vector<double> vof_q_values(qMidC.size());
 
+      // Should be vof_epsilon, look into how to accesss that
+      double voleps = 1e-7;
+
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->get_dof_handler().begin_active(),
       endc = this->get_dof_handler().end();
@@ -85,7 +88,6 @@ namespace aspect
 
           // Check if at interface
           bool at_interface=false;
-          double voleps = this->get_parameters().voleps;
           if (cell_vof>voleps && cell_vof<(1.0-voleps))
             {
               // Fractional volume

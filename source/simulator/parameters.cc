@@ -1132,35 +1132,6 @@ namespace aspect
     if (vof_tracking_enabled)
       Assert(dim==2,ExcMessage("VoF interface tracking not implemented for dim>2."));
 
-    prm.enter_subsection ("VoF config");
-    {
-      voleps = prm.get_double("Small volume");
-
-      vof_solver_tolerance = prm.get_double("VoF solver tolerance");
-
-      vof_composition_var = prm.get("VoF composition variable");
-
-      if (vof_composition_var!="")
-        {
-          if (!use_discontinuous_composition_discretization)
-            {
-              Assert(false, ExcMessage("VoF composition field not implemented for continuous composition."));
-            }
-
-          bool field_exists=false;
-          for (unsigned int i=0; i<n_compositional_fields; ++i)
-            {
-              field_exists = field_exists ||
-                             (vof_composition_var==names_of_compositional_fields[i]);
-            }
-          Assert(field_exists, ExcMessage("VoF composition field variable " +
-                                          vof_composition_var +
-                                          " does not exist."));
-        }
-
-    }
-    prm.leave_subsection ();
-
     // then, finally, let user additions that do not go through the usual
     // plugin mechanism, declare their parameters if they have subscribed
     // to the relevant signals
