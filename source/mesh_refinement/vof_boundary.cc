@@ -60,7 +60,7 @@ namespace aspect
       std::vector<double> vof_q_values(qMidC.size());
 
       // Should be vof_epsilon, look into how to accesss that
-      double voleps = 1e-7;
+      double voleps = vof_epsilon;
 
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->get_dof_handler().begin_active(),
@@ -218,6 +218,12 @@ namespace aspect
     VoFBoundary<dim>::parse_parameters (ParameterHandler &prm)
     {
       //TODO: Add check for vof active
+      prm.enter_subsection ("VoF config");
+      {
+        vof_epsilon = prm.get_double("Small volume");
+      }
+      prm.leave_subsection ();
+
       prm.enter_subsection("Mesh refinement");
       {
         prm.enter_subsection("VoF boundary");

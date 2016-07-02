@@ -67,6 +67,7 @@ namespace aspect
 
       private:
         int min_interface_level;
+        double vof_epsilon;
     };
   }
 }
