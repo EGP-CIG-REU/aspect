@@ -24,6 +24,7 @@
 #include <aspect/assembly.h>
 #include <aspect/simulator_access.h>
 #include <aspect/melt.h>
+#include <aspect/free_surface.h>
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -42,6 +43,30 @@
 
 namespace aspect
 {
+  namespace
+  {
+    /* These functions implement a reduced form of the code from deal.II's TriaAccessor::measure().
+     * In the 3d dG case, a call to face->measure() is not implemented for non-planar faces.
+     * Since we only care about the scaling here, it is enough to have an approximation instead.
+     * The 2d case remains unchanged.
+     */
+    double
+    approximate_face_measure(const DoFHandler<2>::face_iterator &face)
+    {
+      return (face->vertex(0)-face->vertex(1)).norm();
+    }
+
+    double
+    approximate_face_measure(const DoFHandler<3>::face_iterator &face)
+    {
+      const Tensor<1,3> v03 = face->vertex(3) - face->vertex(0);
+      const Tensor<1,3> v12 = face->vertex(2) - face->vertex(1);
+      const Tensor<1,3> twice_area = cross_product_3d(v03, v12);
+      return 0.5 * twice_area.norm();
+    }
+  }
+
+
   namespace internal
   {
     namespace Assembly
@@ -577,6 +602,9 @@ namespace aspect
         const Tensor<1,dim> velocity = (scratch.old_velocity_values[q] +
                                         scratch.old_old_velocity_values[q]) / 2;
 
+        const double strain_rate = ((scratch.old_strain_rates[q]
+                                     + scratch.old_old_strain_rates[q]) / 2).norm();
+
         if (parameters.stabilization_alpha == 2)
           {
             const double field = (scratch.old_field_values[q] + scratch.old_old_field_values[q]) / 2;
@@ -584,7 +612,9 @@ namespace aspect
           }
 
         max_residual = std::max (residual[q],     max_residual);
-        max_velocity = std::max (std::sqrt (velocity*velocity), max_velocity);
+        max_velocity = std::max (velocity.norm()
+                                 + parameters.stabilization_gamma * strain_rate * cell_diameter,
+                                 max_velocity);
 
         if (advection_field.is_temperature())
           {
@@ -666,7 +696,7 @@ namespace aspect
     internal::Assembly::Scratch::
     AdvectionSystem<dim> scratch (finite_element,
                                   finite_element.base_element(advection_field.base_element(introspection)),
-                                  mapping,
+                                  *mapping,
                                   QGauss<dim>((advection_field.is_temperature()
                                                ?
                                                parameters.temperature_degree
@@ -1387,7 +1417,7 @@ namespace aspect
                                           parameters.discontinuous_penalty
                                           * parameters.temperature_degree
                                           * parameters.temperature_degree
-                                          / face->measure()
+                                          / approximate_face_measure(face)
                                           * conductivity
                                           / (density_c_P + latent_heat_LHS)
                                           :
@@ -1612,7 +1642,7 @@ namespace aspect
                                               parameters.discontinuous_penalty
                                               * parameters.temperature_degree
                                               * parameters.temperature_degree
-                                              / face->measure()
+                                              / approximate_face_measure(face)
                                               * conductivity
                                               / (density_c_P + latent_heat_LHS)
                                               :
@@ -1656,7 +1686,7 @@ namespace aspect
                                                        parameters.discontinuous_penalty
                                                        * parameters.temperature_degree
                                                        * parameters.temperature_degree
-                                                       / neighbor->face(neighbor2)->measure()
+                                                       / approximate_face_measure(neighbor->face(neighbor2))
                                                        * neighbor_conductivity
                                                        / (neighbor_density_c_P + neighbor_latent_heat_LHS)
                                                        :
@@ -1930,7 +1960,7 @@ namespace aspect
                                               parameters.discontinuous_penalty
                                               * parameters.temperature_degree
                                               * parameters.temperature_degree
-                                              / face->measure()
+                                              / approximate_face_measure(face)
                                               * conductivity
                                               / (density_c_P + latent_heat_LHS)
                                               :
@@ -1974,7 +2004,7 @@ namespace aspect
                                                        parameters.discontinuous_penalty
                                                        * parameters.temperature_degree
                                                        * parameters.temperature_degree
-                                                       / neighbor_child->face(neighbor2)->measure()
+                                                       / approximate_face_measure(neighbor_child->face(neighbor2))
                                                        * neighbor_conductivity
                                                        / (neighbor_density_c_P + neighbor_latent_heat_LHS)
                                                        :
@@ -2489,7 +2519,7 @@ namespace aspect
                           std_cxx11::_1),
          internal::Assembly::Scratch::
          StokesPreconditioner<dim> (finite_element, quadrature_formula,
-                                    mapping,
+                                    *mapping,
                                     cell_update_flags,
                                     parameters.n_compositional_fields,
                                     parameters.include_melt_transport),
@@ -2740,7 +2770,7 @@ namespace aspect
                           this,
                           std_cxx11::_1),
          internal::Assembly::Scratch::
-         StokesSystem<dim> (finite_element, mapping, quadrature_formula,
+         StokesSystem<dim> (finite_element, *mapping, quadrature_formula,
                             face_quadrature_formula,
                             cell_update_flags,
                             face_update_flags,
@@ -3073,7 +3103,7 @@ namespace aspect
          internal::Assembly::Scratch::
          AdvectionSystem<dim> (finite_element,
                                finite_element.base_element(advection_field.base_element(introspection)),
-                               mapping,
+                               *mapping,
                                QGauss<dim>(advection_quadrature_degree),
                                /* Only generate a valid face quadrature if necessary.
                                 * Otherwise, generate invalid face quadrature rule.

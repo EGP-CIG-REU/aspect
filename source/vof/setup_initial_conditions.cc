@@ -69,7 +69,7 @@ namespace aspect
     initial_solution.reinit(sim.system_rhs, false);
 
     const QIterated<dim> quadrature (QMidpoint<1>(), n_samples);
-    FEValues<dim, dim> fe_init (sim.mapping, sim.finite_element, quadrature,
+    FEValues<dim, dim> fe_init (*sim.mapping, sim.finite_element, quadrature,
                                 update_JxW_values | update_quadrature_points);
 
     double h = 1.0/n_samples;
@@ -128,7 +128,7 @@ namespace aspect
     initial_solution.reinit(sim.system_rhs, false);
 
     const QIterated<dim> quadrature (QMidpoint<1>(), n_samples);
-    FEValues<dim, dim> fe_init (sim.mapping,
+    FEValues<dim, dim> fe_init (*sim.mapping,
                                 sim.finite_element,
                                 quadrature,
                                 update_JxW_values | update_quadrature_points);

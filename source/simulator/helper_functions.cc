@@ -141,39 +141,6 @@ namespace aspect
   }
 
 
-  template <int dim>
-  void Simulator<dim>::output_program_stats()
-  {
-    if (!aspect::output_parallel_statistics)
-      return;
-
-    Utilities::System::MemoryStats stats;
-    Utilities::System::get_memory_stats(stats);
-    pcout << "VmPeak (proc0): " << stats.VmPeak/1024 << " mb" << std::endl;
-
-    // memory consumption:
-    const double mb = 1024*1024; //convert from bytes into mb
-    pcout << "memory in MB:" << std::endl
-          << "* tria " << triangulation.memory_consumption()/mb << std::endl
-          << "  - p4est " << triangulation.memory_consumption_p4est()/mb << std::endl
-          << "* DoFHandler " << dof_handler.memory_consumption()/mb <<std::endl
-          << "* ConstraintMatrix " << constraints.memory_consumption()/mb << std::endl
-          << "* current_constraints " << current_constraints.memory_consumption()/mb << std::endl
-          << "* Matrix " << system_matrix.memory_consumption()/mb << std::endl
-          << "* 5 Vectors " << 5*solution.memory_consumption()/mb << std::endl
-          << "* preconditioner " << (system_preconditioner_matrix.memory_consumption()
-//                                     + Amg_preconditioner->memory_consumption()
-                                     /*+Mp_preconditioner->memory_consumption()
-                                                                      +T_preconditioner->memory_consumption()*/)/mb
-          << std::endl
-          << "  - matrix " << system_preconditioner_matrix.memory_consumption()/mb << std::endl
-//          << "  - prec vel " << Amg_preconditioner->memory_consumption()/mb << std::endl
-          << "  - prec mass " << 0/*Mp_preconditioner->memory_consumption()/mb*/ << std::endl
-          << "  - prec T " << 0/*T_preconditioner->memory_consumption()/mb*/ << std::endl
-          << std::endl;
-  }
-
-
 
   namespace
   {
@@ -263,7 +230,7 @@ namespace aspect
     const unsigned int n_q_points = quadrature_formula.size();
 
 
-    FEValues<dim> fe_values (mapping, finite_element, quadrature_formula, update_values);
+    FEValues<dim> fe_values (*mapping, finite_element, quadrature_formula, update_values);
     std::vector<Tensor<1,dim> > velocity_values(n_q_points);
 
     double max_local_velocity = 0;
@@ -298,7 +265,7 @@ namespace aspect
     const QIterated<dim> quadrature_formula (QTrapez<1>(),
                                              parameters.stokes_velocity_degree);
 
-    FEValues<dim> fe_values (mapping,
+    FEValues<dim> fe_values (*mapping,
                              finite_element,
                              quadrature_formula,
                              update_values |
@@ -454,7 +421,7 @@ namespace aspect
          introspection.extractors.compositional_fields[advection_field.compositional_variable]
         );
 
-    FEValues<dim> fe_values (mapping, finite_element, quadrature_formula,
+    FEValues<dim> fe_values (*mapping, finite_element, quadrature_formula,
                              update_values);
     std::vector<double> old_field_values(n_q_points);
     std::vector<double> old_old_field_values(n_q_points);
@@ -536,7 +503,7 @@ namespace aspect
 
     Assert(introspection.block_indices.velocities == 0, ExcNotImplemented());
     const std::vector<Point<dim> > mesh_support_points = finite_element.base_element(introspection.base_elements.velocities).get_unit_support_points();
-    FEValues<dim> mesh_points (mapping, finite_element, mesh_support_points, update_quadrature_points);
+    FEValues<dim> mesh_points (*mapping, finite_element, mesh_support_points, update_quadrature_points);
     std::vector<types::global_dof_index> cell_dof_indices (finite_element.dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
@@ -583,7 +550,7 @@ namespace aspect
         QGauss < dim - 1 > quadrature (parameters.stokes_velocity_degree + 1);
 
         const unsigned int n_q_points = quadrature.size();
-        FEFaceValues<dim> fe_face_values (mapping, finite_element,  quadrature,
+        FEFaceValues<dim> fe_face_values (*mapping, finite_element,  quadrature,
                                           update_JxW_values | update_values);
 
         std::vector<double> pressure_values(n_q_points);
@@ -621,7 +588,7 @@ namespace aspect
         const QGauss<dim> quadrature (parameters.stokes_velocity_degree + 1);
 
         const unsigned int n_q_points = quadrature.size();
-        FEValues<dim> fe_values (mapping, finite_element,  quadrature,
+        FEValues<dim> fe_values (*mapping, finite_element,  quadrature,
                                  update_JxW_values | update_values);
 
         std::vector<double> pressure_values(n_q_points);
@@ -985,49 +952,137 @@ namespace aspect
   template <int dim>
   void Simulator<dim>::apply_limiter_to_dg_solutions (const AdvectionField &advection_field)
   {
-    AssertThrow (dim == 2,
-                 ExcMessage ("The bound preserving limiter is currently only implemented for 2-dimensional problem."));
+    /*
+     * First setup the quadrature points which are used to find the maximum and minimum solution values at those points.
+     * A quadrature formula that combines all quadrature points constructed as all tensor products of
+     * 1) one dimentional Gauss points; 2) one dimentional Gauss-Lobatto points.
+     * We require that the Gauss-Lobatto points (2) appear in only one direction.
+     * Therefore, possible combination
+     * in 2D: the combinations are 21, 12
+     * in 3D: the combinations are 211, 121, 112
+     */
     const QGauss<1> quadrature_formula_1 (advection_field.is_temperature() ?
                                           parameters.temperature_degree+1 :
                                           parameters.composition_degree+1);
     const QGaussLobatto<1> quadrature_formula_2 (advection_field.is_temperature() ?
                                                  parameters.temperature_degree+1 :
                                                  parameters.composition_degree+1);
-    /*
-     * TODO: currently it only works for 2 dimensional problem. Will add the 3D special selected quadrature points and weight later.
-     * Construct the quadrature points and weights:
-     * 1--Gauss points; 2-- Gauss-Lobatto points; we require that Guass-Lobatto points (2) appear  in only one direction.
-     * in 2D: the combinations are 21, 12
-     * in 3D: the combinations are 211, 121, 112
-     */
 
-    /* 2D construction
-     * Construct the quadrature points and weights:
-     * x direction uses Gauss points and y direction uses Gauss Lobatto points
-     */
-    const QAnisotropic<dim> quadrature_formula_12 (quadrature_formula_1, quadrature_formula_2);
-    //Construct the quadrature points and weights:
-    //x direction uses Gauss-Lobatto points and y direction uses Gauss points
-    const QAnisotropic<dim> quadrature_formula_21 (quadrature_formula_2, quadrature_formula_1);
+    const unsigned int n_q_points_1 = quadrature_formula_1.size();
+    const unsigned int n_q_points_2 = quadrature_formula_2.size();
+    const unsigned int n_q_points   = dim * n_q_points_2 *std::pow(n_q_points_1, dim-1) ;
 
-    const unsigned int n_q_points_12 = quadrature_formula_12.size();
-    const unsigned int n_q_points_21 = quadrature_formula_21.size();
+    std::vector< Point <dim> > quadrature_points (n_q_points);
 
-    FEValues<dim> fe_values_12 (mapping,
-                                finite_element,
-                                quadrature_formula_12,
-                                update_values   |
-                                update_quadrature_points |
-                                update_JxW_values);
-    std::vector<double> values_12 (n_q_points_12);
+    switch (dim)
+      {
+        case 2:
+        {
+          //append quadrature points combination 12
+          for ( unsigned int i=0; i < n_q_points_1 ; i++)
+            {
+              const double  x = quadrature_formula_1.point(i)(0);
+              for ( unsigned int j=0; j < n_q_points_2 ; j++)
+                {
+                  const double  y = quadrature_formula_2.point(j)(0);
+                  quadrature_points[i * n_q_points_2+j] = Point<dim>(x,y);
+                }
+            }
+          const unsigned int n_q_points_12 = n_q_points_1 * n_q_points_2;
+          //append quadrature points combination 21
+          for ( unsigned int i=0; i < n_q_points_2 ; i++)
+            {
+              const double  x = quadrature_formula_2.point(i)(0);
+              for ( unsigned int j=0; j < n_q_points_1 ; j++)
+                {
+                  const double  y = quadrature_formula_1.point(j)(0);
+                  quadrature_points[n_q_points_12 + i * n_q_points_1+j ] = Point<dim>(x,y);
+                }
+            }
+          break;
+        }
 
-    FEValues<dim> fe_values_21 (mapping,
-                                finite_element,
-                                quadrature_formula_21,
-                                update_values   |
-                                update_quadrature_points |
-                                update_JxW_values);
-    std::vector<double> values_21 (n_q_points_21);
+        case 3:
+        {
+          //append quadrature points combination 121
+          for ( unsigned int i=0; i < n_q_points_1 ; i++)
+            {
+              const double  x = quadrature_formula_1.point(i)(0);
+              for ( unsigned int j=0; j < n_q_points_2 ; j++)
+                {
+                  const double  y = quadrature_formula_2.point(j)(0);
+                  for ( unsigned int k=0; k < n_q_points_1 ; k++)
+                    {
+                      const unsigned int k_index = i * n_q_points_2 * n_q_points_1 + j * n_q_points_2 + k;
+                      const double  z = quadrature_formula_1.point(k)(0);
+                      quadrature_points[k_index] = Point<dim>(x,y,z);
+                    }
+                }
+            }
+          const unsigned int n_q_points_121 = n_q_points_1 * n_q_points_2 * n_q_points_1;
+          //append quadrature points combination 112
+          for ( unsigned int i=0; i < n_q_points_1 ; i++)
+            {
+              const double  x = quadrature_formula_1.point(i)(0);
+              for ( unsigned int j=0; j < n_q_points_1 ; j++)
+                {
+                  const double y = quadrature_formula_1.point(j)(0);
+                  for ( unsigned int k=0; k < n_q_points_2 ; k++)
+                    {
+                      const unsigned int k_index =
+                        n_q_points_121 + i * n_q_points_1 * n_q_points_2 + j * n_q_points_2 + k;
+                      const double  z = quadrature_formula_2.point(k)(0);
+                      quadrature_points[k_index] = Point<dim>(x,y,z);
+                    }
+                }
+            }
+          //append quadrature points combination 211
+          for ( unsigned int i=0; i < n_q_points_2 ; i++)
+            {
+              const double  x = quadrature_formula_2.point(i)(0);
+              for ( unsigned int j=0; j < n_q_points_1 ; j++)
+                {
+                  const double  y = quadrature_formula_1.point(j)(0);
+                  for ( unsigned int k=0; k < n_q_points_1 ; k++)
+                    {
+                      const unsigned int k_index =
+                        2 * n_q_points_121 + i * n_q_points_2 * n_q_points_1 + j * n_q_points_1 + k;
+                      const double  z = quadrature_formula_1.point(k)(0);
+                      quadrature_points[k_index] = Point<dim>(x,y,z);
+                    }
+                }
+            }
+          break;
+        }
+
+        default:
+          Assert (false, ExcNotImplemented());
+      }
+    Quadrature<dim> quadrature_formula(quadrature_points);
+
+    // Quadrature rules only used for the numerical integration for better accuracy
+    const QGauss<dim> quadrature_formula_0 (advection_field.is_temperature() ?
+                                            parameters.temperature_degree+1 :
+                                            parameters.composition_degree+1);
+
+    const unsigned int n_q_points_0 = quadrature_formula_0.size();
+
+    // fe values for points evalution
+    FEValues<dim> fe_values (*mapping,
+                             finite_element,
+                             quadrature_formula,
+                             update_values   |
+                             update_quadrature_points);
+    std::vector<double> values (n_q_points);
+    // fe values for numerical integration, with a number of quadrature points
+    // that is equal to 1/dim times the number of total points above
+    FEValues<dim> fe_values_0 (*mapping,
+                               finite_element,
+                               quadrature_formula_0,
+                               update_values   |
+                               update_quadrature_points |
+                               update_JxW_values);
+    std::vector<double> values_0 (n_q_points_0);
 
     const FEValuesExtractors::Scalar field
       = (advection_field.is_temperature()
@@ -1036,7 +1091,6 @@ namespace aspect
          :
          introspection.extractors.compositional_fields[advection_field.compositional_variable]
         );
-
 
     const double max_solution_exact_global = (advection_field.is_temperature()
                                               ?
@@ -1066,17 +1120,16 @@ namespace aspect
         if (cell->is_locally_owned())
           {
             cell->get_dof_indices (local_dof_indices);
-            fe_values_12.reinit (cell);
-            fe_values_21.reinit (cell);
-
-            fe_values_12[field].get_function_values(solution, values_12);
-            fe_values_21[field].get_function_values(solution, values_21);
+            //used to find the maximum, minimum
+            fe_values.reinit (cell);
+            fe_values[field].get_function_values(solution, values);
+            //used for the numerical integration
+            fe_values_0.reinit (cell);
+            fe_values_0[field].get_function_values(solution, values_0);
 
             //Find the local max and local min
-            const double min_solution_local = std::min (*std::min_element (values_12.begin(), values_12.end()),
-                                                        *std::min_element (values_21.begin(), values_21.end()));
-            const double max_solution_local = std::max (*std::max_element (values_12.begin(), values_12.end()),
-                                                        *std::max_element (values_21.begin(), values_21.end()));
+            const double min_solution_local = *std::min_element (values.begin(), values.end());
+            const double max_solution_local = *std::max_element (values.begin(), values.end());
             //Find the trouble cell
             if (min_solution_local < min_solution_exact_global
                 || max_solution_local > max_solution_exact_global)
@@ -1084,10 +1137,10 @@ namespace aspect
                 //Compute the cell area and cell solution average
                 double local_area = 0;
                 double local_solution_average = 0;
-                for (unsigned int q = 0; q < n_q_points_12; ++q)
+                for (unsigned int q = 0; q < n_q_points_0; ++q)
                   {
-                    local_area += fe_values_12.JxW(q);
-                    local_solution_average += values_12[q]*fe_values_12.JxW(q);
+                    local_area += fe_values_0.JxW(q);
+                    local_solution_average += values_0[q]*fe_values_0.JxW(q);
                   }
                 local_solution_average /= local_area;
                 /*
@@ -1144,7 +1197,6 @@ namespace aspect
   template std::pair<double,double> Simulator<dim>::get_extrapolated_advection_field_range (const AdvectionField &advection_field) const; \
   template std::pair<double,bool> Simulator<dim>::compute_time_step () const; \
   template void Simulator<dim>::make_pressure_rhs_compatible(LinearAlgebra::BlockVector &vector); \
-  template void Simulator<dim>::output_program_stats(); \
   template void Simulator<dim>::output_statistics(); \
   template double Simulator<dim>::compute_initial_stokes_residual(); \
   template bool Simulator<dim>::stokes_matrix_depends_on_solution() const; \

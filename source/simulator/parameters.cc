@@ -24,6 +24,7 @@
 #include <aspect/utilities.h>
 #include <aspect/melt.h>
 #include <aspect/vof/handler.h>
+#include <aspect/free_surface.h>
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -501,7 +502,7 @@ namespace aspect
                          "The number of global refinement steps performed on "
                          "the initial coarse mesh, before the problem is first "
                          "solved there.");
-      prm.declare_entry ("Initial adaptive refinement", "2",
+      prm.declare_entry ("Initial adaptive refinement", "0",
                          Patterns::Integer (0),
                          "The number of adaptive refinement steps performed after "
                          "initial global refinement but while still within the first "
@@ -638,8 +639,11 @@ namespace aspect
                            "The exponent $\\alpha$ in the entropy viscosity stabilization. Valid "
                            "options are 1 or 2. The recommended setting is 2. (This parameter does "
                            "not correspond to any variable in the 2012 GJI paper by Kronbichler, "
-                           "Heister and Bangerth that describes ASPECT. Rather, the paper always uses "
-                           "2 as the exponent in the definition of the entropy, following eq. (15).)."
+                           "Heister and Bangerth that describes ASPECT, see \\cite{KHB12}. "
+                           "Rather, the paper always uses 2 as the exponent in the definition "
+                           "of the entropy, following equation (15) of the paper. The full "
+                           "approach is discussed in \\cite{GPP11}.) Note that this is not the "
+                           "thermal expansion coefficient, also commonly referred to as $\\alpha$."
                            "Units: None.");
         prm.declare_entry ("cR", "0.33",
                            Patterns::Double (0),
@@ -662,6 +666,19 @@ namespace aspect
                            "different value than described there: It can be chosen as stated there for "
                            "uniformly refined meshes, but it needs to be chosen larger if the mesh has "
                            "cells that are not squares or cubes.) Units: None.");
+        prm.declare_entry ("gamma", "0.0",
+                           Patterns::Double (0),
+                           "The strain rate scaling factor in the artificial viscosity "
+                           "stabilization. This parameter determines how much the strain rate (in addition "
+                           "to the velocity) should influence the stabilization. (This parameter does "
+                           "not correspond to any variable in the 2012 GJI paper by Kronbichler, "
+                           "Heister and Bangerth that describes ASPECT. Rather, the paper always uses "
+                           "0, i.e. they specify the maximum dissipation $\\nu_h^\\text{max}$ as "
+                           "$\\nu_h^\\text{max}\\vert_K = \\alpha_\\text{max} h_K \\|\\mathbf u\\|_{\\infty,K}$. "
+                           "Here, we use "
+                           "$\\|\\lvert\\mathbf u\\rvert + \\gamma h_K \\lvert\\varepsilon (\\mathbf u)\\rvert\\|_{\\infty,K}$ "
+                           "instead of $\\|\\mathbf u\\|_{\\infty,K}$. "
+                           "Units: None.");
         prm.declare_entry ("Discontinuous penalty", "10",
                            Patterns::Double (0),
                            "The value used to penalize discontinuities in the discontinuous Galerkin "
@@ -772,7 +789,7 @@ namespace aspect
     Simulator<dim>::VoFHandler::declare_parameters(prm);
 
     // also declare the parameters that the FreeSurfaceHandler needs
-    Simulator<dim>::FreeSurfaceHandler::declare_parameters (prm);
+    FreeSurfaceHandler<dim>::declare_parameters (prm);
 
     // then, finally, let user additions that do not go through the usual
     // plugin mechanism, declare their parameters if they have subscribed
@@ -998,6 +1015,7 @@ namespace aspect
         stabilization_alpha                 = prm.get_integer ("alpha");
         stabilization_c_R                   = prm.get_double ("cR");
         stabilization_beta                  = prm.get_double ("beta");
+        stabilization_gamma                 = prm.get_double ("gamma");
         discontinuous_penalty               = prm.get_double ("Discontinuous penalty");
         use_limiter_for_discontinuous_temperature_solution
           = prm.get_bool("Use limiter for discontinuous temperature solution");
@@ -1430,6 +1448,7 @@ namespace aspect
     MaterialModel::declare_parameters<dim> (prm);
     HeatingModel::Manager<dim>::declare_parameters (prm);
     GeometryModel::declare_parameters <dim>(prm);
+    InitialTopographyModel::declare_parameters <dim>(prm);
     GravityModel::declare_parameters<dim> (prm);
     InitialConditions::declare_parameters<dim> (prm);
     CompositionalInitialConditions::declare_parameters<dim> (prm);

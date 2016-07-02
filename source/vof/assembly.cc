@@ -20,6 +20,7 @@
 
 #include <aspect/simulator.h>
 #include <aspect/utilities.h>
+#include <aspect/free_surface.h>
 #include <aspect/vof/handler.h>
 #include <aspect/vof/utilities.h>
 
@@ -573,7 +574,7 @@ namespace aspect
          internal::Assembly::Scratch::
          VoFSystem<dim> (sim.finite_element,
                          vof_fe,
-                         sim.mapping,
+                         *sim.mapping,
                          QGauss<dim>((sim.parameters.stokes_velocity_degree+1)/2),
                          QGauss<dim-1>((sim.parameters.stokes_velocity_degree+1)/2)),
          internal::Assembly::CopyData::
