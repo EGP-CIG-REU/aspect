@@ -20,7 +20,7 @@
 
 #include <aspect/simulator.h>
 #include <aspect/utilities.h>
-#include <aspect/vof/assembly.h>
+#include <aspect/vof/handler.h>
 #include <aspect/vof/utilities.h>
 
 #include <deal.II/base/quadrature_lib.h>
@@ -167,14 +167,14 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir,
-                                                  bool update_from_old,
-                                                  const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                                  internal::Assembly::Scratch::VoFSystem<dim> &scratch,
-                                                  internal::Assembly::CopyData::VoFSystem<dim> &data)
+  void Simulator<dim>::VoFHandler::local_assemble_vof_system (const unsigned int calc_dir,
+                                                              bool update_from_old,
+                                                              const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                                              internal::Assembly::Scratch::VoFSystem<dim> &scratch,
+                                                              internal::Assembly::CopyData::VoFSystem<dim> &data)
   {
-    const bool old_velocity_avail = (timestep_number > 0);
-    const bool old_old_velocity_avail = (timestep_number > 1);
+    const bool old_velocity_avail = (sim.timestep_number > 0);
+    const bool old_old_velocity_avail = (sim.timestep_number > 1);
 
     const unsigned int n_q_points    = scratch.finite_element_values.n_quadrature_points;
     const unsigned int n_f_q_points    = scratch.face_finite_element_values.n_quadrature_points;
@@ -189,12 +189,12 @@ namespace aspect
 
     const FiniteElement<dim> &main_fe = scratch.finite_element_values.get_fe();
 
-    const unsigned int vofN_component = introspection.variable("vofsN").first_component_index;
+    const unsigned int vofN_component = sim.introspection.variable("vofsN").first_component_index;
     const FEValuesExtractors::Vector vofN_n = FEValuesExtractors::Vector(vofN_component);
     const FEValuesExtractors::Scalar vofN_d = FEValuesExtractors::Scalar(vofN_component+dim);
 
-    const unsigned int solution_component = introspection.variable("vofs").first_component_index;
-    const FEValuesExtractors::Scalar solution_field = introspection.variable("vofs").extractor_scalar();
+    const unsigned int solution_component = sim.introspection.variable("vofs").first_component_index;
+    const FEValuesExtractors::Scalar solution_field = sim.introspection.variable("vofs").extractor_scalar();
     const Quadrature<dim> &quadrature = scratch.finite_element_values.get_quadrature();
 
     scratch.finite_element_values.reinit (cell);
@@ -221,24 +221,24 @@ namespace aspect
 
     if (update_from_old)
       {
-        scratch.finite_element_values[solution_field].get_function_values (old_solution,
+        scratch.finite_element_values[solution_field].get_function_values (sim.old_solution,
                                                                            scratch.old_field_values);
 
-        scratch.finite_element_values[vofN_n].get_function_values (old_solution,
+        scratch.finite_element_values[vofN_n].get_function_values (sim.old_solution,
                                                                    scratch.cell_i_n_values);
 
-        scratch.finite_element_values[vofN_d].get_function_values (old_solution,
+        scratch.finite_element_values[vofN_d].get_function_values (sim.old_solution,
                                                                    scratch.cell_i_d_values);
       }
     else
       {
-        scratch.finite_element_values[solution_field].get_function_values (solution,
+        scratch.finite_element_values[solution_field].get_function_values (sim.solution,
                                                                            scratch.old_field_values);
 
-        scratch.finite_element_values[vofN_n].get_function_values (solution,
+        scratch.finite_element_values[vofN_n].get_function_values (sim.solution,
                                                                    scratch.cell_i_n_values);
 
-        scratch.finite_element_values[vofN_d].get_function_values (solution,
+        scratch.finite_element_values[vofN_d].get_function_values (sim.solution,
                                                                    scratch.cell_i_d_values);
       }
 
@@ -269,7 +269,6 @@ namespace aspect
 
     double face_flux;
     double dflux = 0.0;
-    double voleps = parameters.voleps;
 
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
@@ -286,21 +285,21 @@ namespace aspect
 
             scratch.face_finite_element_values.reinit (cell, f);
 
-            scratch.face_finite_element_values[introspection.extractors.velocities]
-            .get_function_values (current_linearization_point,
+            scratch.face_finite_element_values[sim.introspection.extractors.velocities]
+            .get_function_values (sim.current_linearization_point,
                                   scratch.face_current_velocity_values);
 
-            scratch.face_finite_element_values[introspection.extractors.velocities]
-            .get_function_values (old_solution,
+            scratch.face_finite_element_values[sim.introspection.extractors.velocities]
+            .get_function_values (sim.old_solution,
                                   scratch.face_old_velocity_values);
 
-            //scratch.face_finite_element_values[introspection.extractors.velocities]
+            //scratch.face_finite_element_values[sim.introspection.extractors.velocities]
             //.get_function_values (old_old_solution,
             //scratch.face_old_old_velocity_values);
 
-            if (parameters.free_surface_enabled)
-              scratch.face_finite_element_values[introspection.extractors.velocities]
-              .get_function_values (free_surface->mesh_velocity,
+            if (sim.parameters.free_surface_enabled)
+              scratch.face_finite_element_values[sim.introspection.extractors.velocities]
+              .get_function_values (sim.free_surface->mesh_velocity,
                                     scratch.face_mesh_velocity_values);
 
             face_flux = 0;
@@ -319,10 +318,10 @@ namespace aspect
                                     scratch.face_current_velocity_values[q]);
 
                 //Subtract off the mesh velocity for ALE corrections if necessary
-                if (parameters.free_surface_enabled)
+                if (sim.parameters.free_surface_enabled)
                   current_u -= scratch.face_mesh_velocity_values[q];
 
-                face_flux += time_step *
+                face_flux += sim.time_step *
                              current_u *
                              scratch.face_finite_element_values.normal_vector(q) *
                              scratch.face_finite_element_values.JxW(q);
@@ -410,21 +409,21 @@ namespace aspect
 
                 scratch.subface_finite_element_values.reinit (cell, f, subface_no);
 
-                scratch.subface_finite_element_values[introspection.extractors.velocities]
-                .get_function_values (current_linearization_point,
+                scratch.subface_finite_element_values[sim.introspection.extractors.velocities]
+                .get_function_values (sim.current_linearization_point,
                                       scratch.face_current_velocity_values);
 
-                scratch.subface_finite_element_values[introspection.extractors.velocities]
-                .get_function_values (old_solution,
+                scratch.subface_finite_element_values[sim.introspection.extractors.velocities]
+                .get_function_values (sim.old_solution,
                                       scratch.face_old_velocity_values);
 
-                //scratch.face_finite_element_values[introspection.extractors.velocities]
+                //scratch.face_finite_element_values[sim.introspection.extractors.velocities]
                 //.get_function_values (old_old_solution,
                 //scratch.face_old_old_velocity_values);
 
-                if (parameters.free_surface_enabled)
-                  scratch.subface_finite_element_values[introspection.extractors.velocities]
-                  .get_function_values (free_surface->mesh_velocity,
+                if (sim.parameters.free_surface_enabled)
+                  scratch.subface_finite_element_values[sim.introspection.extractors.velocities]
+                  .get_function_values (sim.free_surface->mesh_velocity,
                                         scratch.face_mesh_velocity_values);
 
                 face_flux = 0;
@@ -443,10 +442,10 @@ namespace aspect
                                         scratch.face_current_velocity_values[q]);
 
                     //Subtract off the mesh velocity for ALE corrections if necessary
-                    if (parameters.free_surface_enabled)
+                    if (sim.parameters.free_surface_enabled)
                       current_u -= scratch.face_mesh_velocity_values[q];
 
-                    face_flux += time_step *
+                    face_flux += sim.time_step *
                                  current_u *
                                  scratch.subface_finite_element_values.normal_vector(q) *
                                  scratch.subface_finite_element_values.JxW(q);
@@ -483,11 +482,11 @@ namespace aspect
                 data.local_face_matrices_ext_ext[f_rhs_ind] (0, 0) += face_flux;
 
                 // Temporarily limit to constant cases
-                if (cell_vof > voleps && cell_vof<1.0-voleps)
+                if (cell_vof > vof_epsilon && cell_vof<1.0-vof_epsilon)
                   {
-                    pcout << "Cell at " << cell->center() << " " << cell_vof << std::endl;
-                    pcout << "\t" << face_flux/time_step/cell_vol << std::endl;
-                    pcout << "\t" << cell_i_normal << ".x=" << cell_i_d << std::endl;
+                    sim.pcout << "Cell at " << cell->center() << " " << cell_vof << std::endl;
+                    sim.pcout << "\t" << face_flux/sim.time_step/cell_vol << std::endl;
+                    sim.pcout << "\t" << cell_i_normal << ".x=" << cell_i_d << std::endl;
                     // Assert(false, ExcNotImplemented());
                   }
                 continue;
@@ -524,26 +523,26 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::assemble_vof_system (unsigned int dir, bool update_from_old)
+  void Simulator<dim>::VoFHandler::assemble_vof_system (unsigned int dir, bool update_from_old)
   {
-    computing_timer.enter_section ("   Assemble VoF system");
-    const unsigned int block_idx = introspection.variable("vofs").block_index;
-    system_matrix.block(block_idx, block_idx) = 0;
-    system_rhs = 0;
+    sim.computing_timer.enter_section ("   Assemble VoF system");
+    const unsigned int block_idx = sim.introspection.variable("vofs").block_index;
+    sim.system_matrix.block(block_idx, block_idx) = 0;
+    sim.system_rhs = 0;
 
     typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
     CellFilter;
 
     // const unsigned int vof_base_element = introspection.variable("vofs").base_index;
-    const FiniteElement<dim> &vof_fe = (*introspection.variable("vofs").fe);
+    const FiniteElement<dim> &vof_fe = (*sim.introspection.variable("vofs").fe);
 
     WorkStream::
     run (CellFilter (IteratorFilters::LocallyOwnedCell(),
-                     dof_handler.begin_active()),
+                     sim.dof_handler.begin_active()),
          CellFilter (IteratorFilters::LocallyOwnedCell(),
-                     dof_handler.end()),
-         std_cxx11::bind (&Simulator<dim>::
+                     sim.dof_handler.end()),
+         std_cxx11::bind (&Simulator<dim>::VoFHandler::
                           local_assemble_vof_system,
                           this,
                           dir,
@@ -551,7 +550,7 @@ namespace aspect
                           std_cxx11::_1,
                           std_cxx11::_2,
                           std_cxx11::_3),
-         std_cxx11::bind (&Simulator<dim>::
+         std_cxx11::bind (&Simulator<dim>::VoFHandler::
                           copy_local_to_global_vof_system,
                           this,
                           std_cxx11::_1),
@@ -572,30 +571,30 @@ namespace aspect
          // instead of subscripting with the correct compositional
          // field index.)
          internal::Assembly::Scratch::
-         VoFSystem<dim> (finite_element,
+         VoFSystem<dim> (sim.finite_element,
                          vof_fe,
-                         mapping,
-                         QGauss<dim>((parameters.stokes_velocity_degree+1)/2),
-                         QGauss<dim-1>((parameters.stokes_velocity_degree+1)/2)),
+                         sim.mapping,
+                         QGauss<dim>((sim.parameters.stokes_velocity_degree+1)/2),
+                         QGauss<dim-1>((sim.parameters.stokes_velocity_degree+1)/2)),
          internal::Assembly::CopyData::
          VoFSystem<dim> (vof_fe));
 
-    system_matrix.compress(VectorOperation::add);
-    system_rhs.compress(VectorOperation::add);
+    sim.system_matrix.compress(VectorOperation::add);
+    sim.system_rhs.compress(VectorOperation::add);
 
-    computing_timer.exit_section ();
+    sim.computing_timer.exit_section ();
   }
 
   template <int dim>
-  void Simulator<dim>::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data)
+  void Simulator<dim>::VoFHandler::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data)
   {
     // copy entries into the global matrix. note that these local contributions
     // only correspond to the advection dofs, as assembled above
-    current_constraints.distribute_local_to_global (data.local_matrix,
-                                                    data.local_rhs,
-                                                    data.local_dof_indices,
-                                                    system_matrix,
-                                                    system_rhs);
+    sim.current_constraints.distribute_local_to_global (data.local_matrix,
+                                                        data.local_rhs,
+                                                        data.local_dof_indices,
+                                                        sim.system_matrix,
+                                                        sim.system_rhs);
 
     /* In the following, we copy DG contributions element by element. This
      * is allowed since there are no constraints imposed on discontinuous fields.
@@ -607,12 +606,12 @@ namespace aspect
           {
             for (unsigned int i=0; i<data.neighbor_dof_indices[f].size(); ++i)
               {
-                system_rhs(data.neighbor_dof_indices[f][i]) += data.local_face_rhs[f][i];
+                sim.system_rhs(data.neighbor_dof_indices[f][i]) += data.local_face_rhs[f][i];
                 for (unsigned int j=0; j< data.neighbor_dof_indices[f].size(); ++j)
                   {
-                    system_matrix.add(data.neighbor_dof_indices[f][i],
-                                      data.neighbor_dof_indices[f][j],
-                                      data.local_face_matrices_ext_ext[f](i,j));
+                    sim.system_matrix.add(data.neighbor_dof_indices[f][i],
+                                          data.neighbor_dof_indices[f][j],
+                                          data.local_face_matrices_ext_ext[f](i,j));
                   }
               }
           }
@@ -623,14 +622,14 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void Simulator<dim>::assemble_vof_system (unsigned int dir, \
-                                                     bool update_from_old); \
-  template void Simulator<dim>::local_assemble_vof_system (const unsigned int calc_dir, \
-                                                           bool update_from_old, \
-                                                           const typename DoFHandler<dim>::active_cell_iterator &cell, \
-                                                           internal::Assembly::Scratch::VoFSystem<dim> &scratch, \
-                                                           internal::Assembly::CopyData::VoFSystem<dim> &data); \
-  template void Simulator<dim>::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
+  template void Simulator<dim>::VoFHandler::assemble_vof_system (unsigned int dir, \
+                                                                 bool update_from_old); \
+  template void Simulator<dim>::VoFHandler::local_assemble_vof_system (const unsigned int calc_dir, \
+                                                                       bool update_from_old, \
+                                                                       const typename DoFHandler<dim>::active_cell_iterator &cell, \
+                                                                       internal::Assembly::Scratch::VoFSystem<dim> &scratch, \
+                                                                       internal::Assembly::CopyData::VoFSystem<dim> &data); \
+  template void Simulator<dim>::VoFHandler::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
 
 
   ASPECT_INSTANTIATE(INSTANTIATE)

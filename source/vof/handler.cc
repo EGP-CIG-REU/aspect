@@ -22,6 +22,7 @@
 #include <aspect/simulator.h>
 #include <aspect/global.h>
 #include <aspect/vof/handler.h>
+#include <aspect/vof/assembly.h>
 
 #include <deal.II/fe/fe_dgq.h>
 
@@ -158,11 +159,11 @@ namespace aspect
         // Update base to intermediate solution
         if (!vof_dir_order_dsc)
           {
-            sim.assemble_vof_system(dir, update_from_old);
+            assemble_vof_system(dir, update_from_old);
           }
         else
           {
-            sim.assemble_vof_system(dim-dir-1, update_from_old);
+            assemble_vof_system(dim-dir-1, update_from_old);
           }
         solve_vof_system ();
         // Copy current candidate normals.

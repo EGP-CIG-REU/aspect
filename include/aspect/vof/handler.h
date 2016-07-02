@@ -23,6 +23,7 @@
 
 #include <aspect/simulator.h>
 #include <aspect/vof_initial_conditions/interface.h>
+#include <aspect/vof/assembly.h>
 
 using namespace dealii;
 
@@ -60,6 +61,17 @@ namespace aspect
 
       // Logic to handle dimensionally split update
       void do_vof_update ();
+
+      // Assembly
+      void assemble_vof_system (unsigned int dir,
+                                bool update_from_old);
+      void local_assemble_vof_system (const unsigned int calc_dir,
+                                      bool update_from_old,
+                                      const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                      internal::Assembly::Scratch::VoFSystem<dim> &scratch,
+                                      internal::Assembly::CopyData::VoFSystem<dim> &data);
+      void copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
+      // Solver
       void solve_vof_system ();
 
 
