@@ -75,6 +75,9 @@ namespace aspect
   template <int dim>
   class FreeSurfaceHandler;
 
+  template <int dim>
+  class VoFHandler;
+
   namespace internal
   {
     namespace Assembly
@@ -264,12 +267,6 @@ namespace aspect
          */
         unsigned int base_element(const Introspection<dim> &introspection) const;
       };
-
-      /**
-       * Member class for handling VoF interface tracking. Definition is in
-       * <code>include/aspect/vof/handler.h</code>
-       */
-      class VoFHandler;
 
     private:
 
@@ -1095,7 +1092,7 @@ namespace aspect
        * if we do not need the machinery for doing melt stuff, we do
        * not even allocate it.
        */
-      std_cxx11::shared_ptr<VoFHandler> vof_handler;
+      std_cxx11::shared_ptr<VoFHandler<dim> > vof_handler;
 
       const IntermediaryConstructorAction post_signal_creation;
 
@@ -1309,7 +1306,7 @@ namespace aspect
       friend class boost::serialization::access;
       friend class SimulatorAccess<dim>;
       friend class FreeSurfaceHandler<dim>;  //FreeSurfaceHandler needs access to the internals of the Simulator
-      friend class VoFHandler;          //VoFHandler needs access to the internals of the Simulator
+      friend class VoFHandler<dim>;          //VoFHandler needs access to the internals of the Simulator
       friend struct Parameters<dim>;
   };
 }

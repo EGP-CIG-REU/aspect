@@ -32,21 +32,22 @@ namespace aspect
 {
 
   template <int dim>
-  Simulator<dim>::VoFHandler::VoFHandler (Simulator<dim> &simulator,
+  VoFHandler<dim>::VoFHandler (Simulator<dim> &simulator,
                                           ParameterHandler &prm)
     : sim (simulator),
       vof_initial_conditions (VoFInitialConditions::create_initial_conditions<dim>(prm))
   {
+    this->initialize_simulator(sim);
     parse_parameters (prm);
 
-    sim.signals.edit_finite_element_variables.connect(std_cxx11::bind(&aspect::Simulator<dim>::VoFHandler::edit_finite_element_variables,
+    sim.signals.edit_finite_element_variables.connect(std_cxx11::bind(&aspect::VoFHandler<dim>::edit_finite_element_variables,
                                                                       std_cxx11::ref(*this),
                                                                       std_cxx11::_1));
   }
 
   template <int dim>
   void
-  Simulator<dim>::VoFHandler::edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars)
+  VoFHandler<dim>::edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars)
   {
     vars.push_back(VariableDeclaration<dim>("vofs",
                                             std_cxx11::shared_ptr<FiniteElement<dim>>(
@@ -69,7 +70,7 @@ namespace aspect
 
   template <int dim>
   void
-  Simulator<dim>::VoFHandler::declare_parameters (ParameterHandler &prm)
+  VoFHandler<dim>::declare_parameters (ParameterHandler &prm)
   {
     prm.enter_subsection ("VoF config");
     {
@@ -92,7 +93,7 @@ namespace aspect
 
   template <int dim>
   void
-  Simulator<dim>::VoFHandler::parse_parameters (ParameterHandler &prm)
+  VoFHandler<dim>::parse_parameters (ParameterHandler &prm)
   {
     prm.enter_subsection ("VoF config");
     {
@@ -127,9 +128,12 @@ namespace aspect
 
   template <int dim>
   void
-  Simulator<dim>::VoFHandler::initialize (ParameterHandler &prm)
+  VoFHandler<dim>::initialize (ParameterHandler &prm)
   {
     // Do checks on required assumptions
+    AssertThrow(dim==2,ExcMessage("Volume of Fluid Interface Tracking is currently only functional for dim=2."));
+
+    AssertThrow(!sim.material_model->is_compressible(), ExcMessage("Volume of Fluid Interface Tracking currently assumes incompressiblity."));
 
 
     // Do initial conditions setup
@@ -144,7 +148,7 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::do_vof_update ()
+  void VoFHandler<dim>::do_vof_update ()
   {
     const unsigned int vof_block_idx = sim.introspection.variable("vofs").block_index;
     const unsigned int vofN_block_idx = sim.introspection.variable("vofsLS").block_index;
@@ -183,7 +187,7 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template class Simulator<dim>::VoFHandler;
+  template class VoFHandler<dim>;
 
   ASPECT_INSTANTIATE(INSTANTIATE)
 }

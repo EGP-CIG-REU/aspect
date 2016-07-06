@@ -36,7 +36,7 @@
 namespace aspect
 {
   template <int dim>
-  void Simulator<dim>::VoFHandler::solve_vof_system ()
+  void VoFHandler<dim>::solve_vof_system ()
   {
     unsigned int block_idx = sim.introspection.variable("vofs").block_index;
 
@@ -111,7 +111,7 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void Simulator<dim>::VoFHandler::solve_vof_system ();
+  template void VoFHandler<dim>::solve_vof_system ();
 
 
   ASPECT_INSTANTIATE(INSTANTIATE)

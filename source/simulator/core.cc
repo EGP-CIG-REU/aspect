@@ -127,7 +127,7 @@ namespace aspect
     assemblers (new internal::Assembly::AssemblerLists<dim>()),
     parameters (prm, mpi_communicator_),
     melt_handler (parameters.include_melt_transport ? new MeltHandler<dim> (prm) : NULL),
-    vof_handler (parameters.vof_tracking_enabled ? new VoFHandler (*this, prm) : NULL),
+    vof_handler (parameters.vof_tracking_enabled ? new VoFHandler<dim> (*this, prm) : NULL),
     post_signal_creation(
       std_cxx11::bind (&internals::SimulatorSignals::call_connector_functions<dim>,
                        std_cxx11::ref(signals))),

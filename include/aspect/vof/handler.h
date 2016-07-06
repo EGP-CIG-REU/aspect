@@ -22,6 +22,7 @@
 #define __aspect_vof_handler_h
 
 #include <aspect/simulator.h>
+#include <aspect/simulator_access.h>
 #include <aspect/vof_initial_conditions/interface.h>
 #include <aspect/vof/assembly.h>
 
@@ -37,7 +38,7 @@ namespace aspect
    * all.
    */
   template <int dim>
-  class Simulator<dim>::VoFHandler
+  class VoFHandler : public SimulatorAccess<dim>
   {
     public:
       // Construtor

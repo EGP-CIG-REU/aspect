@@ -168,11 +168,11 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::local_assemble_vof_system (const unsigned int calc_dir,
-                                                              bool update_from_old,
-                                                              const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                                              internal::Assembly::Scratch::VoFSystem<dim> &scratch,
-                                                              internal::Assembly::CopyData::VoFSystem<dim> &data)
+  void VoFHandler<dim>::local_assemble_vof_system (const unsigned int calc_dir,
+                                                   bool update_from_old,
+                                                   const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                                   internal::Assembly::Scratch::VoFSystem<dim> &scratch,
+                                                   internal::Assembly::CopyData::VoFSystem<dim> &data)
   {
     const bool old_velocity_avail = (sim.timestep_number > 0);
     const bool old_old_velocity_avail = (sim.timestep_number > 1);
@@ -300,7 +300,7 @@ namespace aspect
 
             if (sim.parameters.free_surface_enabled)
               scratch.face_finite_element_values[sim.introspection.extractors.velocities]
-              .get_function_values (sim.free_surface->mesh_velocity,
+              .get_function_values (this->get_mesh_velocity(),
                                     scratch.face_mesh_velocity_values);
 
             face_flux = 0;
@@ -424,7 +424,7 @@ namespace aspect
 
                 if (sim.parameters.free_surface_enabled)
                   scratch.subface_finite_element_values[sim.introspection.extractors.velocities]
-                  .get_function_values (sim.free_surface->mesh_velocity,
+                  .get_function_values (this->get_mesh_velocity(),
                                         scratch.face_mesh_velocity_values);
 
                 face_flux = 0;
@@ -524,7 +524,7 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::assemble_vof_system (unsigned int dir, bool update_from_old)
+  void VoFHandler<dim>::assemble_vof_system (unsigned int dir, bool update_from_old)
   {
     sim.computing_timer.enter_section ("   Assemble VoF system");
     const unsigned int block_idx = sim.introspection.variable("vofs").block_index;
@@ -543,7 +543,7 @@ namespace aspect
                      sim.dof_handler.begin_active()),
          CellFilter (IteratorFilters::LocallyOwnedCell(),
                      sim.dof_handler.end()),
-         std_cxx11::bind (&Simulator<dim>::VoFHandler::
+         std_cxx11::bind (&VoFHandler<dim>::
                           local_assemble_vof_system,
                           this,
                           dir,
@@ -551,7 +551,7 @@ namespace aspect
                           std_cxx11::_1,
                           std_cxx11::_2,
                           std_cxx11::_3),
-         std_cxx11::bind (&Simulator<dim>::VoFHandler::
+         std_cxx11::bind (&VoFHandler<dim>::
                           copy_local_to_global_vof_system,
                           this,
                           std_cxx11::_1),
@@ -587,7 +587,7 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data)
+  void VoFHandler<dim>::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data)
   {
     // copy entries into the global matrix. note that these local contributions
     // only correspond to the advection dofs, as assembled above
@@ -623,14 +623,14 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void Simulator<dim>::VoFHandler::assemble_vof_system (unsigned int dir, \
-                                                                 bool update_from_old); \
-  template void Simulator<dim>::VoFHandler::local_assemble_vof_system (const unsigned int calc_dir, \
-                                                                       bool update_from_old, \
-                                                                       const typename DoFHandler<dim>::active_cell_iterator &cell, \
-                                                                       internal::Assembly::Scratch::VoFSystem<dim> &scratch, \
-                                                                       internal::Assembly::CopyData::VoFSystem<dim> &data); \
-  template void Simulator<dim>::VoFHandler::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
+  template void VoFHandler<dim>::assemble_vof_system (unsigned int dir, \
+                                                      bool update_from_old); \
+  template void VoFHandler<dim>::local_assemble_vof_system (const unsigned int calc_dir, \
+                                                            bool update_from_old, \
+                                                            const typename DoFHandler<dim>::active_cell_iterator &cell, \
+                                                            internal::Assembly::Scratch::VoFSystem<dim> &scratch, \
+                                                            internal::Assembly::CopyData::VoFSystem<dim> &data); \
+  template void VoFHandler<dim>::copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
 
 
   ASPECT_INSTANTIATE(INSTANTIATE)

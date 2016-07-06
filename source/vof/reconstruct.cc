@@ -28,7 +28,7 @@ namespace aspect
   using namespace dealii;
 
   template <>
-  void Simulator<2>::VoFHandler::update_vof_normals (LinearAlgebra::BlockVector &solution)
+  void VoFHandler<2>::update_vof_normals (LinearAlgebra::BlockVector &solution)
   {
     const int dim = 2;
 
@@ -85,9 +85,9 @@ namespace aspect
     const unsigned int c_var_index =
       ( (!use_vof_composition) ? numbers::invalid_unsigned_int
         : sim.introspection.compositional_index_for_name(vof_composition_var));
-    AdvectionField advf =
-      ( (!use_vof_composition) ? AdvectionField::temperature()
-        : AdvectionField::composition(c_var_index));
+    Simulator<dim>::AdvectionField advf =
+      ( (!use_vof_composition) ? Simulator<dim>::AdvectionField::temperature()
+        : Simulator<dim>::AdvectionField::composition(c_var_index));
     const unsigned int base_element =
       ( (!use_vof_composition) ? numbers::invalid_unsigned_int
         : advf.base_element(sim.introspection));
@@ -356,7 +356,7 @@ namespace aspect
 
 
   template <>
-  void Simulator<3>::VoFHandler::update_vof_normals (LinearAlgebra::BlockVector &solution)
+  void VoFHandler<3>::update_vof_normals (LinearAlgebra::BlockVector &solution)
   {
     Assert(false, ExcNotImplemented());
   }

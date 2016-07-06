@@ -32,7 +32,7 @@ namespace aspect
   using namespace dealii;
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::set_initial_vofs ()
+  void VoFHandler<dim>::set_initial_vofs ()
   {
     switch (vof_initial_conditions->init_type())
       {
@@ -60,7 +60,7 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::init_vof_compos ()
+  void VoFHandler<dim>::init_vof_compos ()
   {
     unsigned int n_samples = vof_initial_conditions->n_samples ();
 
@@ -119,7 +119,7 @@ namespace aspect
   }
 
   template <int dim>
-  void Simulator<dim>::VoFHandler::init_vof_ls ()
+  void VoFHandler<dim>::init_vof_ls ()
   {
     unsigned int n_samples = vof_initial_conditions->n_samples ();
 
@@ -216,9 +216,9 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void Simulator<dim>::VoFHandler::set_initial_vofs ();\
-  template void Simulator<dim>::VoFHandler::init_vof_ls (); \
-  template void Simulator<dim>::VoFHandler::init_vof_compos ();
+  template void VoFHandler<dim>::set_initial_vofs ();\
+  template void VoFHandler<dim>::init_vof_ls (); \
+  template void VoFHandler<dim>::init_vof_compos ();
 
   ASPECT_INSTANTIATE(INSTANTIATE)
 }

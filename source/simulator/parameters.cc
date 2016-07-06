@@ -786,7 +786,7 @@ namespace aspect
                        "When set to true, VoF interface tracking will be used");
 
     // declare the VoF parameters
-    Simulator<dim>::VoFHandler::declare_parameters(prm);
+    VoFHandler<dim>::declare_parameters(prm);
 
     // also declare the parameters that the FreeSurfaceHandler needs
     FreeSurfaceHandler<dim>::declare_parameters (prm);
