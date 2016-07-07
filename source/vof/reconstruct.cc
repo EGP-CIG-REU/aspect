@@ -323,6 +323,8 @@ namespace aspect
                 nnormal = normal / normall1n;
                 nd = d / normall1n;
               }
+            //Calculate correct factor to retain vol frac and [0,1] bound
+            double fact = 0.5-abs(cell_vof-0.5);
             for (unsigned int i=0; i<sim.finite_element.base_element(base_element).dofs_per_cell; ++i)
               {
                 const unsigned int system_local_dof
@@ -331,7 +333,7 @@ namespace aspect
 
                 Tensor<1, dim, double> uSupp = support_points[i]-uReCen;
 
-                const double value = 0.5*(1.0+nd-uSupp*nnormal);
+                const double value = cell_vof + fact*(nd-uSupp*nnormal);
 
                 initial_solution(local_dof_indicies[system_local_dof]) = value;
               }
