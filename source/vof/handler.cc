@@ -33,7 +33,7 @@ namespace aspect
 
   template <int dim>
   VoFHandler<dim>::VoFHandler (Simulator<dim> &simulator,
-                                          ParameterHandler &prm)
+                               ParameterHandler &prm)
     : sim (simulator),
       vof_initial_conditions (VoFInitialConditions::create_initial_conditions<dim>(prm))
   {
@@ -107,7 +107,7 @@ namespace aspect
         {
           if (!sim.parameters.use_discontinuous_composition_discretization)
             {
-              Assert(false, ExcMessage("VoF composition field not implemented for continuous composition."));
+              AssertThrow(false, ExcMessage("VoF composition field not implemented for continuous composition."));
             }
 
           bool field_exists=false;
@@ -135,6 +135,16 @@ namespace aspect
 
     AssertThrow(!sim.material_model->is_compressible(), ExcMessage("Volume of Fluid Interface Tracking currently assumes incompressiblity."));
 
+    AssertThrow(!this->get_parameters().free_surface_enabled,
+                ExcMessage("Volume of Fluid Interface Tracking is currently incompatible with the Free Surface implementation."));
+
+    // Check for correct mapping
+
+    if ( this->get_parameters().initial_adaptive_refinement > 0 ||
+         this->get_parameters().adaptive_refinement_interval > 0 )
+      {
+        // AMR active so check refinement strategy includes 'vof boundary'
+      }
 
     // Do initial conditions setup
     if (SimulatorAccess<dim> *sim_a = dynamic_cast<SimulatorAccess<dim>*>(vof_initial_conditions.get()))
