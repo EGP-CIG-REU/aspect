@@ -2217,8 +2217,6 @@ namespace aspect
         time_step = old_time_step = 0;
 
         set_initial_temperature_and_compositional_fields ();
-        if (parameters.vof_tracking_enabled)
-          vof_handler->set_initial_vofs ();
         compute_initial_pressure_field ();
 
         signals.post_set_initial_state (*this);

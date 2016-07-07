@@ -43,6 +43,8 @@ namespace aspect
     sim.signals.edit_finite_element_variables.connect(std_cxx11::bind(&aspect::VoFHandler<dim>::edit_finite_element_variables,
                                                                       std_cxx11::ref(*this),
                                                                       std_cxx11::_1));
+    sim.signals.post_set_initial_state.connect(std_cxx11::bind(&aspect::VoFHandler<dim>::set_initial_vofs,
+                                                               std_cxx11::ref(*this)));
   }
 
   template <int dim>
