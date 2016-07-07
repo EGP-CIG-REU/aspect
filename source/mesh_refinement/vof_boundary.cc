@@ -199,18 +199,6 @@ namespace aspect
     VoFBoundary<dim>::
     declare_parameters (ParameterHandler &prm)
     {
-      prm.enter_subsection("Mesh refinement");
-      {
-
-        prm.enter_subsection("VoF boundary");
-        {
-          prm.declare_entry ("Boundary refinement", "0",
-                             Patterns::Integer(0),
-                             "Minimum refinement level near fluid interface");
-        }
-        prm.leave_subsection();
-      }
-      prm.leave_subsection();
     }
 
     template <int dim>
@@ -218,21 +206,14 @@ namespace aspect
     VoFBoundary<dim>::parse_parameters (ParameterHandler &prm)
     {
       //TODO: Add check for vof active
+      AssertThrow(this->get_parameters().vof_tracking_enabled,
+                  ExcMessage("The 'vof boundary' mesh refinement strategy requires the 'Use VoF tracking' parameter be enabled."));
+
       prm.enter_subsection ("VoF config");
       {
         vof_epsilon = prm.get_double("Small volume");
       }
       prm.leave_subsection ();
-
-      prm.enter_subsection("Mesh refinement");
-      {
-        prm.enter_subsection("VoF boundary");
-        {
-          min_interface_level = prm.get_integer ("Boundary refinement");
-        }
-        prm.leave_subsection();
-      }
-      prm.leave_subsection();
     }
 
 
