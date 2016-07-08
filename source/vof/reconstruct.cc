@@ -333,7 +333,7 @@ namespace aspect
 
                 Tensor<1, dim, double> uSupp = support_points[i]-uReCen;
 
-                const double value = cell_vof + fact*(nd-uSupp*nnormal);
+                const double value = cell_vof + fact*(uSupp*nnormal);
 
                 initial_solution(local_dof_indicies[system_local_dof]) = value;
               }

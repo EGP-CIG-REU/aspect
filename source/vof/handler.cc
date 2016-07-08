@@ -32,6 +32,17 @@ namespace aspect
 {
 
   template <int dim>
+  VoFField<dim>::VoFField(const FEVariable<dim> &fraction,
+                          const FEVariable<dim> &reconstruction,
+                          const FEVariable<dim> &level_set,
+                          const std::string c_field_name)
+    : fraction (fraction),
+      reconstruction (reconstruction),
+      level_set (level_set),
+      c_field_name (c_field_name)
+  {}
+
+  template <int dim>
   VoFHandler<dim>::VoFHandler (Simulator<dim> &simulator,
                                ParameterHandler &prm)
     : sim (simulator),
@@ -147,6 +158,13 @@ namespace aspect
       {
         // AMR active so check refinement strategy includes 'vof boundary'
       }
+
+    // Gather data
+
+    data = new VoFField<dim>(sim.introspection.variable("vofs"),
+                             sim.introspection.variable("vofsN"),
+                             sim.introspection.variable("vofsLS"),
+                             vof_composition_var);
 
     // Do initial conditions setup
     if (SimulatorAccess<dim> *sim_a = dynamic_cast<SimulatorAccess<dim>*>(vof_initial_conditions.get()))

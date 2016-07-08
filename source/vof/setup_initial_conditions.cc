@@ -50,8 +50,8 @@ namespace aspect
           Assert(false, ExcNotImplemented ());
       }
 
-    const unsigned int vofN_blockidx = sim.introspection.variable("vofsN").block_index;
-    const unsigned int vofLS_blockidx = sim.introspection.variable("vofsLS").block_index;
+    const unsigned int vofN_blockidx = data->reconstruction.block_index;
+    const unsigned int vofLS_blockidx = data->level_set.block_index;
     update_vof_normals (sim.solution);
     sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
@@ -77,7 +77,7 @@ namespace aspect
     std::vector<types::global_dof_index>
     local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = sim.introspection.variable("vofs");
+    const FEVariable<dim> &vof_var = data->fraction;
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind
@@ -138,7 +138,7 @@ namespace aspect
     std::vector<types::global_dof_index>
     local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = sim.introspection.variable("vofs");
+    const FEVariable<dim> &vof_var = data->fraction;
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind

@@ -30,6 +30,21 @@ using namespace dealii;
 
 namespace aspect
 {
+  template<int dim>
+  struct VoFField
+  {
+    /**
+     * Initialize th
+     */
+    VoFField(const FEVariable<dim> &fraction,
+             const FEVariable<dim> &reconstruction,
+             const FEVariable<dim> &level_set,
+             const std::string c_field_name);
+
+    const FEVariable<dim> &fraction, &reconstruction, &level_set;
+
+    const std::string c_field_name;
+  };
 
   /**
    * A member class that isolates the functions and variables that deal
@@ -85,6 +100,9 @@ namespace aspect
 
       //Initial conditions
       const std_cxx11::unique_ptr<VoFInitialConditions::Interface<dim> >      vof_initial_conditions;
+
+      // Store
+      VoFField<dim> *data;
 
       // Minimal considered volume fraction
       double vof_epsilon;
