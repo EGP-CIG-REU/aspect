@@ -38,12 +38,12 @@ namespace aspect
       {
         case VoFInitialConditions::VoFInitType::composition:
         {
-          init_vof_compos ();
+          init_vof_compos (*data);
           break;
         }
         case VoFInitialConditions::VoFInitType::signed_distance_level_set:
         {
-          init_vof_ls ();
+          init_vof_ls (*data);
           break;
         }
         default:
@@ -52,7 +52,7 @@ namespace aspect
 
     const unsigned int vofN_blockidx = data->reconstruction.block_index;
     const unsigned int vofLS_blockidx = data->level_set.block_index;
-    update_vof_normals (sim.solution);
+    update_vof_normals (*data, sim.solution);
     sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
@@ -60,7 +60,7 @@ namespace aspect
   }
 
   template <int dim>
-  void VoFHandler<dim>::init_vof_compos ()
+  void VoFHandler<dim>::init_vof_compos (const VoFField<dim> field)
   {
     unsigned int n_samples = vof_initial_conditions->n_samples ();
 
@@ -77,7 +77,7 @@ namespace aspect
     std::vector<types::global_dof_index>
     local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = data->fraction;
+    const FEVariable<dim> &vof_var = field.fraction;
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind
@@ -119,7 +119,7 @@ namespace aspect
   }
 
   template <int dim>
-  void VoFHandler<dim>::init_vof_ls ()
+  void VoFHandler<dim>::init_vof_ls (const VoFField<dim> field)
   {
     unsigned int n_samples = vof_initial_conditions->n_samples ();
 
@@ -138,7 +138,7 @@ namespace aspect
     std::vector<types::global_dof_index>
     local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = data->fraction;
+    const FEVariable<dim> &vof_var = field.fraction;
     const unsigned int component_index = vof_var.first_component_index;
     const unsigned int blockidx = vof_var.block_index;
     const unsigned int vof_ind
@@ -217,8 +217,8 @@ namespace aspect
 {
 #define INSTANTIATE(dim) \
   template void VoFHandler<dim>::set_initial_vofs ();\
-  template void VoFHandler<dim>::init_vof_ls (); \
-  template void VoFHandler<dim>::init_vof_compos ();
+  template void VoFHandler<dim>::init_vof_ls (const VoFField<dim> field); \
+  template void VoFHandler<dim>::init_vof_compos (const VoFField<dim> field);
 
   ASPECT_INSTANTIATE(INSTANTIATE)
 }

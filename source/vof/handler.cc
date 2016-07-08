@@ -193,17 +193,17 @@ namespace aspect
         // Update base to intermediate solution
         if (!vof_dir_order_dsc)
           {
-            assemble_vof_system(dir, update_from_old);
+            assemble_vof_system(*data, dir, update_from_old);
           }
         else
           {
-            assemble_vof_system(dim-dir-1, update_from_old);
+            assemble_vof_system(*data, dim-dir-1, update_from_old);
           }
-        solve_vof_system ();
+        solve_vof_system (*data);
         // Copy current candidate normals.
         // primarily useful for exact linear translation
         sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
-        update_vof_normals (sim.solution);
+        update_vof_normals (*data, sim.solution);
 
         sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
         sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);

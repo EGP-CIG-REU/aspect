@@ -36,9 +36,9 @@
 namespace aspect
 {
   template <int dim>
-  void VoFHandler<dim>::solve_vof_system ()
+  void VoFHandler<dim>::solve_vof_system (const VoFField<dim> field)
   {
-    unsigned int block_idx = data->fraction.block_index;
+    unsigned int block_idx = field.fraction.block_index;
 
     sim.computing_timer.enter_section ("   Solve VoF system");
     sim.pcout << "   Solving VoF system... " << std::flush;
@@ -111,7 +111,7 @@ namespace aspect
 namespace aspect
 {
 #define INSTANTIATE(dim) \
-  template void VoFHandler<dim>::solve_vof_system ();
+  template void VoFHandler<dim>::solve_vof_system (const VoFField<dim> field);
 
 
   ASPECT_INSTANTIATE(INSTANTIATE)

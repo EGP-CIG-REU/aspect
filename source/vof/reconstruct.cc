@@ -28,7 +28,8 @@ namespace aspect
   using namespace dealii;
 
   template <>
-  void VoFHandler<2>::update_vof_normals (LinearAlgebra::BlockVector &solution)
+  void VoFHandler<2>::update_vof_normals (const VoFField<2> field,
+                                          LinearAlgebra::BlockVector &solution)
   {
     const int dim = 2;
 
@@ -358,7 +359,8 @@ namespace aspect
 
 
   template <>
-  void VoFHandler<3>::update_vof_normals (LinearAlgebra::BlockVector &solution)
+  void VoFHandler<3>::update_vof_normals (const VoFField<3> field,
+                                          LinearAlgebra::BlockVector &solution)
   {
     Assert(false, ExcNotImplemented());
   }

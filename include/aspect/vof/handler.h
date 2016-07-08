@@ -72,17 +72,19 @@ namespace aspect
 
       // Functions for initialization of state
       void set_initial_vofs ();
-      void init_vof_compos ();
-      void init_vof_ls ();
+      void init_vof_compos (const VoFField<dim> field);
+      void init_vof_ls (const VoFField<dim> field);
 
       // Do interface reconstruction
-      void update_vof_normals (LinearAlgebra::BlockVector &solution);
+      void update_vof_normals (const VoFField<dim> field,
+                               LinearAlgebra::BlockVector &solution);
 
       // Logic to handle dimensionally split update
       void do_vof_update ();
 
       // Assembly
-      void assemble_vof_system (unsigned int dir,
+      void assemble_vof_system (const VoFField<dim> field,
+                                unsigned int dir,
                                 bool update_from_old);
       void local_assemble_vof_system (const VoFField<dim> field,
                                       const unsigned int calc_dir,
@@ -92,7 +94,7 @@ namespace aspect
                                       internal::Assembly::CopyData::VoFSystem<dim> &data);
       void copy_local_to_global_vof_system (const internal::Assembly::CopyData::VoFSystem<dim> &data);
       // Solver
-      void solve_vof_system ();
+      void solve_vof_system (const VoFField<dim> field);
 
 
     private:
