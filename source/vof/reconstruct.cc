@@ -66,25 +66,25 @@ namespace aspect
     std::vector<types::global_dof_index> cell_dof_indicies (sim.finite_element.dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = sim.introspection.variable("vofs");
+    const FEVariable<dim> &vof_var = data->fraction;
     const unsigned int vof_c_index = vof_var.first_component_index;
     const unsigned int vof_ind
       = sim.finite_element.component_to_system_index(vof_c_index, 0);
 
-    const FEVariable<dim> &vofN_var = sim.introspection.variable("vofsN");
+    const FEVariable<dim> &vofN_var = data->reconstruction;
     const unsigned int vofN_c_index = vofN_var.first_component_index;
     const unsigned int vofN_blockidx = vofN_var.block_index;
 
-    const FEVariable<dim> &vofLS_var = sim.introspection.variable("vofsLS");
+    const FEVariable<dim> &vofLS_var = data->level_set;
     const unsigned int vofLS_c_index = vofLS_var.first_component_index;
     const unsigned int n_vofLS_dofs = vofLS_var.fe->dofs_per_cell;
     const unsigned int vofLS_blockidx = vofLS_var.block_index;
 
     //
-    bool use_vof_composition = vof_composition_var!="";
+    bool use_vof_composition = data->c_field_name!="";
     const unsigned int c_var_index =
       ( (!use_vof_composition) ? numbers::invalid_unsigned_int
-        : sim.introspection.compositional_index_for_name(vof_composition_var));
+        : sim.introspection.compositional_index_for_name(data->c_field_name));
     Simulator<dim>::AdvectionField advf =
       ( (!use_vof_composition) ? Simulator<dim>::AdvectionField::temperature()
         : Simulator<dim>::AdvectionField::composition(c_var_index));

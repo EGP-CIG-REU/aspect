@@ -84,7 +84,8 @@ namespace aspect
       // Assembly
       void assemble_vof_system (unsigned int dir,
                                 bool update_from_old);
-      void local_assemble_vof_system (const unsigned int calc_dir,
+      void local_assemble_vof_system (const VoFField<dim> field,
+                                      const unsigned int calc_dir,
                                       bool update_from_old,
                                       const typename DoFHandler<dim>::active_cell_iterator &cell,
                                       internal::Assembly::Scratch::VoFSystem<dim> &scratch,

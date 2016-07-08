@@ -168,7 +168,8 @@ namespace aspect
   }
 
   template <int dim>
-  void VoFHandler<dim>::local_assemble_vof_system (const unsigned int calc_dir,
+  void VoFHandler<dim>::local_assemble_vof_system (const VoFField<dim> field,
+                                                   const unsigned int calc_dir,
                                                    bool update_from_old,
                                                    const typename DoFHandler<dim>::active_cell_iterator &cell,
                                                    internal::Assembly::Scratch::VoFSystem<dim> &scratch,
@@ -190,12 +191,12 @@ namespace aspect
 
     const FiniteElement<dim> &main_fe = scratch.finite_element_values.get_fe();
 
-    const unsigned int vofN_component = sim.introspection.variable("vofsN").first_component_index;
+    const unsigned int vofN_component = field.reconstruction.first_component_index;
     const FEValuesExtractors::Vector vofN_n = FEValuesExtractors::Vector(vofN_component);
     const FEValuesExtractors::Scalar vofN_d = FEValuesExtractors::Scalar(vofN_component+dim);
 
-    const unsigned int solution_component = sim.introspection.variable("vofs").first_component_index;
-    const FEValuesExtractors::Scalar solution_field = sim.introspection.variable("vofs").extractor_scalar();
+    const unsigned int solution_component = field.fraction.first_component_index;
+    const FEValuesExtractors::Scalar solution_field = field.fraction.extractor_scalar();
     const Quadrature<dim> &quadrature = scratch.finite_element_values.get_quadrature();
 
     scratch.finite_element_values.reinit (cell);
@@ -527,7 +528,7 @@ namespace aspect
   void VoFHandler<dim>::assemble_vof_system (unsigned int dir, bool update_from_old)
   {
     sim.computing_timer.enter_section ("   Assemble VoF system");
-    const unsigned int block_idx = sim.introspection.variable("vofs").block_index;
+    const unsigned int block_idx = data->fraction.block_index;
     sim.system_matrix.block(block_idx, block_idx) = 0;
     sim.system_rhs = 0;
 
@@ -535,8 +536,7 @@ namespace aspect
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
     CellFilter;
 
-    // const unsigned int vof_base_element = introspection.variable("vofs").base_index;
-    const FiniteElement<dim> &vof_fe = (*sim.introspection.variable("vofs").fe);
+    const FiniteElement<dim> &vof_fe = (*data->fraction.fe);
 
     WorkStream::
     run (CellFilter (IteratorFilters::LocallyOwnedCell(),
@@ -546,6 +546,7 @@ namespace aspect
          std_cxx11::bind (&VoFHandler<dim>::
                           local_assemble_vof_system,
                           this,
+                          *data,
                           dir,
                           update_from_old,
                           std_cxx11::_1,
@@ -625,7 +626,8 @@ namespace aspect
 #define INSTANTIATE(dim) \
   template void VoFHandler<dim>::assemble_vof_system (unsigned int dir, \
                                                       bool update_from_old); \
-  template void VoFHandler<dim>::local_assemble_vof_system (const unsigned int calc_dir, \
+  template void VoFHandler<dim>::local_assemble_vof_system (const VoFField<dim> field, \
+                                                            const unsigned int calc_dir, \
                                                             bool update_from_old, \
                                                             const typename DoFHandler<dim>::active_cell_iterator &cell, \
                                                             internal::Assembly::Scratch::VoFSystem<dim> &scratch, \
