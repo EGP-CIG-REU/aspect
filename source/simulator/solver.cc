@@ -22,6 +22,7 @@
 #include <aspect/simulator.h>
 #include <aspect/global.h>
 #include <aspect/melt.h>
+#include <aspect/vof/handler.h>
 
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -375,6 +376,13 @@ namespace aspect
   template <int dim>
   double Simulator<dim>::solve_advection (const AdvectionField &advection_field)
   {
+    // TODO: Modify to more robust method
+    // Skip if this composition field is being set from the vof handler
+    if (!advection_field.is_temperature() &&
+        parameters.vof_tracking_enabled)
+      if (vof_handler->get_field().c_field_name == introspection.name_for_compositional_index(advection_field.compositional_variable))
+        return 0.0;
+
     double advection_solver_tolerance = -1;
     unsigned int block_idx = advection_field.block_index(introspection);
 

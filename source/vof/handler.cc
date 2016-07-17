@@ -178,6 +178,12 @@ namespace aspect
   }
 
   template <int dim>
+  const VoFField<dim>& VoFHandler<dim>::get_field() const
+  {
+    return *data;
+  }
+
+  template <int dim>
   void VoFHandler<dim>::do_vof_update ()
   {
     const unsigned int vof_block_idx = sim.introspection.variable("vofs").block_index;

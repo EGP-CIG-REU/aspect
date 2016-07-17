@@ -24,6 +24,7 @@
 #include <aspect/assembly.h>
 #include <aspect/simulator_access.h>
 #include <aspect/melt.h>
+#include <aspect/vof/handler.h>
 #include <aspect/free_surface.h>
 
 
@@ -3041,6 +3042,13 @@ namespace aspect
   template <int dim>
   void Simulator<dim>::assemble_advection_system (const AdvectionField &advection_field)
   {
+    // TODO: Modify to more robust method
+    // Skip if this composition field is being set from the vof handler
+    if (!advection_field.is_temperature() &&
+        parameters.vof_tracking_enabled)
+      if (vof_handler->get_field().c_field_name == introspection.name_for_compositional_index(advection_field.compositional_variable))
+        return;
+
     if (advection_field.is_temperature())
       computing_timer.enter_section ("   Assemble temperature system");
     else

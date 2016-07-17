@@ -67,6 +67,9 @@ namespace aspect
 
       void parse_parameters (ParameterHandler &prm);
 
+      // Get VoF data
+      const VoFField<dim>& get_field() const;
+
       // initialiation
       void initialize (ParameterHandler &prm);
 
