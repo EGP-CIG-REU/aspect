@@ -325,7 +325,7 @@ namespace aspect
                 nd = d / normall1n;
               }
             //Calculate correct factor to retain vol frac and [0,1] bound
-            double fact = 0.5-abs(cell_vof-0.5);
+            double fact = 2.0*(0.5-abs(cell_vof-0.5));
             for (unsigned int i=0; i<sim.finite_element.base_element(base_element).dofs_per_cell; ++i)
               {
                 const unsigned int system_local_dof
