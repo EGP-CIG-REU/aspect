@@ -305,6 +305,7 @@ namespace aspect
                                     scratch.face_mesh_velocity_values);
 
             face_flux = 0;
+            double face_size = 0;
             double face_ls_d = 0;
             double face_ls_time_grad = 0;
 
@@ -322,6 +323,9 @@ namespace aspect
                 //Subtract off the mesh velocity for ALE corrections if necessary
                 if (sim.parameters.free_surface_enabled)
                   current_u -= scratch.face_mesh_velocity_values[q];
+
+                face_size += sim.time_step *
+                             scratch.face_finite_element_values.JxW(q);
 
                 face_flux += sim.time_step *
                              current_u *
@@ -345,16 +349,23 @@ namespace aspect
 
             // Calculate outward flux
             double flux_vof;
-            if (face_flux < 0.0)
+            if (abs(face_flux) < vof_epsilon*face_size)
               {
                 flux_vof = 0.0;
               }
             else
               {
-                flux_vof = VolumeOfFluid::calc_vof_flux_edge<dim> (f_dim,
-                                                                   face_ls_time_grad,
-                                                                   cell_i_normal,
-                                                                   face_ls_d);
+                if (face_flux < 0.0)
+                  {
+                    flux_vof = 0.0;
+                  }
+                else
+                  {
+                    flux_vof = VolumeOfFluid::calc_vof_flux_edge<dim> (f_dim,
+                                                                       face_ls_time_grad,
+                                                                       cell_i_normal,
+                                                                       face_ls_d);
+                  }
               }
 
             if (face->at_boundary())
@@ -429,6 +440,7 @@ namespace aspect
                                         scratch.face_mesh_velocity_values);
 
                 face_flux = 0;
+                double face_size = 0;
                 double face_ls_d = 0;
                 double face_ls_time_grad = 0;
 
@@ -446,6 +458,9 @@ namespace aspect
                     //Subtract off the mesh velocity for ALE corrections if necessary
                     if (sim.parameters.free_surface_enabled)
                       current_u -= scratch.face_mesh_velocity_values[q];
+
+                    face_size += sim.time_step *
+                                 scratch.subface_finite_element_values.JxW(q);
 
                     face_flux += sim.time_step *
                                  current_u *
@@ -468,6 +483,11 @@ namespace aspect
                 dflux += face_flux;
                 // fluxes to RHS
                 double flux_vof = cell_vof;
+                if (abs(face_flux) < vof_epsilon*face_size)
+                  {
+                    flux_vof = 0.0;
+                    face_flux = 0.0;
+                  }
                 if (face_flux<0.0)
                   {
                     flux_vof = 0.0;
