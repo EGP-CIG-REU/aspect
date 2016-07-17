@@ -352,6 +352,7 @@ namespace aspect
             if (abs(face_flux) < vof_epsilon*face_size)
               {
                 flux_vof = 0.0;
+                face_flux = 0.0;
               }
             else
               {
