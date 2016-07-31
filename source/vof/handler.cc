@@ -178,7 +178,7 @@ namespace aspect
   }
 
   template <int dim>
-  const VoFField<dim>& VoFHandler<dim>::get_field() const
+  const VoFField<dim> &VoFHandler<dim>::get_field() const
   {
     return *data;
   }

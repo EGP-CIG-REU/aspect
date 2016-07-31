@@ -3510,7 +3510,7 @@ In this first example, let us consider a simple situation: a 2d box of dimension
 $[0,1]\times [0,1]$ that is heated from below, insulated at the left and right,
 and cooled from the top. We will also consider the simplest model, the
 incompressible Boussinesq approximation with constant coefficients
-$\eta,\rho_0,\mathbf g,C_p k$, for this testcase. Furthermore, we
+$\eta,\rho_0,\mathbf g,C_p, k$, for this testcase. Furthermore, we
 assume that the medium expands linearly with
 temperature. This leads to the following set of equations:
 \begin{align}
@@ -3532,23 +3532,26 @@ temperature. This leads to the following set of equations:
   & \textrm{in $\Omega$}.
 \end{align}
 It is well known that we can non-dimensionalize this set of equations by
-introducing the Raleigh number $Ra=\frac{g\alpha}{\eta k}$. Formally,
+introducing the Rayleigh number $Ra=\frac{\rho_0 g \alpha \Delta T h^3}{\eta \kappa}$, 
+where $h$ is the height of the box, $\kappa = \frac{k}{\rho C_p}$ is the thermal diffusivity
+and $\Delta T$ is the temperature difference between top and bottom of the box. Formally,
 we can obtain the non-dimensionalized equations by using the above form and
 setting coefficients in the following way:
 \begin{align*}
-  \rho_0=C_p=k=\alpha=\eta=1, \qquad T_0=0, \qquad g=Ra,
+  \rho_0=C_p=\kappa=\alpha=\eta=h=\Delta T=1, \qquad T_0=0, \qquad g=Ra,
 \end{align*}
 where $\mathbf g=-g \mathbf e_z$ is the gravity vector in negative
 $z$-direction. While this would be a valid description of the problem, it is not
 what one typically finds in the literature because there the density in the
-temperature equation is chosen as $\rho_0$ rather than $\rho(1-\alpha(T-T_0))$
+temperature equation is chosen as reference density $\rho_0$ rather than the 
+full density $\rho(1-\alpha(T-T_0))$
 as used by \aspect{}. However, we can mimic this by choosing a very small value
 for $\alpha$ -- small enough to ensure that for all reasonable temperatures,
 the density used here is equal to $\rho_0$ for all practical purposes --, and
 instead making $g$ correspondingly larger.
 Consequently, in this cookbook we will use the following set of parameters:
 \begin{align*}
-  \rho_0=C_p=T_0=k=\eta=1, \qquad T_0=0, \qquad \alpha=10^{-10}, \qquad
+  \rho_0=C_p=\kappa=\eta=h=\Delta T=1, \qquad T_0=0, \qquad \alpha=10^{-10}, \qquad
   g=10^{10} Ra.
 \end{align*}
 We will see all of these values again in the input file discussed below.
@@ -6002,7 +6005,7 @@ The next input parameters describe the scaling from the shear wave velocity
 perturbation to the final temperature field. The shear wave velocity perturbation 
 $\delta v_s / v_s$ (that is provided by S20RTS) is scaled into a density perturbation $\delta \rho / \rho$ with a 
 constant that is specified in the initial condition section of the input parameter 
-file as `Vs to density scaling'. Here we choose a constant scaling of 0.2. This 
+file as `Vs to density scaling'. Here we choose a constant scaling of 0.15. This 
 perturbation is further translated into a temperature difference $\Delta T$ by 
 multiplying it by the negative inverse of thermal expansion, which is also 
 specified in this section of the parameter file as `Thermal expansion coefficient 
@@ -6012,31 +6015,36 @@ model or the reference temperature (as specified in this section of the paramete
 incompressible model. Features in the upper mantle such as cratons might 
 be chemically buoyant and therefore isostatically compensated, in which case 
 their shear wave perturbation would not contribute buoyancy variations. We therefore included an 
-additional option to zero out temperature perturbations within a certain depth. 
-In this example we set this parameter `Remove temperature heterogeneity down to specified 
-depth' to 200km. The chemical variation within the mantle 
+additional option to zero out temperature perturbations within a certain depth, however, in this example we don't make use of this functionality. The chemical variation within the mantle 
 might require a more sophisticated `Vs to density' scaling that varies for 
 example with depth or as a function of the perturbation itself, which is not captured
 in this model. The described procedure 
 provides an absolute temperature for every point, which will only be adjusted 
-at the boundaries if indicated in the Boundary temperature model. 
+at the boundaries if indicated in the Boundary temperature model. In this example
+we chose a surface and core mantle boundary temperature that differ from the
+reference mantle temperature in order to approximate thermal boundary layers.
 
 \paragraph{Visualizing 3D models.}
 
 In this cookbook we calculate the instantaneous solution to examine the flow 
-field. Figure \ref{fig:ic-1} shows the density field for a resolution of 2 global refinement 
-steps (bottom right) as used in the cookbook, as well as 4 global refinement 
+field. Figure \ref{fig:ic-1} shows some of the output for a resolution of 2 global refinement 
+steps (c and e) as used in the cookbook, as well as 4 global refinement 
 steps (other panels in this figure). The top panels show the density variation 
-that has been obtained from scaling S20RTS and removing perturbations in 
-the upper 200km. One can see the two large low shear wave velocity perturbations 
+that has been obtained from scaling S20RTS in the way described above.
+One can see the two large low shear wave velocity perturbations 
 underneath Africa and the Pacific that lead to upwelling if they are assumed to 
 be buoyant (as is done in this case). One can also see the subducting slabs 
 underneath South America and the Philippine region that lead to local downwelling. 
 This flow produces dynamic topography on the surface, which is shown 
-in the bottom row (4 refinement steps on the left, 2 refinement steps on the right). 
+in the middle row for 2 refinement steps (c) and 4 refinement steps (d). 
 One can see that subduction zones are visible as depressed topography 
 due to the downward flow, while regions such as Iceland, Hawaii, or mid ocean 
-ridges are elevated due to (deep and) shallow upward flow. 
+ridges are elevated due to (deep and) shallow upward flow. The bottom row
+shows the heat flux density at the surface for 2 refinement steps (e, colorbar
+ranges from 13 to 19 mW/$m^2$) and for 4 refinement steps (f, colorbar ranges
+from 35 to 95 mW/$m^2$). Similar to the dynamic topography, a first order correlation
+with upper mantle features such as high heat flow at mid ocean ridges and low
+heat flow at cratons is correctly initialized by the tomography model. 
 This model uses a highly simplified material model that is incompressible and 
 isoviscous and does therefore not represent real mantle flow. More realistic 
 material properties, density scaling as well as boundary conditions will affect the magnitude 
@@ -6045,13 +6053,14 @@ and pattern shown here.
 \begin{figure}
   \includegraphics[width=\textwidth]{cookbooks/initial-condition-S20RTS/full_mantle.png}
   \hfill
-  \caption{\it The top panels show the density distribution as prescribed from the shear
+  \caption{\it Panels a and b show the density distribution as prescribed from the shear
   wave velocity model S20RTS and the resulting flow for a global refinement of 4. This
-  model assumes a constant scaling between shear wave and density perturbations 
-  and zeros out perturbations in the upper 200km.
-  The bottom figures show the great circle (blue line) along which the top slices
-  are evaluated. They also show the resulting dynamic topography for a global refinement of 4 (left)
-  and 2 (right, cookbook). }
+  model assumes a constant scaling between shear wave and density perturbations.
+  Panel c shows the great circle (dashed blue line) along which the top slices
+  are evaluated. Panels c and d show the resulting dynamic topography for a global refinement of 2 (c, cookbook)
+  and 4 (d). Panels e and f show the resulting heat flux density for a global refinement of
+  2 (e, cookbook) and 4 (f). The colorbar ranges from 13 to 19 mW/$m^2$ for panel e and
+  from 35 to 95 mW/$m^2$ for panel f.}
   \label{fig:ic-1}
 \end{figure}
 
@@ -6521,9 +6530,10 @@ Instructions for how to compile and run models with a shared library are given i
 
 Analyzing Equations~\eqref{eq:inner-core-1}--\eqref{eq:inner-core-3} reveals that two parameters determine 
 the dynamics of convection in the inner core: the Rayleigh number $Ra$ and the phase change number $\mathcal{P}$. 
-For low Rayleigh numbers below a critical value ($\sim1000$, but also slightly depending on $\mathcal{P}$), 
-there is no convection and thermal diffusion dominates the heat transport. 
-For higher values of $Ra$, the style of convection in the inner core depends on $\mathcal{P}$: 
+For low Rayleigh numbers below a critical value $Ra_c$ that is approximately $1000$ for high $\mathcal{P}$ ($\gg 29$), and 
+that depends linearly on $\mathcal{P}$ for smaller $\mathcal{P}$ (see \cite{Deguen2013}), there is no convection 
+and thermal diffusion dominates the heat transport. 
+For higher values of $Ra > Ra_c$, the style of convection in the inner core depends on $\mathcal{P}$: 
 For high $\mathcal{P}$ ($\gg 29$, see \cite{Deguen2013}), convection is dominated by thermal plumes with the number 
 of plumes scaling with the Rayleigh number; whereas for low values of $\mathcal{P}$, the inner core is in a 
 translation regime, where material freezes at one side and melts at the other side, so that the velocity field 
@@ -6531,11 +6541,23 @@ is uniform, pointing from the freezing to the melting side.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.3\textwidth]{cookbooks/inner_core_convection/convection.png}
-    \includegraphics[width=0.3\textwidth]{cookbooks/inner_core_convection/translation.png}
-    \includegraphics[width=0.3\textwidth]{cookbooks/inner_core_convection/no_convection.png}
+    \begin{tabular}{lcl}
+    \includegraphics[height=0.25\textwidth]{cookbooks/inner_core_convection/convection.png}
+    & \hspace{1cm} &
+    \includegraphics[height=0.25\textwidth]{cookbooks/inner_core_convection/convection_contours.png}
+    \\
+    \includegraphics[height=0.25\textwidth]{cookbooks/inner_core_convection/translation.png}
+    & \hspace{1cm} &
+    \includegraphics[height=0.25\textwidth]{cookbooks/inner_core_convection/translation_contours.png}
+    \\
+    \includegraphics[height=0.25\textwidth]{cookbooks/inner_core_convection/no_convection.png}
+    & \hspace{1cm} &
+    \includegraphics[height=0.25\textwidth]{cookbooks/inner_core_convection/no_convection_contours.png}
+    \end{tabular}
     \caption{Convection regimes in the inner core for different values of $Ra$ and $\mathcal{P}$.
-             From left to right: plume convection, translation, no convection.}
+             From top to bottom: plume convection, translation, no convection; full 3d models
+             on the left and 2d slices on the right. Temperature is shown as contours, 
+             velocity is shown as arrows.}
     \label{fig:inner-core-regimes}
 \end{figure}
 
@@ -6632,7 +6654,7 @@ amounts to the following:
  information in a number of directories relative to the current one.
  If it is unable to pick up where \aspect{} was built and installed, you can
  specify this directory explicitly this using \texttt{-D
-   ASPECT\_DIR=$<$...$>$} as an additional flag to \texttt{cmake}, where
+   Aspect\_DIR=$<$...$>$} as an additional flag to \texttt{cmake}, where
  \texttt{$<$...$>$} is the path to the build directory.
  \item Build the library:
 \begin{verbatim}
@@ -6655,7 +6677,7 @@ the current directory.
 \label{sec:benchmark-van-keken}
 
 \textit{This section is a co-production of Cedric Thieulot, Juliane Dannberg,
-Timo Heister and Wolfgang Bangerth with an extension to this benchmark provided by the Virginia Tech Dept. of Geosciences class Geodynamics and ASPECT co-taught by Scott King and D.~Sarah Stamps.}
+Timo Heister and Wolfgang Bangerth with an extension to this benchmark provided by the Virginia Tech Department of Geosciences class ``Geodynamics and ASPECT'' co-taught by Scott King and D.~Sarah Stamps.}
 
 One of the most widely used benchmarks for mantle convection codes is the
 isoviscous Rayleigh-Taylor case (``case 1a'') published by van Keken \textit{et
@@ -7477,7 +7499,7 @@ T_2, & y<y_{tr}
 \end{align*}
 While it is not entirely obvious while this equation for $T(y)$ should be
 correct (in particular why it should be asymmetric), it is not difficult to
-verify that it indeed satisfies the equatoin stated above for both $y<y_{tr}$
+verify that it indeed satisfies the equation stated above for both $y<y_{tr}$
 and $y>y_{tr}$. Furthermore, it indeed satisfies the jump condition we get by
 evaluating the equation at $y=y_{tr}$.
 Indeed, the jump condition can be reinterpreted as a balance of heat conduction:
@@ -7486,13 +7508,13 @@ we consider only steady-state, the same amount of heat is conducted upwards from
 the transition:
 
 \begin{gather*}
-\underbrace{\rho v_y T \Delta S}_{\text{latent heat release}} = \underbrace{\frac{\kappa}{\rho_0 c_p} \frac{\partial T}{\partial y} \vert_{y=y_{tr^-}} = \frac{v_y}{\rho_0 c_p} (T_2-T_1)}_{\text{heat conduction}}
+\underbrace{\rho v_y T \Delta S}_{\text{latent heat release}} = \underbrace{\frac{\kappa}{\rho_0 C_p} \frac{\partial T}{\partial y} \vert_{y=y_{tr^-}} = \frac{v_y}{\rho_0 C_p} (T_2-T_1)}_{\text{heat conduction}}
 \end{gather*}
 
 In contrast to \cite{STO01}, we also consider the density change $\Delta\rho$ across the phase transition: While the heat conduction takes place above the transition and the density can be assumed as $\rho=\rho_0=$ const., the latent heat is released directly at the phase transition. Thus, we assume an average density $\rho=\rho_0 + 0.5\Delta\rho$ for the left side of the equation. Rearranging this equation gives
 
 \begin{gather*}
-T_2 = \frac{T_1}{1 - (1+\frac{\Delta \rho}{2 \rho_0}) \frac{\Delta S}{c_p}}
+T_2 = \frac{T_1}{1 - (1+\frac{\Delta \rho}{2 \rho_0}) \frac{\Delta S}{C_p}}
 \end{gather*}
 
 In addition, we have tested the approach exactly as it is described in \cite{STO01} by setting the entropy change to a specific value and in spite of that using a constant density. However, this is physically inconsistent, as the entropy change is proportional to the density change across the phase transition. With this method, we could reproduce the analytic results from \cite{STO01}.
@@ -8505,7 +8527,7 @@ do:
   \end{itemize}
   You can then just run the commands
     \begin{verbatim}
- cmake -DASPECT_DIR=/path/to/aspect .
+ cmake -DAspect_DIR=/path/to/aspect .
  make
     \end{verbatim}
     and it should compile your plugin files into a shared library
@@ -8518,8 +8540,8 @@ do:
     installation (i.e., the directory where you configured and compiled it,
     which may be the same directory as where you keep your sources, or a
     different one, as discussed in Section~\ref{sec:installation}) in either the
-    directory explicitly specified in the \texttt{ASPECT\_DIR} variable passed
-    to \texttt{cmake}, the shell environment, or just one directory up. It then
+    directory explicitly specified in the \texttt{Aspect\_DIR} variable passed
+    to \texttt{cmake}, the shell environment variable \texttt{ASPECT\_DIR}, or just one directory up. It then
     sets up compiler paths and similar, and the following lines simply define
     the name of a plugin, list the source files for it, and define everything
     that's necessary to compile them into a shared library. Calling

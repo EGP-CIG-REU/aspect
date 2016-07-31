@@ -1042,37 +1042,11 @@ namespace aspect
       for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
         coupling[x.compositional_fields[c]][x.compositional_fields[c]]
           = DoFTools::always;
-    }
-    bool need_flux_sparsity = false;
-    {
-      const typename Introspection<dim>::ComponentIndices &x
-        = introspection.component_indices;
-
-      // Assume vel/pressure never DG
-      if (parameters.use_discontinuous_temperature_discretization)
-        {
-          need_flux_sparsity = true;
-          dgcell_coupling[x.temperature][x.temperature] = DoFTools::always;
-          face_coupling[x.temperature][x.temperature] = DoFTools::always;
-        }
-      if (parameters.use_discontinuous_composition_discretization)
-        {
-          need_flux_sparsity = true;
-          for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
-            {
-              dgcell_coupling[x.compositional_fields[c]][x.compositional_fields[c]]
-                = DoFTools::always;
-              face_coupling[x.compositional_fields[c]][x.compositional_fields[c]]
-                = DoFTools::always;
-            }
-        }
 
       if (parameters.vof_tracking_enabled)
         {
-          need_flux_sparsity = true;
           const unsigned int vof_c_index = introspection.variable("vofs").first_component_index;
-          dgcell_coupling[vof_c_index][vof_c_index] = DoFTools::always;
-          face_coupling[vof_c_index][vof_c_index] = DoFTools::always;
+          coupling[vof_c_index][vof_c_index] = DoFTools::always;
         }
     }
 
@@ -1086,24 +1060,64 @@ namespace aspect
                mpi_communicator);
 #endif
 
-    DoFTools::make_sparsity_pattern (dof_handler,
-                                     coupling, sp,
-                                     constraints, false,
-                                     Utilities::MPI::
-                                     this_mpi_process(mpi_communicator));
-    if (need_flux_sparsity)
+    if ((parameters.use_discontinuous_temperature_discretization) ||
+        (parameters.use_discontinuous_composition_discretization) ||
+        (parameters.vof_tracking_enabled))
       {
-        // Non-working flux coupling
-        // DoFTools::make_flux_sparsity_pattern (dof_handler,
-        //                                       sp,
-        //                                       dgcell_coupling,
-        //                                       face_coupling);
-        DoFTools::make_flux_sparsity_pattern (dof_handler, sp,
+        Table<2,DoFTools::Coupling> face_coupling (introspection.n_components,
+                                                   introspection.n_components);
+        const typename Introspection<dim>::ComponentIndices &x
+          = introspection.component_indices;
+        if (parameters.use_discontinuous_temperature_discretization)
+          face_coupling[x.temperature][x.temperature] = DoFTools::always;
+
+        if (parameters.use_discontinuous_composition_discretization)
+          {
+            for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
+              face_coupling[x.compositional_fields[c]][x.compositional_fields[c]] = DoFTools::always;
+          }
+
+        if (parameters.vof_tracking_enabled)
+          {
+            const unsigned int vof_c_index = introspection.variable("vofs").first_component_index;
+            face_coupling[vof_c_index][vof_c_index] = DoFTools::always;
+          }
+
+#if DEAL_II_VERSION_GTE(8,5,0)
+        DoFTools::make_flux_sparsity_pattern (dof_handler,
+                                              sp,
                                               constraints, false,
+                                              coupling,
+                                              face_coupling,
                                               Utilities::MPI::
                                               this_mpi_process(mpi_communicator));
-
+#else
+        if (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
+          {
+            DoFTools::make_sparsity_pattern (dof_handler,
+                                             coupling, sp,
+                                             constraints, false,
+                                             Utilities::MPI::
+                                             this_mpi_process(mpi_communicator));
+            DoFTools::make_flux_sparsity_pattern (dof_handler,
+                                                  sp,
+                                                  coupling,
+                                                  face_coupling);
+          }
+        else
+          DoFTools::make_flux_sparsity_pattern (dof_handler,
+                                                sp,
+                                                constraints, false,
+                                                Utilities::MPI::
+                                                this_mpi_process(mpi_communicator));
+#endif
       }
+    else
+      DoFTools::make_sparsity_pattern (dof_handler,
+                                       coupling, sp,
+                                       constraints, false,
+                                       Utilities::MPI::
+                                       this_mpi_process(mpi_communicator));
 
 #ifdef ASPECT_USE_PETSC
     SparsityTools::distribute_sparsity_pattern(sp,
@@ -1167,17 +1181,56 @@ namespace aspect
                mpi_communicator);
 #endif
 
-    DoFTools::make_sparsity_pattern (dof_handler,
-                                     coupling, sp,
-                                     constraints, false,
-                                     Utilities::MPI::
-                                     this_mpi_process(mpi_communicator));
     if ((parameters.use_discontinuous_temperature_discretization) || (parameters.use_discontinuous_composition_discretization))
-      DoFTools::make_flux_sparsity_pattern (dof_handler,
-                                            sp,
-                                            constraints, false,
-                                            Utilities::MPI::
-                                            this_mpi_process(mpi_communicator));
+      {
+        Table<2,DoFTools::Coupling> face_coupling (introspection.n_components,
+                                                   introspection.n_components);
+        const typename Introspection<dim>::ComponentIndices &x
+          = introspection.component_indices;
+        if (parameters.use_discontinuous_temperature_discretization)
+          face_coupling[x.temperature][x.temperature] = DoFTools::always;
+
+        if (parameters.use_discontinuous_composition_discretization)
+          {
+            for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
+              face_coupling[x.compositional_fields[c]][x.compositional_fields[c]] = DoFTools::always;
+          }
+
+#if DEAL_II_VERSION_GTE(8,5,0)
+        DoFTools::make_flux_sparsity_pattern (dof_handler,
+                                              sp,
+                                              constraints, false,
+                                              coupling,
+                                              face_coupling,
+                                              Utilities::MPI::
+                                              this_mpi_process(mpi_communicator));
+#else
+        if (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
+          {
+            DoFTools::make_sparsity_pattern (dof_handler,
+                                             coupling, sp,
+                                             constraints, false,
+                                             Utilities::MPI::
+                                             this_mpi_process(mpi_communicator));
+            DoFTools::make_flux_sparsity_pattern (dof_handler,
+                                                  sp,
+                                                  coupling,
+                                                  face_coupling);
+          }
+        else
+          DoFTools::make_flux_sparsity_pattern (dof_handler,
+                                                sp,
+                                                constraints, false,
+                                                Utilities::MPI::
+                                                this_mpi_process(mpi_communicator));
+#endif
+      }
+    else
+      DoFTools::make_sparsity_pattern (dof_handler,
+                                       coupling, sp,
+                                       constraints, false,
+                                       Utilities::MPI::
+                                       this_mpi_process(mpi_communicator));
 
 #ifdef ASPECT_USE_PETSC
     SparsityTools::distribute_sparsity_pattern(sp,
@@ -1831,10 +1884,6 @@ namespace aspect
           assemble_advection_system (AdvectionField::temperature());
           solve_advection(AdvectionField::temperature());
 
-          if (parameters.use_discontinuous_temperature_discretization
-              && parameters.use_limiter_for_discontinuous_temperature_solution)
-            apply_limiter_to_dg_solutions(AdvectionField::temperature());
-
           current_linearization_point.block(introspection.block_indices.temperature)
             = solution.block(introspection.block_indices.temperature);
 
@@ -1842,9 +1891,6 @@ namespace aspect
             {
               assemble_advection_system (AdvectionField::composition(c));
               solve_advection(AdvectionField::composition(c));
-              if (parameters.use_discontinuous_composition_discretization
-                  && parameters.use_limiter_for_discontinuous_composition_solution)
-                apply_limiter_to_dg_solutions(AdvectionField::composition(c));
             }
 
           if (parameters.vof_tracking_enabled)
@@ -2131,12 +2177,14 @@ namespace aspect
             {
               assemble_advection_system (AdvectionField::composition(c));
               solve_advection(AdvectionField::composition(c));
-              current_linearization_point.block(introspection.block_indices.compositional_fields[c])
-                = solution.block(introspection.block_indices.compositional_fields[c]);
             }
 
           if (parameters.vof_tracking_enabled)
             vof_handler->do_vof_update ();
+
+          for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
+            current_linearization_point.block(introspection.block_indices.compositional_fields[c])
+              = solution.block(introspection.block_indices.compositional_fields[c]);
 
           break;
         }

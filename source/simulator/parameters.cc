@@ -28,7 +28,6 @@
 
 #include <deal.II/base/parameter_handler.h>
 
-#include <dirent.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
@@ -848,24 +847,9 @@ namespace aspect
     else if (output_directory[output_directory.size()-1] != '/')
       output_directory += "/";
 
-    // verify that the output directory actually exists. if it doesn't, create
-    // it on processor zero
-    if ((Utilities::MPI::this_mpi_process(mpi_communicator) == 0) &&
-        (opendir(output_directory.c_str()) == NULL))
-      {
-        std::cout << "\n"
-                  << "-----------------------------------------------------------------------------\n"
-                  << "The output directory <" << output_directory
-                  << "> provided in the input file appears not to exist.\n"
-                  << "ASPECT will create it for you.\n"
-                  << "-----------------------------------------------------------------------------\n\n"
-                  << std::endl;
-
-        const int error = Utilities::mkdirp(output_directory, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-
-        AssertThrow (error == 0,
-                     ExcMessage (std::string("Can't create the output directory at <") + output_directory + ">"));
-      }
+    Utilities::create_directory (output_directory,
+                                 mpi_communicator,
+                                 false);
 
     if (prm.get ("Resume computation") == "true")
       resume_computation = true;
@@ -1021,12 +1005,6 @@ namespace aspect
           = prm.get_bool("Use limiter for discontinuous temperature solution");
         use_limiter_for_discontinuous_composition_solution
           = prm.get_bool("Use limiter for discontinuous composition solution");
-        if (use_limiter_for_discontinuous_temperature_solution
-            || use_limiter_for_discontinuous_composition_solution)
-          AssertThrow (nonlinear_solver == NonlinearSolver::IMPES,
-                       ExcMessage ("The bound preserving limiter currently is "
-                                   "only implemented for the scheme using IMPES nonlinear solver. "
-                                   "Please deactivate the limiter or change the solver scheme."));
         global_temperature_max_preset       = prm.get_double ("Global temperature maximum");
         global_temperature_min_preset       = prm.get_double ("Global temperature minimum");
         global_composition_max_preset       = Utilities::string_to_double
