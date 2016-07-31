@@ -67,25 +67,25 @@ namespace aspect
     std::vector<types::global_dof_index> cell_dof_indicies (sim.finite_element.dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indicies (sim.finite_element.dofs_per_cell);
 
-    const FEVariable<dim> &vof_var = data->fraction;
+    const FEVariable<dim> &vof_var = field.fraction;
     const unsigned int vof_c_index = vof_var.first_component_index;
     const unsigned int vof_ind
       = sim.finite_element.component_to_system_index(vof_c_index, 0);
 
-    const FEVariable<dim> &vofN_var = data->reconstruction;
+    const FEVariable<dim> &vofN_var = field.reconstruction;
     const unsigned int vofN_c_index = vofN_var.first_component_index;
     const unsigned int vofN_blockidx = vofN_var.block_index;
 
-    const FEVariable<dim> &vofLS_var = data->level_set;
+    const FEVariable<dim> &vofLS_var = field.level_set;
     const unsigned int vofLS_c_index = vofLS_var.first_component_index;
     const unsigned int n_vofLS_dofs = vofLS_var.fe->dofs_per_cell;
     const unsigned int vofLS_blockidx = vofLS_var.block_index;
 
     //
-    bool use_vof_composition = data->c_field_name!="";
+    bool use_vof_composition = field.c_field_name!="";
     const unsigned int c_var_index =
       ( (!use_vof_composition) ? numbers::invalid_unsigned_int
-        : sim.introspection.compositional_index_for_name(data->c_field_name));
+        : sim.introspection.compositional_index_for_name(field.c_field_name));
     Simulator<dim>::AdvectionField advf =
       ( (!use_vof_composition) ? Simulator<dim>::AdvectionField::temperature()
         : Simulator<dim>::AdvectionField::composition(c_var_index));
@@ -177,7 +177,7 @@ namespace aspect
                         resc_cell_centers[3 * j + i] = Point<dim> (0.0,
                                                                    0.0);
                       }
-                    local_vofs (3 * j + i) = sim.solution (cell_dof_indicies[vof_ind]);
+                    local_vofs (3 * j + i) = solution (cell_dof_indicies[vof_ind]);
                   }
               }
             // Gather cell strip sums
@@ -245,7 +245,7 @@ namespace aspect
             // render linear translation problems less dependent on the
             // interface reconstruction, so other tests will also be necessary.
             for (unsigned int i=0; i<dim; ++i)
-              normals[6][i] = sim.solution(local_dof_indicies[sim.finite_element
+              normals[6][i] = solution(local_dof_indicies[sim.finite_element
                                                               .component_to_system_index(vofN_c_index+i, 0)]);
 
             // If candidate normal too small, remove from consideration
@@ -346,12 +346,12 @@ namespace aspect
     sim.compute_current_constraints();
     sim.current_constraints.distribute(initial_solution);
 
-    sim.solution.block(vofN_blockidx) = initial_solution.block(vofN_blockidx);
-    sim.solution.block(vofLS_blockidx) = initial_solution.block(vofLS_blockidx);
+    solution.block(vofN_blockidx) = initial_solution.block(vofN_blockidx);
+    solution.block(vofLS_blockidx) = initial_solution.block(vofLS_blockidx);
     if (use_vof_composition)
       {
         const unsigned int blockidx = advf.block_index(sim.introspection);
-        sim.solution.block(blockidx) = initial_solution.block(blockidx);
+        solution.block(blockidx) = initial_solution.block(blockidx);
       }
 
     sim.computing_timer.exit_section();
