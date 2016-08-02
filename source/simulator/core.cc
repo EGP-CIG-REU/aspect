@@ -981,10 +981,7 @@ namespace aspect
 
     Table<2,DoFTools::Coupling> coupling (introspection.n_components,
                                           introspection.n_components);
-    Table<2,DoFTools::Coupling> dgcell_coupling (introspection.n_components,
-                                                 introspection.n_components);
-    Table<2,DoFTools::Coupling> face_coupling (introspection.n_components,
-                                               introspection.n_components);
+    coupling.fill (DoFTools::none);
 
     // determine which blocks should be fillable in the matrix.
     // note:
@@ -1066,6 +1063,8 @@ namespace aspect
       {
         Table<2,DoFTools::Coupling> face_coupling (introspection.n_components,
                                                    introspection.n_components);
+        face_coupling.fill (DoFTools::none);
+
         const typename Introspection<dim>::ComponentIndices &x
           = introspection.component_indices;
         if (parameters.use_discontinuous_temperature_discretization)
@@ -1149,6 +1148,7 @@ namespace aspect
 
     Table<2,DoFTools::Coupling> coupling (introspection.n_components,
                                           introspection.n_components);
+    coupling.fill (DoFTools::none);
 
     const typename Introspection<dim>::ComponentIndices &x
       = introspection.component_indices;
@@ -1185,6 +1185,8 @@ namespace aspect
       {
         Table<2,DoFTools::Coupling> face_coupling (introspection.n_components,
                                                    introspection.n_components);
+        face_coupling.fill (DoFTools::none);
+
         const typename Introspection<dim>::ComponentIndices &x
           = introspection.component_indices;
         if (parameters.use_discontinuous_temperature_discretization)
@@ -1889,8 +1891,22 @@ namespace aspect
 
           for (unsigned int c=0; c < parameters.n_compositional_fields; ++c)
             {
-              assemble_advection_system (AdvectionField::composition(c));
-              solve_advection(AdvectionField::composition(c));
+              const AdvectionField adv_field (AdvectionField::composition(c));
+              const typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+              switch (method)
+                {
+                  case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                    assemble_advection_system (adv_field);
+                    solve_advection(adv_field);
+                    break;
+
+                  case Parameters<dim>::AdvectionFieldMethod::particles:
+                    interpolate_particle_properties(adv_field);
+                    break;
+
+                  default:
+                    AssertThrow(false,ExcNotImplemented());
+                }
             }
 
           if (parameters.vof_tracking_enabled)
@@ -1985,13 +2001,27 @@ namespace aspect
 
               for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
                 {
-                  assemble_advection_system (AdvectionField::composition(c));
+                  const AdvectionField adv_field (AdvectionField::composition(c));
+                  typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+                  switch (method)
+                    {
+                      case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                        assemble_advection_system (adv_field);
 
-                  if (iteration == 0)
-                    initial_composition_residual[c] = system_rhs.block(introspection.block_indices.compositional_fields[c]).l2_norm();
+                        if (iteration == 0)
+                          initial_composition_residual[c] = system_rhs.block(introspection.block_indices.compositional_fields[c]).l2_norm();
 
-                  composition_residual[c]
-                    = solve_advection(AdvectionField::composition(c));
+                        composition_residual[c]
+                          = solve_advection(adv_field);
+                        break;
+
+                      case Parameters<dim>::AdvectionFieldMethod::particles:
+                        interpolate_particle_properties(adv_field);
+                        break;
+
+                      default:
+                        AssertThrow(false,ExcNotImplemented());
+                    }
                 }
 
               if (parameters.vof_tracking_enabled)
@@ -2083,8 +2113,22 @@ namespace aspect
 
           for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
             {
-              assemble_advection_system (AdvectionField::composition(c));
-              solve_advection(AdvectionField::composition(c));
+              const AdvectionField adv_field (AdvectionField::composition(c));
+              typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+              switch (method)
+                {
+                  case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                    assemble_advection_system (adv_field);
+                    solve_advection(adv_field);
+                    break;
+
+                  case Parameters<dim>::AdvectionFieldMethod::particles:
+                    interpolate_particle_properties(adv_field);
+                    break;
+
+                  default:
+                    AssertThrow(false,ExcNotImplemented());
+                }
             }
 
           if (parameters.vof_tracking_enabled)
@@ -2175,8 +2219,22 @@ namespace aspect
 
           for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
             {
-              assemble_advection_system (AdvectionField::composition(c));
-              solve_advection(AdvectionField::composition(c));
+              const AdvectionField adv_field (AdvectionField::composition(c));
+              typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+              switch (method)
+                {
+                  case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                    assemble_advection_system (adv_field);
+                    solve_advection(adv_field);
+                    break;
+
+                  case Parameters<dim>::AdvectionFieldMethod::particles:
+                    interpolate_particle_properties(adv_field);
+                    break;
+
+                  default:
+                    AssertThrow(false,ExcNotImplemented());
+                }
             }
 
           if (parameters.vof_tracking_enabled)
