@@ -1037,8 +1037,25 @@ namespace aspect
         }
       coupling[x.temperature][x.temperature] = DoFTools::always;
       for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
-        coupling[x.compositional_fields[c]][x.compositional_fields[c]]
-          = DoFTools::always;
+        {
+          const AdvectionField adv_field (AdvectionField::composition(c));
+          const typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+          switch (method)
+            {
+              // Coupling cases
+              case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                  = DoFTools::always;
+                break;
+              // Non-coupling cases
+              case Parameters<dim>::AdvectionFieldMethod::particles:
+                coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                  = DoFTools::none;
+                break;
+              default:
+                Assert(false,ExcNotImplemented());
+            }
+        }
 
       if (parameters.vof_tracking_enabled)
         {
@@ -1073,7 +1090,25 @@ namespace aspect
         if (parameters.use_discontinuous_composition_discretization)
           {
             for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
-              face_coupling[x.compositional_fields[c]][x.compositional_fields[c]] = DoFTools::always;
+              {
+                const AdvectionField adv_field (AdvectionField::composition(c));
+                const typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+                switch (method)
+                  {
+                    // Coupling cases
+                    case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                      face_coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                        = DoFTools::always;
+                      break;
+                    // Non-coupling cases
+                    case Parameters<dim>::AdvectionFieldMethod::particles:
+                      face_coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                        = DoFTools::none;
+                      break;
+                    default:
+                      Assert(false,ExcNotImplemented());
+                  }
+              }
           }
 
         if (parameters.vof_tracking_enabled)
@@ -1168,7 +1203,25 @@ namespace aspect
     coupling[x.temperature][x.temperature] = DoFTools::always;
 
     for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
-      coupling[x.compositional_fields[c]][x.compositional_fields[c]] = DoFTools::always;
+      {
+        const AdvectionField adv_field (AdvectionField::composition(c));
+        const typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+        switch (method)
+          {
+            // Coupling cases
+            case Parameters<dim>::AdvectionFieldMethod::fem_field:
+              coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                = DoFTools::always;
+              break;
+            // Non-coupling cases
+            case Parameters<dim>::AdvectionFieldMethod::particles:
+              coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                = DoFTools::none;
+              break;
+            default:
+              Assert(false,ExcNotImplemented());
+          }
+      }
 
     LinearAlgebra::BlockDynamicSparsityPattern sp;
 
@@ -1195,7 +1248,25 @@ namespace aspect
         if (parameters.use_discontinuous_composition_discretization)
           {
             for (unsigned int c=0; c<parameters.n_compositional_fields; ++c)
-              face_coupling[x.compositional_fields[c]][x.compositional_fields[c]] = DoFTools::always;
+              {
+                const AdvectionField adv_field (AdvectionField::composition(c));
+                const typename Parameters<dim>::AdvectionFieldMethod::Kind method = adv_field.advection_method(introspection);
+                switch (method)
+                  {
+                    // Coupling cases
+                    case Parameters<dim>::AdvectionFieldMethod::fem_field:
+                      face_coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                        = DoFTools::always;
+                      break;
+                    // Non-coupling cases
+                    case Parameters<dim>::AdvectionFieldMethod::particles:
+                      face_coupling[x.compositional_fields[c]][x.compositional_fields[c]]
+                        = DoFTools::none;
+                      break;
+                    default:
+                      Assert(false,ExcNotImplemented());
+                  }
+              }
           }
 
 #if DEAL_II_VERSION_GTE(8,5,0)
@@ -1277,11 +1348,12 @@ namespace aspect
     // large
     {
       std::locale s = pcout.get_stream().getloc();
-      // Creating std::locale with an empty string causes problems
-      // on some platforms, so catch the exception and ignore
+      // Creating std::locale with an empty string previously caused problems
+      // on some platforms, so the functionality to catch the exception and ignore
+      // is kept here, even though explicitly setting a facet should always work.
       try
         {
-          pcout.get_stream().imbue(std::locale(""));
+          pcout.get_stream().imbue(std::locale(std::locale(), new aspect::Utilities::ThousandSep));
         }
       catch (std::runtime_error e)
         {

@@ -192,6 +192,23 @@ namespace aspect
                                                       double phi );   //longitude (radians)
 
     /**
+     * A struct to enable numerical output with a comma as thousands separator
+     */
+    struct ThousandSep : std::numpunct<char>
+    {
+      protected:
+        virtual char do_thousands_sep() const
+        {
+          return ',';
+        }
+        virtual std::string do_grouping() const
+        {
+          return "\003";  // groups of 3 digits (this string is in octal format)
+        }
+
+    };
+
+    /**
      * Checks whether a file named filename exists.
      *
      * @param filename File to check existence
@@ -339,18 +356,11 @@ namespace aspect
     }
 
     /**
-     * Add standard call for replacing $ASPECT_SOURCE_DIR
+     * Replace the variable $ASPECT_SOURCE_DIR in @p location by the current
+     * source directory of ASPECT and return the resulting string.
      */
-    inline
     std::string
-    expand_ASPECT_SOURCE_DIR (std::string location)
-    {
-      return Utilities::replace_in_string(location,
-                                          "$ASPECT_SOURCE_DIR",
-                                          ASPECT_SOURCE_DIR);
-    }
-
-
+    expand_ASPECT_SOURCE_DIR (const std::string &location);
 
 
     /**
@@ -401,16 +411,23 @@ namespace aspect
 
         /**
          * Interpolation functions to access the data.
+         * Either InterpolatedUniformGridData or InterpolatedTensorProductGridData;
+         * the type is determined from the grid specified in the data file.
          */
-        std::vector<Functions::InterpolatedUniformGridData<dim> *> data;
+        std::vector<Function<dim> *> data;
 
         /**
-         * Min and Max coordinates in data file
+         * The coordinate values in each direction as specified in the data file.
+         */
+        std_cxx11::array<std::vector<double>,dim> coordinate_values;
+
+        /**
+         * The min and max of the coordinates in the data file.
          */
         std_cxx11::array<std::pair<double,double>,dim> grid_extent;
 
         /**
-         * Number of points in the data grid.
+         * Number of points in the data grid as specified in the data file.
          */
         TableIndices<dim> table_points;
 
