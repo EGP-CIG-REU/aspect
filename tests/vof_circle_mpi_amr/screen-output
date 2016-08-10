@@ -1,0 +1,1056 @@
+
+Loading shared library <./libvof_circle_mpi_amr.so>
+
+Number of active cells: 64 (on 4 levels)
+Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
+
+*** Timestep 0:  t=0 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 5.49126816e-02 FEstL1= 0.00000000e+00.
+
+Number of active cells: 85 (on 5 levels)
+Number of degrees of freedom: 1,985 (798+108+399+85+255+340)
+
+*** Timestep 0:  t=0 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
+
+*** Timestep 0:  t=0 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
+
+*** Timestep 1:  t=0.0220971 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
+
+*** Timestep 2:  t=0.0441942 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
+
+*** Timestep 3:  t=0.0662913 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
+
+*** Timestep 4:  t=0.0883883 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,220 (1,686+219+843+184+552+736)
+
+*** Timestep 5:  t=0.110485 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
+
+*** Timestep 6:  t=0.132583 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,306 (1,724+224+862+187+561+748)
+
+*** Timestep 7:  t=0.15468 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,684 (1,868+242+934+205+615+820)
+
+*** Timestep 8:  t=0.176777 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,621 (1,844+239+922+202+606+808)
+
+*** Timestep 9:  t=0.198874 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,621 (1,844+239+922+202+606+808)
+
+*** Timestep 10:  t=0.220971 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,747 (1,892+245+946+208+624+832)
+
+*** Timestep 11:  t=0.243068 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,747 (1,892+245+946+208+624+832)
+
+*** Timestep 12:  t=0.265165 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 7.24060118e-03 FEstL1= 5.14659007e-03.
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,747 (1,892+245+946+208+624+832)
+
+*** Timestep 13:  t=0.287262 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,621 (1,844+239+922+202+606+808)
+
+*** Timestep 14:  t=0.309359 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,621 (1,844+239+922+202+606+808)
+
+*** Timestep 15:  t=0.331456 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,621 (1,844+239+922+202+606+808)
+
+*** Timestep 16:  t=0.353553 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,747 (1,892+245+946+208+624+832)
+
+*** Timestep 17:  t=0.37565 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 196 (on 6 levels)
+Number of degrees of freedom: 4,530 (1,818+235+909+196+588+784)
+
+*** Timestep 18:  t=0.397748 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 190 (on 6 levels)
+Number of degrees of freedom: 4,390 (1,762+227+881+190+570+760)
+
+*** Timestep 19:  t=0.419845 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,254 (1,708+220+854+184+552+736)
+
+*** Timestep 20:  t=0.441942 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,254 (1,708+220+854+184+552+736)
+
+*** Timestep 21:  t=0.464039 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 193 (on 6 levels)
+Number of degrees of freedom: 4,437 (1,776+229+888+193+579+772)
+
+*** Timestep 22:  t=0.486136 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 190 (on 6 levels)
+Number of degrees of freedom: 4,380 (1,756+226+878+190+570+760)
+
+*** Timestep 23:  t=0.508233 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 1.00529915e-02 FEstL1= 8.19902396e-03.
+
+Number of active cells: 196 (on 6 levels)
+Number of degrees of freedom: 4,500 (1,800+232+900+196+588+784)
+
+*** Timestep 24:  t=0.53033 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,254 (1,708+220+854+184+552+736)
+
+*** Timestep 25:  t=0.552427 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 190 (on 6 levels)
+Number of degrees of freedom: 4,374 (1,752+226+876+190+570+760)
+
+*** Timestep 26:  t=0.574524 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,254 (1,708+220+854+184+552+736)
+
+*** Timestep 27:  t=0.596621 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 193 (on 6 levels)
+Number of degrees of freedom: 4,437 (1,776+229+888+193+579+772)
+
+*** Timestep 28:  t=0.618718 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 175 (on 6 levels)
+Number of degrees of freedom: 4,065 (1,636+211+818+175+525+700)
+
+*** Timestep 29:  t=0.640816 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 223 (on 6 levels)
+Number of degrees of freedom: 5,095 (2,032+263+1,016+223+669+892)
+
+*** Timestep 30:  t=0.662913 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 220 (on 6 levels)
+Number of degrees of freedom: 5,032 (2,008+260+1,004+220+660+880)
+
+*** Timestep 31:  t=0.68501 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 223 (on 6 levels)
+Number of degrees of freedom: 5,092 (2,030+263+1,015+223+669+892)
+
+*** Timestep 32:  t=0.707107 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 220 (on 6 levels)
+Number of degrees of freedom: 5,032 (2,008+260+1,004+220+660+880)
+
+*** Timestep 33:  t=0.729204 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 5,018 (2,014+261+1,007+217+651+868)
+
+*** Timestep 34:  t=0.751301 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 1.29363316e-02 FEstL1= 1.16007056e-02.
+
+Number of active cells: 214 (on 6 levels)
+Number of degrees of freedom: 4,958 (1,992+258+996+214+642+856)
+
+*** Timestep 35:  t=0.773398 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 5,018 (2,014+261+1,007+217+651+868)
+
+*** Timestep 36:  t=0.795495 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 220 (on 6 levels)
+Number of degrees of freedom: 5,032 (2,008+260+1,004+220+660+880)
+
+*** Timestep 37:  t=0.817592 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 223 (on 6 levels)
+Number of degrees of freedom: 5,092 (2,030+263+1,015+223+669+892)
+
+*** Timestep 38:  t=0.839689 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 226 (on 6 levels)
+Number of degrees of freedom: 5,158 (2,056+266+1,028+226+678+904)
+
+*** Timestep 39:  t=0.861786 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 226 (on 6 levels)
+Number of degrees of freedom: 5,155 (2,054+266+1,027+226+678+904)
+
+*** Timestep 40:  t=0.883883 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,995 (2,000+259+1,000+217+651+868)
+
+*** Timestep 41:  t=0.905981 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,770 (1,906+247+953+208+624+832)
+
+*** Timestep 42:  t=0.928078 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
+
+*** Timestep 43:  t=0.950175 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
+
+*** Timestep 44:  t=0.972272 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
+
+*** Timestep 45:  t=0.994369 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
+
+*** Timestep 46:  t=1.01647 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 1.61032993e-02 FEstL1= 1.52831042e-02.
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
+
+*** Timestep 47:  t=1.03856 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
+
+*** Timestep 48:  t=1.06066 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
+
+*** Timestep 49:  t=1.08276 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
+
+*** Timestep 50:  t=1.10485 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
+
+*** Timestep 51:  t=1.12695 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 211 (on 6 levels)
+Number of degrees of freedom: 4,859 (1,946+252+973+211+633+844)
+
+*** Timestep 52:  t=1.14905 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
+
+*** Timestep 53:  t=1.17115 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
+
+*** Timestep 54:  t=1.19324 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
+
+*** Timestep 55:  t=1.21534 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 211 (on 6 levels)
+Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
+
+*** Timestep 56:  t=1.23744 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 211 (on 6 levels)
+Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
+
+*** Timestep 57:  t=1.25953 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 1.88576875e-02 FEstL1= 1.79153334e-02.
+
+Number of active cells: 211 (on 6 levels)
+Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
+
+*** Timestep 58:  t=1.28163 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
+
+*** Timestep 59:  t=1.30373 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
+
+*** Timestep 60:  t=1.32583 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
+
+*** Timestep 61:  t=1.34792 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 223 (on 6 levels)
+Number of degrees of freedom: 5,085 (2,026+262+1,013+223+669+892)
+
+*** Timestep 62:  t=1.37002 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 217 (on 6 levels)
+Number of degrees of freedom: 4,985 (1,994+258+997+217+651+868)
+
+*** Timestep 63:  t=1.39212 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,694 (1,874+243+937+205+615+820)
+
+*** Timestep 64:  t=1.41421 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
+
+*** Timestep 65:  t=1.43631 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
+
+*** Timestep 66:  t=1.45841 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
+
+*** Timestep 67:  t=1.4805 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,307 (1,726+222+863+187+561+748)
+
+*** Timestep 68:  t=1.5026 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 2.08237524e-02 FEstL1= 2.00563335e-02.
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,307 (1,726+222+863+187+561+748)
+
+*** Timestep 69:  t=1.5247 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
+
+*** Timestep 70:  t=1.5468 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
+
+*** Timestep 71:  t=1.56889 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
+
+*** Timestep 72:  t=1.59099 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
+
+*** Timestep 73:  t=1.61309 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 184 (on 6 levels)
+Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
+
+*** Timestep 74:  t=1.63518 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,713 (1,886+244+943+205+615+820)
+
+*** Timestep 75:  t=1.65728 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
+
+*** Timestep 76:  t=1.67938 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 199 (on 6 levels)
+Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
+
+*** Timestep 77:  t=1.70148 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
+
+*** Timestep 78:  t=1.72357 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,687 (1,870+242+935+205+615+820)
+
+*** Timestep 79:  t=1.74567 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 211 (on 6 levels)
+Number of degrees of freedom: 4,807 (1,914+248+957+211+633+844)
+
+*** Timestep 80:  t=1.76777 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 2.35312648e-02 FEstL1= 2.27884763e-02.
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,687 (1,870+242+935+205+615+820)
+
+*** Timestep 81:  t=1.78986 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 205 (on 6 levels)
+Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
+
+*** Timestep 82:  t=1.81196 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 199 (on 6 levels)
+Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
+
+*** Timestep 83:  t=1.83406 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 208 (on 6 levels)
+Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
+
+*** Timestep 84:  t=1.85616 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,624 (1,846+239+923+202+606+808)
+
+*** Timestep 85:  t=1.87825 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 202 (on 6 levels)
+Number of degrees of freedom: 4,644 (1,858+241+929+202+606+808)
+
+*** Timestep 86:  t=1.90035 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 190 (on 6 levels)
+Number of degrees of freedom: 4,372 (1,750+227+875+190+570+760)
+
+*** Timestep 87:  t=1.92245 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
+
+*** Timestep 88:  t=1.94454 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 181 (on 6 levels)
+Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
+
+*** Timestep 89:  t=1.96664 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
+
+*** Timestep 90:  t=1.98874 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol: 0.785 m^3
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
+
+*** Timestep 91:  t=2 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF vol:  0.785 m^3
+     VOF Calculation:  IEstL1= 2.56987304e-02 FEstL1= 2.50958327e-02.
+
+Number of active cells: 187 (on 6 levels)
+Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
+
+Termination requested by criterion: end time
+
+
++---------------------------------------------+------------+------------+
++---------------------------------+-----------+------------+------------+
++---------------------------------+-----------+------------+------------+
+
