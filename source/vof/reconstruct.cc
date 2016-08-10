@@ -246,7 +246,7 @@ namespace aspect
             // interface reconstruction, so other tests will also be necessary.
             for (unsigned int i=0; i<dim; ++i)
               normals[6][i] = solution(local_dof_indicies[sim.finite_element
-                                                              .component_to_system_index(vofN_c_index+i, 0)]);
+                                                          .component_to_system_index(vofN_c_index+i, 0)]);
 
             // If candidate normal too small, remove from consideration
             if (normals[6]*normals[6]< vof_epsilon)
