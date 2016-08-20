@@ -122,13 +122,6 @@ namespace aspect
         get_particles() const;
 
         /**
-         * Returns the number of particles in the cell that contains the
-         * most tracers in the global model.
-         */
-        unsigned int
-        get_global_max_tracers_per_cell() const;
-
-        /**
          * Advance particles by the old timestep using the current
          * integration scheme. This accounts for the fact that the tracers
          * are actually still at their old positions and the current timestep
@@ -165,17 +158,21 @@ namespace aspect
 
         /**
          * Callback function that is called from Simulator before every
-         * refinement. Allows registering store_tracers() in the triangulation.
+         * refinement and when writing checkpoints.
+         * Allows registering store_tracers() in the triangulation.
          */
         void
-        register_store_callback_function(typename parallel::distributed::Triangulation<dim> &triangulation);
+        register_store_callback_function(const bool serialization,
+                                         typename parallel::distributed::Triangulation<dim> &triangulation);
 
         /**
          * Callback function that is called from Simulator after every
-         * refinement. Allows registering load_tracers() in the triangulation.
+         * refinement and after resuming from a checkpoint.
+         * Allows registering load_tracers() in the triangulation.
          */
         void
-        register_load_callback_function(typename parallel::distributed::Triangulation<dim> &triangulation);
+        register_load_callback_function(const bool serialization,
+                                        typename parallel::distributed::Triangulation<dim> &triangulation);
 
         /**
          * Called by listener functions from Triangulation for every cell
@@ -291,6 +288,16 @@ namespace aspect
         types::particle_index global_number_of_particles;
 
         /**
+         * The maximum number of particles per cell in the global domain. This
+         * variable is important to store and load particle data during
+         * repartition and serialization of the solution. Note that the
+         * variable is only updated when it is needed, e.g. before or after
+         * serialization (before/after mesh refinement, before creating a
+         * checkpoint and after resuming from a checkpoint).
+         */
+        unsigned int global_max_particles_per_cell;
+
+        /**
          * This variable stores the next free particle index that is available
          * globally in case new particles need to be generated.
          */
@@ -352,18 +359,24 @@ namespace aspect
         update_n_global_particles();
 
         /**
+         * Calculates and stores the number of particles in the cell that
+         * contains the most tracers in the global model (stored in the
+         * member variable global_max_particles_per_cell). This variable is a
+         * state variable, because it is needed to serialize and deserialize
+         * the particle data correctly in parallel (it determines the size of
+         * the data chunks per cell that are stored and read). Before accessing
+         * the variable this function has to be called, unless the state was
+         * read from another source (e.g. after resuming from a checkpoint).
+         */
+        void
+        update_global_max_particles_per_cell();
+
+        /**
          * Calculates the next free particle index in the global model domain.
          * This equals one plus the highest particle index currently active.
          */
         void
         update_next_free_particle_index();
-
-        /**
-         * Returns whether a given particle is in the given cell.
-         */
-        bool
-        particle_is_in_cell(const Particle<dim> &particle,
-                            const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const;
 
         /**
          * Returns a map of neighbor cells of the current cell. This map is
@@ -376,14 +389,19 @@ namespace aspect
                                  const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const;
 
         /**
-         * Finds the cells containing each particle for all particles. If
-         * particles moved out of this subdomain they will be sent
-         * to their new process and inserted there. After this function call
-         * every particle is either on its current process and in its current
-         * cell, or deleted (if it could not find its new process or cell).
+         * Finds the cells containing each particle for all particles in
+         * @p particles_to_sort. If particles moved out of the local subdomain
+         * they will be sent to their new process and inserted there.
+         * After this function call every particle is either on its current
+         * process and in its current cell, or deleted (if it could not find
+         * its new process or cell).
+         *
+         * @param [in] particles_to_sort Vector containing all pairs of
+         * particles and their old cells that will be sorted into the
+         * 'particles' member variable in this function.
          */
         void
-        sort_particles_in_subdomains_and_cells();
+        sort_particles_in_subdomains_and_cells(const std::vector<std::pair<types::LevelInd, Particle<dim> > > &particles_to_sort);
 
         /**
          * Apply the bounds for the maximum and minimum number of particles
@@ -401,9 +419,9 @@ namespace aspect
          * that can not be found are discarded.
          */
         void
-        move_particles_back_into_mesh(std::multimap<types::LevelInd, Particle<dim> >            &lost_particles,
-                                      std::multimap<types::LevelInd, Particle<dim> >            &moved_particles_cell,
-                                      std::multimap<types::subdomain_id, Particle<dim> >        &moved_particles_domain);
+        move_particles_back_into_mesh(const std::vector<std::pair<types::LevelInd, Particle<dim> > > &lost_particles,
+                                      std::vector<std::pair<types::LevelInd, Particle<dim> > >       &moved_particles_cell,
+                                      std::multimap<types::subdomain_id, Particle<dim> >             &moved_particles_domain);
 
         /**
          * Transfer particles that have crossed subdomain boundaries to other
@@ -413,14 +431,20 @@ namespace aspect
          * of ghost cells of the current process, this also handles
          * periodic boundaries correctly. Afterwards the transfer is done in the
          * same way as local communication between neighbor processes.
-         * All received particles will immediately be inserted into the
-         * particles member variable.
+         * All received particles and their new cells will be appended to the
+         * @p received_particles vector.
          *
          * @param [in] sent_particles All particles that should be sent and
          * their new subdomain_ids are in this map.
+         *
+         * @param [in,out] received_particles List that stores all received
+         * particles. Note that it is not required nor checked that the list
+         * is empty, received particles are simply attached to the end of
+         * the vector.
          */
         void
-        send_recv_particles(const std::multimap<types::subdomain_id,Particle <dim> > &sent_particles);
+        send_recv_particles(const std::multimap<types::subdomain_id,Particle <dim> > &sent_particles,
+                            std::vector<std::pair<types::LevelInd, Particle<dim> > > &received_particles);
 
         /**
          * Advect the particle positions by one integration step. Needs to be
@@ -446,12 +470,16 @@ namespace aspect
         /**
          * Advect the particles of one cell. Performs only one step for
          * multi-step integrators. Needs to be called until integrator->continue()
-         * evaluates to false.
+         * evaluates to false. Particles that moved out of their old cell
+         * during this advection step are removed from the local multimap and
+         * stored in @p particles_out_of_cell for further treatment (sorting
+         * them into the new cell).
          */
         void
         local_advect_particles(const typename DoFHandler<dim>::active_cell_iterator &cell,
                                const typename std::multimap<types::LevelInd, Particle<dim> >::iterator &begin_particle,
-                               const typename std::multimap<types::LevelInd, Particle<dim> >::iterator &end_particle);
+                               const typename std::multimap<types::LevelInd, Particle<dim> >::iterator &end_particle,
+                               std::vector<std::pair<types::LevelInd, Particle <dim> > >               &particles_out_of_cell);
     };
 
     /* -------------------------- inline and template functions ---------------------- */
@@ -460,7 +488,7 @@ namespace aspect
     template <class Archive>
     void World<dim>::serialize (Archive &ar, const unsigned int)
     {
-      ar &particles
+      ar &global_max_particles_per_cell
       &next_free_particle_index
       ;
     }
