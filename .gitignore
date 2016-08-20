@@ -5,6 +5,7 @@
 /**/cmake_install.cmake
 /.cproject
 /.project
+/.idea/*
 /.settings
 /AspectConfig.cmake
 /CMakeLists.txt.user*
@@ -27,6 +28,8 @@
 /doc/aspect.dox
 /doc/aspect.tag
 /doc/deal.tag
+/doc/manual.pdf
+/doc/manual/.idea/*
 /doc/doxygen/
 /doc/manual/manual.aux
 /doc/manual/manual.bbl
