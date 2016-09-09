@@ -28,6 +28,8 @@ namespace aspect
     {
       template <int dim>
       Function<dim>::Function()
+        :
+        n_functions (0)
       {}
 
       template <int dim>
@@ -35,15 +37,17 @@ namespace aspect
       Function<dim>::initialize_one_particle_property(const Point<dim> &position,
                                                       std::vector<double> &data) const
       {
-        data.push_back(function.value(position));
+        for (unsigned int i = 0; i < n_functions; i++)
+          data.push_back(function->value(position, i));
       }
-
 
       template <int dim>
       std::vector<std::pair<std::string, unsigned int> >
       Function<dim>::get_property_information() const
       {
-        const std::vector<std::pair<std::string,unsigned int> > property_information (1,std::make_pair("function",1));
+        std::vector<std::pair<std::string,unsigned int> > property_information;
+        for (unsigned int i = 0; i < n_functions; i++)
+          property_information.push_back(std::make_pair("function" + Utilities::to_string(i+1), 1));
         return property_information;
       }
 
@@ -58,6 +62,9 @@ namespace aspect
           {
             prm.enter_subsection("Function");
             {
+              prm.declare_entry ("Number of functions", "1",
+                                 Patterns::Integer (0),
+                                 "The number of functions related to particle properties.");
               Functions::ParsedFunction<dim>::declare_parameters (prm, 1);
             }
             prm.leave_subsection();
@@ -77,9 +84,11 @@ namespace aspect
           prm.enter_subsection("Tracers");
           {
             prm.enter_subsection("Function");
+            n_functions = prm.get_integer ("Number of functions");
             try
               {
-                function.parse_parameters (prm);
+                function.reset (new Functions::ParsedFunction<dim>(n_functions));
+                function->parse_parameters (prm);
               }
             catch (...)
               {
