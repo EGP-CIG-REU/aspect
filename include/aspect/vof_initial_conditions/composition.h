@@ -19,13 +19,11 @@
 */
 
 
-#ifndef __aspect__vof_initial_conditions_function_h
-#define __aspect__vof_initial_conditions_function_h
+#ifndef __aspect__vof_initial_conditions_composition_h
+#define __aspect__vof_initial_conditions_composition_h
 
 #include <aspect/vof_initial_conditions/interface.h>
 #include <aspect/simulator_access.h>
-
-#include <deal.II/base/parsed_function.h>
 
 namespace aspect
 {
@@ -35,12 +33,12 @@ namespace aspect
 
     /**
      * A class that implements initial conditions for the compositional fields
-     * based on a functional description provided in the input file.
+     * based on a specified composition field.
      *
      * @ingroup VoFInitialConditionsModels
      */
     template <int dim>
-    class Function : public Interface<dim>,
+    class Composition : public Interface<dim>,
       public SimulatorAccess<dim>
     {
       public:
@@ -94,13 +92,12 @@ namespace aspect
          * Required information on initialization method.
          */
 
-        typename VoFInitType::Kind function_init_type;
         unsigned int n_init_samples;
 
         /**
-         * A function object representing the compositional fields.
+         * Name of composition field for consideration
          */
-        Functions::ParsedFunction<dim> function;
+        unsigned int c_idx;
     };
   }
 }
