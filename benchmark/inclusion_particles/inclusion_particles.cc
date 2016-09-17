@@ -272,8 +272,8 @@ namespace aspect
                const Point<dim> &p) const
     {
       const double r2 = (p(0)-1.0)*(p(0)-1.0) + (p(1)-1.0)*(p(1)-1.0);
-      return (r2<0.2*0.2)? eta_B : 1.0;
-      //return composition[0];    
+      //return (r2<0.2*0.2)? eta_B : 1.0;
+      return composition[0];    
     }
 
 
