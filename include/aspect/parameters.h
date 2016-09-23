@@ -180,6 +180,7 @@ namespace aspect
     double                         start_time;
     double                         CFL_number;
     double                         maximum_time_step;
+      double                       time_step_fixed;
     bool                           use_artificial_viscosity_smoothing;
     bool                           use_conduction_timestep;
     bool                           convert_to_years;

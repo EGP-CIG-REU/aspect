@@ -131,6 +131,85 @@ namespace aspect
 
       template <int dim>
       void
+      RichardsonExtrapolation<dim>::write_out_current_data()
+      {
+          std::ofstream interpolated_data_stream;
+          interpolated_data_stream.open(output_file_name, std::ios_base::out);
+          interpolated_data_stream << std::setprecision(14);
+
+          const QGauss<dim> quadrature_formula(this->get_parameters().stokes_velocity_degree + 1);
+
+          FEValues<dim> fe_values(this->get_mapping(),
+                                  this->get_fe(),
+                                  quadrature_formula,
+                                  update_values |
+                                  update_quadrature_points |
+                                  update_JxW_values);
+
+          const FEValuesExtractors::Scalar &extractor_pressure = this->introspection().extractors.pressure;
+          const FEValuesExtractors::Scalar &extractor_temperature = this->introspection().extractors.temperature;
+          const FEValuesExtractors::Vector &extractor_velocity = this->introspection().extractors.velocities;
+
+          // Declaring an iterator over all active cells on local mpi process
+          typename DoFHandler<dim>::active_cell_iterator cell = this->get_dof_handler().begin_active();
+          for (; cell != this->get_dof_handler().end();
+                 ++cell)
+          {
+              if (!(cell->is_locally_owned()))
+                  continue;
+
+              fe_values.reinit(cell);
+              // Each vector is of the same length.
+              const std::vector<Point<dim>>  quadrature_points = fe_values.get_quadrature_points();
+
+              std::vector<double> interpolated_temperature(quadrature_points.size());
+              std::vector<double> interpolated_pressure(quadrature_points.size());
+              std::vector<Tensor<1,dim>> interpolated_velocity(quadrature_points.size());
+              std::vector<std::vector<double>> interpolated_compositional_fields(this->n_compositional_fields(),
+                                                                                 std::vector<double>(quadrature_points.size()));
+
+              fe_values[extractor_pressure].get_function_values(this->get_solution(), interpolated_pressure);
+              fe_values[extractor_temperature].get_function_values(this->get_solution(), interpolated_temperature);
+              fe_values[extractor_velocity].get_function_values(this->get_solution(), interpolated_velocity);
+
+              typename std::vector<std::vector<double>>::iterator itr_compositional_fields = interpolated_compositional_fields.begin();
+
+              unsigned int index = 0;
+              for(; itr_compositional_fields != interpolated_compositional_fields.end(); itr_compositional_fields++) {
+                  fe_values[this->introspection().extractors.compositional_fields[index]].get_function_values(
+                          this->get_solution(),
+                          *itr_compositional_fields);
+                  index++;
+              }
+
+              typename std::vector<double>::const_iterator itr_temperature = interpolated_temperature.begin();
+              typename std::vector<double>::const_iterator itr_pressure = interpolated_pressure.begin();
+              typename std::vector<Tensor<1,dim>>::const_iterator itr_velocity = interpolated_velocity.begin();
+
+              typename std::vector<Point<dim>>::const_iterator itr_quadrature_points = quadrature_points.begin();
+
+              unsigned int quadrature_point_index = 0;
+              for (; itr_quadrature_points != quadrature_points.end();
+                     itr_quadrature_points++, itr_velocity++, itr_pressure++, itr_temperature++, quadrature_point_index++)
+              {
+                  interpolated_data_stream << (*itr_quadrature_points)[0] << "\t" << (*itr_quadrature_points)[1]
+                                           << "\t" << (*itr_velocity)[0] << "\t" << (*itr_velocity)[1]
+                                           << "\t" << *itr_pressure << "\t" << *itr_temperature;
+                  if (this->n_compositional_fields() != 0) {
+                      unsigned int count = 0;
+                      itr_compositional_fields = interpolated_compositional_fields.begin();
+                      for(; itr_compositional_fields != interpolated_compositional_fields.end(); itr_compositional_fields++, count++)
+                          interpolated_data_stream << "\t" << (*itr_compositional_fields)[quadrature_point_index] << "\t";
+                  }
+                  interpolated_data_stream << std::endl;
+              }
+          }
+
+          interpolated_data_stream.close();
+      }
+
+      template <int dim>
+      void
       RichardsonExtrapolation<dim>::write_out_data()
       {
           std::ofstream interpolated_data_stream;
@@ -340,16 +419,21 @@ namespace aspect
               compositional_field_l2_error[compositional_field_index] = std::sqrt(Utilities::MPI::sum(compositional_field_l2_error[compositional_field_index], this->get_mpi_communicator()));
 
           if(Utilities::MPI::this_mpi_process(this->get_mpi_communicator()) == 0) {
+              std::ofstream error("Errors.dat", std::ios_base::app);
               info = "u_l2: " + std::to_string(velocity_l2_error);
-              std::cout << std::setprecision(14) << "Errors: u_l2: " << velocity_l2_error << " p_l2: " << pressure_l2_error << " t_l2: " << temperature_l2_error;
+              error << std::setprecision(14) << "Errors: u_l2: " << velocity_l2_error << " p_l2: " << pressure_l2_error << " t_l2: " << temperature_l2_error;
               for(unsigned int compositional_field_index = 0; compositional_field_index < this->n_compositional_fields(); compositional_field_index++)
-                  std::cout << " c_" + Utilities::int_to_string(compositional_field_index) + ": " << compositional_field_l2_error[compositional_field_index];
-              std::cout << std::endl;
+                  error << " c_" + Utilities::int_to_string(compositional_field_index) + ": " << compositional_field_l2_error[compositional_field_index];
+              error << std::endl;
+              error.close();
+
           }
+
         }
 
         // Write out the current solution, interpolated at a higher resolved mesh.
-        write_out_data();
+        //write_out_data();
+          write_out_current_data();
       }
 
       return std::pair<std::string, std::string> ("Richardson Extrapolation: ",

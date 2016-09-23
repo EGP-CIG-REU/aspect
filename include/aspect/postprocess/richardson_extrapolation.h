@@ -79,6 +79,9 @@ namespace aspect
         void
         write_out_data();
 
+        void
+        write_out_current_data();
+
         /**
          *  Function that computes the error between interpolated (read in) values
          *  with the current solution at current nodal points.

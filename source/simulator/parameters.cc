@@ -129,6 +129,8 @@ namespace aspect
                        "one can choose $c>1$) though a CFL number significantly larger than "
                        "one will yield rather diffusive solutions. Units: None.");
 
+    prm.declare_entry ("Delta time", "10", Patterns::Double (0), "A hack that allows to set the delta time per time step");
+
     prm.declare_entry ("Maximum time step",
                        /* boost::lexical_cast<std::string>(std::numeric_limits<double>::max() /
                                                            year_in_seconds) = */ "5.69e+300",
@@ -847,8 +849,10 @@ namespace aspect
     use_conduction_timestep = prm.get_bool ("Use conduction timestep");
     convert_to_years        = prm.get_bool ("Use years in output instead of seconds");
     timing_output_frequency = prm.get_integer ("Timing output frequency");
+    time_step_fixed = prm.get_double("Delta time");
 
-    maximum_time_step       = prm.get_double("Maximum time step");
+
+      maximum_time_step       = prm.get_double("Maximum time step");
     if (convert_to_years == true)
       maximum_time_step *= year_in_seconds;
 

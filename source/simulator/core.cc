@@ -2401,6 +2401,7 @@ namespace aspect
 
         // get new time step size
         const double new_time_step = compute_time_step();
+        //  const double new_time_step = Utilities:: parameters.time_step_fixed;
 
         // see if we want to refine the mesh
         maybe_refine_mesh(new_time_step,max_refinement_level);
