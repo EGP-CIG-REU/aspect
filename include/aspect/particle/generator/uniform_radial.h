@@ -111,6 +111,8 @@ namespace aspect
            * particles can differ slightly from this number.
            */
           types::particle_index n_tracers;
+
+          unsigned int n_tracers_in_reference_cell;
       };
 
     }

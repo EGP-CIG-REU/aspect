@@ -137,6 +137,17 @@ namespace aspect
         return std::make_pair(types::LevelInd(),Particle<dim>());
       }
 
+        template <int dim>
+        std::pair<types::LevelInd,Particle<dim> >
+        generate_particle (const typename DoFHandler<dim>::active_cell_iterator &itr,
+                           const Point<dim> position,
+                           const types::particle_index id)
+        {
+          const Particle<dim> particle(position, position, id);
+          const types::LevelInd cell(itr->level(), itr->index());
+          return std::make_pair(cell,particle);
+        }
+
       template <int dim>
       void
       Interface<dim>::declare_parameters (ParameterHandler &)

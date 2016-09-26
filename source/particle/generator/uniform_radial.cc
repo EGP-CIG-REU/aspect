@@ -33,6 +33,34 @@ namespace aspect
       void
       UniformRadial<dim>::generate_particles(std::multimap<types::LevelInd, Particle<dim> > &particles)
       {
+
+        typename DoFHandler<dim>::active_cell_iterator
+                cell = this->get_dof_handler().begin_active(),
+                endc = this->get_dof_handler().end();
+        unsigned  int n_particles;
+        if (dim == 2)
+         n_particles = std::pow(n_tracers_in_reference_cell, 2)*this->get_triangulation().n_global_active_cells();
+
+        Point<dim> spacing;
+        for (unsigned int i = 0; i < dim; ++i)
+        {
+          spacing[i] = 1 / fmax(n_tracers_in_reference_cell,1);
+        }
+
+        unsigned int cell_count = 0;
+        for (; cell != endc ; cell++, cell_count++)
+        {
+          for (unsigned int count_in_x = 0; count_in_x < n_tracers_in_reference_cell; count_in_x++)
+            for (unsigned int count_in_y = 0; count_in_y < n_tracers_in_reference_cell; count_in_y++)
+            {
+              Point<dim> position((count_in_x*spacing[0] + spacing[0]/2,
+                                   count_in_y*spacing[1] + spacing[1]/2));
+              types::particle_index id = cell_count * count_in_x*count_in_y + (count_in_x + n_tracers_in_reference_cell*count_in_y);
+              particles.insert(this->generate_particle(cell, position, id));
+            }
+        }
+        return;
+
         // Create the array of shell to deal with
         const double radial_spacing = (P_max[0] - P_min[0]) / fmax(radial_layers-1,1);
 
@@ -147,6 +175,9 @@ namespace aspect
             {
               prm.enter_subsection("Uniform radial");
               {
+                prm.declare_entry("Number of particles in reference cell", "1",
+                                  Patterns::Integer (),
+                                  "Number of particles in each dimension.");
                 prm.declare_entry ("Center x", "0",
                                    Patterns::Double (),
                                    "x coordinate for the center of the spherical region, "
@@ -212,6 +243,8 @@ namespace aspect
             {
               prm.enter_subsection("Uniform radial");
               {
+                n_tracers_in_reference_cell = prm.get_integer("Number of particles in reference cell");
+
                 P_center[0] = prm.get_double ("Center x");
                 P_center[1] = prm.get_double ("Center y");
 
