@@ -1,0 +1,190 @@
+set Additional shared libraries            = ./libegp_hvl.so
+
+############### Global parameters
+
+set Dimension                              = 2
+
+set Start time                             = 0
+
+set End time                               = 100
+
+set Output directory                       = output_test
+
+set Pressure normalization                 = volume
+set Nonlinear solver scheme                = Stokes only
+
+set CFL number                             = 0.8
+
+############### Parameters describing the model
+
+subsection Geometry model
+  set Model name = spherical shell
+
+  subsection Spherical shell
+    set Inner radius = 0.1
+    set Outer radius = 0.5
+    set Opening angle = 360
+
+    # use a number of cells the is guaranteed to not create any
+    # symmetries
+    #set Cells along circumference = 11
+  end
+end
+
+subsection Model settings
+# Set to tangential velocity boundary conditions.
+# Note that the function specified in "Boundary velocity model" has no influence unless the following line is unmommneted 
+# and the parameter  "Tangential velocity boundary indicators" is reset.
+  set Prescribed velocity boundary indicators = 0: function, 1: function 
+#  set Prescribed velocity boundary indicators =
+  set Tangential velocity boundary indicators = 
+  set Zero velocity boundary indicators       =
+end
+
+subsection Boundary velocity model
+  subsection Function
+    set Function constants  = pi=3.1415926
+    set Variable names      = x,z
+    set Function expression = -z;x
+  end
+end
+
+subsection Material model
+  set Model name = EGPHVLMaterial
+
+  subsection EGPHVL
+    # Do not change these set of parameters! EGP && HL
+    set Viscosity jump = 1
+    set Reference density = 1
+  end
+end
+
+
+subsection Gravity model
+  set Model name = radial constant
+  subsection Radial constant
+    set Magnitude = 1
+  end
+
+  subsection Function
+    set Variable names      = r,theta,t
+    set Function expression = 0;0
+  end
+end
+
+
+############### Parameters describing the temperature field
+
+subsection Boundary temperature model
+  set Model name = box
+end
+
+
+subsection Initial conditions
+  set Model name = function
+  subsection Function
+    set Function expression = 0
+  end
+end
+
+subsection Adiabatic conditions model
+  set Model name = function
+
+  subsection Function
+    set Function constants  =
+    set Function expression = 0; 0
+    set Variable names      = depth
+  end
+
+end
+
+subsection Compositional fields
+#  set Number of fields = 0
+#  set Names of fields = density_comp #, viscosity_comp
+#  set Compositional field methods = particles #, particles
+  # set Mapped particle properties = density_comp:function1 #, viscosity_comp:function2
+  # This is what was recommended by Rene on Friday, August 11, 2016
+#  set Mapped particle properties = density_comp:function1
+end
+
+subsection Compositional initial conditions
+  set Model name = function
+  subsection Function
+    set Variable names      = x,z
+    set Function expression = 0
+  end
+end
+
+############### Parameters describing the discretization
+
+subsection Discretization
+  set Stokes velocity polynomial degree       = 2
+  set Use locally conservative discretization = true
+  set Use discontinuous composition discretization = true
+end
+
+
+subsection Mesh refinement
+  set Coarsening fraction                      = 0
+  set Initial adaptive refinement              = 0
+  set Initial global refinement                = 5
+end
+
+
+############### Parameters describing what to do with the solution
+
+subsection Postprocess
+  set List of postprocessors = visualization, tracers, EGPHVLPostprocessor
+  
+  subsection Visualization
+    set Output format                 = vtu
+    set Number of grouped files       = 1
+    set Time between graphical output = 0
+    set List of output variables = density, viscosity, partition
+  end
+
+  subsection Tracers
+    set Number of tracers = 1024
+    set Time between data output = 0
+    set Data output format = vtu
+    set Integration scheme = rk2
+    #set Interpolation scheme = cell average
+    # set Interpolation scheme = least squares
+    set Maximum tracers per cell = 36864
+
+    set Particle generator name = uniform radial
+
+    subsection Generator
+      subsection Uniform box
+       set Minimum x = -.49739583333333333334
+       set Maximum x = .49739583333333333334
+       set Minimum y = -.49739583333333333334
+       set Maximum y = .49739583333333333334
+      end
+
+      subsection Uniform radial
+        set Minimum radius = 0.15
+        set Maximum radius = 0.45
+        set Minimum longitude = 0.0
+        set Maximum longitude = 360.0
+        set Center x = 0.0
+        set Center y = 0.0
+        set Radial layers = 4
+      end
+    end
+  end
+end
+
+subsection Termination criteria
+  set Checkpoint on termination = true
+  set Termination criteria      = user request
+
+  subsection User request
+    set File name = end
+  end
+end
+
+subsection Checkpointing
+  #set Steps between checkpoint = 5
+end
+

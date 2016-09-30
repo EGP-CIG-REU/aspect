@@ -1,0 +1,185 @@
+set Additional shared libraries            = ./libegp_hvl_box.so
+
+############### Global parameters
+
+set Dimension                              = 2
+
+set Start time                             = 0
+
+#set End time                               = 12.566370614359172
+
+set Output directory                       = output_egp_hvl_box
+
+set Pressure normalization                 = volume
+set Nonlinear solver scheme                = IMPES
+
+set Use years in output instead of seconds     = false
+
+#set Resume computation = true
+############### Parameters describing the model
+
+subsection Geometry model
+  set Model name = box
+
+  subsection Box
+    set X extent = 6.283185307179586
+    set X repetitions = 1
+    set Y extent = 6.283185307179586
+    set Y repetitions = 1
+
+#    set Box origin X coordinate = 0
+#    set Box origin Y coordinate = 0
+  end
+end
+
+
+subsection Model settings
+
+  set Prescribed velocity boundary indicators = 0: function, 1: function, 2: function, 3: function
+  set Tangential velocity boundary indicators = 
+  set Zero velocity boundary indicators       =
+end
+
+subsection Boundary velocity model
+  subsection Function
+    set Variable names      = x,y
+    set Function constants  = pi=6.283185307179586
+    set Function expression = -1*cos(y)*sin(x); cos(x)*sin(y)
+  end
+end
+
+subsection Material model
+  set Model name = EGPHVLMaterial
+
+  subsection EGPHVL
+    # Do not change these set of parameters! EGP && HL
+    set Viscosity jump = 1
+    set Reference density = 1
+  end
+end
+
+
+subsection Gravity model
+  set Model name = function
+  subsection Function
+    set Variable names      = x,y,t
+    set Function constants = PI=3.141592653589793
+    set Function expression = -sin(x)*cos(y);-cos(x)*sin(y)
+  end
+end
+
+
+############### Parameters describing the temperature field
+
+subsection Boundary temperature model
+  set Model name = box
+end
+
+
+subsection Initial conditions
+  set Model name = function
+  subsection Function
+    set Function expression = 0
+  end
+end
+
+subsection Adiabatic conditions model
+  set Model name = function
+
+  subsection Function
+    set Function constants  =
+    set Function expression = 0; 0
+    set Variable names      = depth
+  end
+
+end
+
+
+############### Parameters describing the discretization
+
+subsection Discretization
+  set Stokes velocity polynomial degree       = 2
+  set Use locally conservative discretization = false
+end
+
+
+subsection Mesh refinement
+  set Initial adaptive refinement              = 0
+  set Initial global refinement = 5
+  set Time steps between mesh refinement       = 0
+  set Coarsening fraction                      = 0
+end
+
+
+############### Parameters describing what to do with the solution
+
+subsection Postprocess
+  set List of postprocessors = visualization, EGPHVLPostprocessor, tracers
+  
+  subsection Visualization
+    set Output format                 = vtu
+    set Number of grouped files       = 1
+    set Time between graphical output = 0
+    set List of output variables = density, viscosity, partition, gravity
+  end
+
+  subsection Tracers
+    set Number of tracers = 512
+    set Time between data output = 0
+    set Data output format = vtu
+    # set List of tracer properties = function
+    set Integration scheme = rk2
+    # set Interpolation scheme = cell average
+    # set Interpolation scheme = least squares
+    set Maximum tracers per cell = 64
+
+    subsection Function
+#     set Number of functions = 1
+      set Variable names      = x, z
+      set Function constants  = pi=3.1415926, eta_b=1e3, background_density=1.0
+#     set Function expression = ref_density - sin(pi*z) * cos(pi*x); if(x<0.5, 1, eta_b)
+      set Function expression = background_density - sin(pi*z) * cos(pi*x)
+    end
+
+    set Particle generator name = uniform radial
+
+    subsection Generator
+      subsection Probability density function
+        set Variable names      = x,y
+        set Function expression = x*x*y
+      end
+
+      subsection Uniform box
+       set Minimum x = -0.5
+       set Maximum x = 0.5
+       set Minimum y = -0.5
+       set Maximum y = 0.5
+      end
+
+      subsection Uniform radial
+        set Minimum radius = 0.04908738521234052
+        set Maximum radius = 1.1780972450961724
+        set Minimum longitude = 0.0
+        set Maximum longitude = 270.0
+        set Center x = 3.141592653589793
+        set Center y = 3.141592653589793
+        set Radial layers = 4
+      end
+
+    end
+  end
+end
+
+subsection Termination criteria
+  set Checkpoint on termination = true
+  set Termination criteria      = user request
+
+  subsection User request
+    set File name = end
+  end
+end
+
+subsection Checkpointing
+  #set Steps between checkpoint = 5
+end
+
