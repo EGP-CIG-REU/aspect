@@ -30,7 +30,7 @@ namespace aspect
    *
    * The results are published in Kronbichler, Heister and Bangerth paper.
    */
-  namespace InclusionBenchmark
+  namespace EGPHVLBenchmark
   {
     using namespace dealii;
 
@@ -42,11 +42,8 @@ namespace aspect
       // released under the GNU General Public License (GPL).
 
       void analytic_solution(
-        double pos[],
-        double _eta_A, double _eta_B,   /* Input parameters: density, viscosity A, viscosity B */
-        double _x_c, int _n,      /* Input parameters: viscosity jump location, wavenumber in x */
-        double vel[], double *presssure,
-        double total_stress[], double strain_rate[] )
+        double pos[],  /* Input parameters: density, viscosity A, viscosity B */
+        double vel[], double *presssure)
       {
         /****************************************************************************************/
         /****************************************************************************************/
@@ -55,14 +52,6 @@ namespace aspect
         vel[1] =  cos(pos[0])*sin(pos[1]);
 
         (*presssure) = cos(pos[0])*cos(pos[1]);
-
-        total_stress[0] = 0.0;
-        total_stress[1] = 0.0;
-        total_stress[2] = 0.0;
-
-        strain_rate[0] = 0;
-        strain_rate[1] = 0;
-        strain_rate[2] = 0;
       }
 
       /**
@@ -70,15 +59,12 @@ namespace aspect
        * of the jump in viscosity $\eta_B$.
        */
       template <int dim>
-      class FunctionStreamline : public Function<dim>
+      class FunctionEGPHVL : public Function<dim>
       {
         public:
-          FunctionStreamline (const double eta_B,
-                         const double background_density)
+          FunctionEGPHVL ()
             :
-            Function<dim>(),
-            eta_B_(eta_B),
-            background_density (background_density)
+            Function<dim>()
           {}
 
           virtual void vector_value (const Point< dim >   &p,
@@ -88,23 +74,13 @@ namespace aspect
 
             double pos[2]= {p(0),p(1)};
             double total_stress[3], strain_rate[3];
-            double eta_A=1.0;
-            double eta_B=1.0;
 
             // call the analytic function for the solution with a zero
             // background density
             AnalyticSolutions::analytic_solution
             (pos,
-             eta_A, eta_B,
-             0.5, 1,
-             &values[0], &values[2], total_stress, strain_rate );
-
-            // then add the background pressure to the value we just got
-            // values[2] = 0.0;
-            // values[2] += (0.5-p[1])*background_density;
+             &values[0], &values[2]);
           }
-        private:
-          double eta_B_, background_density;
       };
     }
 
@@ -466,8 +442,7 @@ namespace aspect
           material_model
             = dynamic_cast<const BenchmarkMaterialModel<dim> *>(&this->get_material_model());
 
-          ref_func.reset (new AnalyticSolutions::FunctionStreamline<dim>(material_model->get_eta_B(),
-                                                                    material_model->get_background_density()));
+          ref_func.reset (new AnalyticSolutions::FunctionEGPHVL<dim>());
         }
       else
         {
@@ -538,8 +513,8 @@ namespace aspect
       Vector<float> cellwise_errors_pl2 (this->get_triangulation().n_active_cells());
 
       ComponentSelectFunction<dim> comp_u(std::pair<unsigned int, unsigned int>(0,dim),
-                                          this->get_fe().n_components());
-      ComponentSelectFunction<dim> comp_p(dim, this->get_fe().n_components());
+                                          dim+2);
+      ComponentSelectFunction<dim> comp_p(dim, dim+2);
 
       VectorTools::integrate_difference (this->get_mapping(),this->get_dof_handler(),
                                          this->get_solution(),
@@ -592,7 +567,7 @@ namespace aspect
 // explicit instantiations
 namespace aspect
 {
-  namespace InclusionBenchmark
+  namespace EGPHVLBenchmark
   {
     ASPECT_REGISTER_MATERIAL_MODEL(BenchmarkMaterialModel,
                                    "EGPHVLMaterial",

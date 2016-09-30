@@ -6,7 +6,7 @@ set Dimension                              = 2
 
 set Start time                             = 0
 
-#set End time                               = 12.566370614359172
+set End time                               = 0
 
 set Output directory                       = output_egp_hvl_box
 
@@ -36,15 +36,17 @@ end
 subsection Model settings
 
   set Prescribed velocity boundary indicators = 0: function, 1: function, 2: function, 3: function
+#  set Prescribed velocity boundary indicators =
+#  set Tangential velocity boundary indicators = 0, 1, 2, 3
   set Tangential velocity boundary indicators = 
-  set Zero velocity boundary indicators       =
+  set Zero velocity boundary indicators       = 
 end
 
 subsection Boundary velocity model
   subsection Function
     set Variable names      = x,y
     set Function constants  = pi=6.283185307179586
-    set Function expression = -1*cos(y)*sin(x); cos(x)*sin(y)
+    set Function expression = -1*sin(x)*cos(y); cos(x)*sin(y)
   end
 end
 
@@ -64,7 +66,8 @@ subsection Gravity model
   subsection Function
     set Variable names      = x,y,t
     set Function constants = PI=3.141592653589793
-    set Function expression = -sin(x)*cos(y);-cos(x)*sin(y)
+    #set Function expression = -sin(x)*cos(y);-cos(x)*sin(y)
+    set Function expression = 0;0
   end
 end
 
@@ -104,9 +107,9 @@ end
 
 
 subsection Mesh refinement
-  set Initial adaptive refinement              = 0
-  set Initial global refinement = 5
-  set Time steps between mesh refinement       = 0
+  set Initial adaptive refinement = 0
+  set Initial global refinement = 6
+  set Time steps between mesh refinement = 0
   set Coarsening fraction                      = 0
 end
 
