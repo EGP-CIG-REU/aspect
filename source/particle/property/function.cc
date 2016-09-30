@@ -29,7 +29,7 @@ namespace aspect
       template <int dim>
       Function<dim>::Function()
         :
-        n_functions (0)
+        n_components (0)
       {}
 
       template <int dim>
@@ -37,7 +37,7 @@ namespace aspect
       Function<dim>::initialize_one_particle_property(const Point<dim> &position,
                                                       std::vector<double> &data) const
       {
-        for (unsigned int i = 0; i < n_functions; i++)
+        for (unsigned int i = 0; i < n_components; i++)
           data.push_back(function->value(position, i));
       }
 
@@ -45,9 +45,7 @@ namespace aspect
       std::vector<std::pair<std::string, unsigned int> >
       Function<dim>::get_property_information() const
       {
-        std::vector<std::pair<std::string,unsigned int> > property_information;
-        for (unsigned int i = 0; i < n_functions; i++)
-          property_information.push_back(std::make_pair("function" + Utilities::to_string(i+1), 1));
+        const std::vector<std::pair<std::string,unsigned int> > property_information (1,std::make_pair("function",n_components));
         return property_information;
       }
 
@@ -62,9 +60,10 @@ namespace aspect
           {
             prm.enter_subsection("Function");
             {
-              prm.declare_entry ("Number of functions", "1",
+              prm.declare_entry ("Number of components", "1",
                                  Patterns::Integer (0),
-                                 "The number of functions related to particle properties.");
+                                 "The number of function components where each component is described"
+                                 "by a function expression delimited by a ';'.");
               Functions::ParsedFunction<dim>::declare_parameters (prm, 1);
             }
             prm.leave_subsection();
@@ -84,10 +83,9 @@ namespace aspect
           prm.enter_subsection("Tracers");
           {
             prm.enter_subsection("Function");
-            n_functions = prm.get_integer ("Number of functions");
             try
               {
-                function.reset (new Functions::ParsedFunction<dim>(n_functions));
+                function.reset (new Functions::ParsedFunction<dim>(n_components));
                 function->parse_parameters (prm);
               }
             catch (...)

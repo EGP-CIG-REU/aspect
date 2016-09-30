@@ -6,6 +6,28 @@
  *
  * <ol>
  *
+ * <li> Changed: HDF5 particle output files are now named 'particles-...'
+ * instead of 'particle-...' to be consistent with the vtu output. Also 
+ * particle properties with more than one component are now correctly split
+ * into scalar fields in the output files, if they have more or less components
+ * than the number of spatial dimensions in the model.
+ * <br>
+ * (Rene Gassmoeller, 2016/09/20)
+ *
+ * </li>
+ * <li> New: Multiple particle properties can be intialized by specifying
+ * multiple particle property function components as opposed to one particle
+ * property.
+ * <br>
+ * (Harsha Lokavarapu, Gerry Puckett, 2016/09/20)
+ *
+ * <li> Changed: The timestep entry in the statistics file has been moved to
+ * column 3 and is now the timestep used for the timestep corresponding to the
+ * current row.
+ * <br>
+ * (Jonathan Robey, 2016/09/16)
+ * </li>
+ *
  * <li> Changed: The 'cell average' particle interpolator is now more
  * tolerant against cells without particles by interpolating properties
  * from neighboring cells. This is necessary, because during refinement

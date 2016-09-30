@@ -241,12 +241,10 @@ namespace aspect
 
 
 
-  /**
-   * Find the largest velocity throughout the domain.
-   **/
   template <int dim>
-  double Simulator<dim>::get_maximal_velocity (
-    const LinearAlgebra::BlockVector &solution) const
+  double
+  Simulator<dim>::
+  get_maximal_velocity (const LinearAlgebra::BlockVector &solution) const
   {
     // use a quadrature formula that has one point at
     // the location of each degree of freedom in the
@@ -538,11 +536,8 @@ namespace aspect
     if (parameters.use_conduction_timestep)
       min_conduction_timestep = - Utilities::MPI::max (-min_local_conduction_timestep, mpi_communicator);
 
-    double new_time_step = std::min(min_convection_timestep,min_conduction_timestep);
-
-    // for now the bool (convection/conduction dominated)
-    // is unused, will be added to statistics later
-    bool convection_dominant = (min_convection_timestep < min_conduction_timestep);
+    double new_time_step = std::min(min_convection_timestep,
+                                    min_conduction_timestep);
 
     if (new_time_step == std::numeric_limits<double>::max())
       {
@@ -552,7 +547,6 @@ namespace aspect
         // the velocity was one
         new_time_step = (parameters.CFL_number /
                          (parameters.temperature_degree * 1));
-        convection_dominant = false;
       }
 
     new_time_step = termination_manager.check_for_last_time_step(std::min(new_time_step,
@@ -682,12 +676,10 @@ namespace aspect
     hanging_constraints.distribute(vec);
   }
 
-  /*
-   * normalize the pressure by calculating the surface integral of the pressure on the outer
-   * shell and subtracting this from all pressure nodes.
-   */
+
+
   template <int dim>
-  void Simulator<dim>::normalize_pressure(LinearAlgebra::BlockVector &vector)
+  void Simulator<dim>::normalize_pressure (LinearAlgebra::BlockVector &vector)
   {
     if (parameters.pressure_normalization == "no")
       return;
@@ -737,7 +729,7 @@ namespace aspect
                 }
             }
       }
-    else if (parameters.pressure_normalization=="volume")
+    else if (parameters.pressure_normalization == "volume")
       {
         const QGauss<dim> quadrature (parameters.stokes_velocity_degree + 1);
 
@@ -769,12 +761,12 @@ namespace aspect
       AssertThrow (false, ExcMessage("Invalid pressure normalization method: " +
                                      parameters.pressure_normalization));
 
-    pressure_adjustment = 0.0;
     // sum up the integrals from each processor
     {
       const double my_temp[2] = {my_pressure, my_area};
       double temp[2];
       Utilities::MPI::sum (my_temp, mpi_communicator, temp);
+
       if (parameters.pressure_normalization == "surface")
         pressure_adjustment = -temp[0]/temp[1] + parameters.surface_pressure;
       else if (parameters.pressure_normalization == "volume")
@@ -873,12 +865,12 @@ namespace aspect
   }
 
 
-  /*
-   * inverse to normalize_pressure.
-   */
+
   template <int dim>
-  void Simulator<dim>::denormalize_pressure (LinearAlgebra::BlockVector &vector,
-                                             const LinearAlgebra::BlockVector &relevant_vector)
+  void
+  Simulator<dim>::
+  denormalize_pressure (LinearAlgebra::BlockVector &vector,
+                        const LinearAlgebra::BlockVector &relevant_vector) const
   {
     if (parameters.pressure_normalization == "no")
       return;
@@ -970,14 +962,9 @@ namespace aspect
 
 
 
-  /**
-   * This routine adjusts the second block of the right hand side of the
-   * system containing the compressibility, so that the system becomes
-   * compatible. See the general documentation of this class for more
-   * information.
-   */
   template <int dim>
-  void Simulator<dim>::make_pressure_rhs_compatible(LinearAlgebra::BlockVector &vector)
+  void
+  Simulator<dim>::make_pressure_rhs_compatible(LinearAlgebra::BlockVector &vector)
   {
     if (parameters.use_locally_conservative_discretization)
       AssertThrow(false, ExcNotImplemented());
@@ -1340,7 +1327,7 @@ namespace aspect
 #define INSTANTIATE(dim) \
   template struct Simulator<dim>::AdvectionField; \
   template void Simulator<dim>::normalize_pressure(LinearAlgebra::BlockVector &vector); \
-  template void Simulator<dim>::denormalize_pressure(LinearAlgebra::BlockVector &vector, const LinearAlgebra::BlockVector &relevant_vector); \
+  template void Simulator<dim>::denormalize_pressure(LinearAlgebra::BlockVector &vector, const LinearAlgebra::BlockVector &relevant_vector) const; \
   template double Simulator<dim>::get_maximal_velocity (const LinearAlgebra::BlockVector &solution) const; \
   template std::pair<double,double> Simulator<dim>::get_extrapolated_advection_field_range (const AdvectionField &advection_field) const; \
   template void Simulator<dim>::maybe_write_timing_output () const; \
