@@ -12,6 +12,7 @@ set Output directory                       = output_egp_hvl_box
 
 set Pressure normalization                 = volume
 set Nonlinear solver scheme                = IMPES
+set Linear solver tolerance                    = 1e-14
 
 set Use years in output instead of seconds     = false
 
@@ -22,9 +23,9 @@ subsection Geometry model
   set Model name = box
 
   subsection Box
-    set X extent = 6.283185307179586
+    set X extent = 1
     set X repetitions = 1
-    set Y extent = 6.283185307179586
+    set Y extent = 1
     set Y repetitions = 1
 
 #    set Box origin X coordinate = 0
@@ -108,7 +109,7 @@ end
 
 subsection Mesh refinement
   set Initial adaptive refinement = 0
-  set Initial global refinement = 6
+  set Initial global refinement = 7
   set Time steps between mesh refinement = 0
   set Coarsening fraction                      = 0
 end
@@ -117,8 +118,14 @@ end
 ############### Parameters describing what to do with the solution
 
 subsection Postprocess
-  set List of postprocessors = visualization, EGPHVLPostprocessor, tracers
-  
+  set List of postprocessors = visualization, EGPHVLPostprocessor, tracers, richardson extrapolation
+  subsection Richardson extrapolation
+    set End time = 0
+    set Input file name of interpolated data = interpolated_values_6_onto_7
+    set Output file name of interpolated data =  interpolated_values_7_onto_8
+    set Output file name of errors = Errors_egp_hvl_box.dat
+  end
+
   subsection Visualization
     set Output format                 = vtu
     set Number of grouped files       = 1

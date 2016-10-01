@@ -51,7 +51,7 @@ namespace aspect
         vel[0] = -1*cos(pos[1])*sin(pos[0]);
         vel[1] =  cos(pos[0])*sin(pos[1]);
 
-        (*presssure) = cos(pos[0])*cos(pos[1]);
+        (*presssure) = 2*cos(pos[0])*cos(pos[1]);
       }
 
       /**

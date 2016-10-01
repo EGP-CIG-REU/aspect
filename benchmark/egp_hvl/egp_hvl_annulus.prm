@@ -1,4 +1,4 @@
-set Additional shared libraries            = ./libegp_hvl.so
+set Additional shared libraries            = ./libegp_hvl_annulus.so
 
 ############### Global parameters
 
@@ -6,13 +6,15 @@ set Dimension                              = 2
 
 set Start time                             = 0
 
-set End time                               = 100
+set End time                               = 0
 
-set Output directory                       = output_test
+set Output directory                       = output_annulus_Q3_Q2_0
 
 set Pressure normalization                 = volume
-set Nonlinear solver scheme                = Stokes only
+set Nonlinear solver scheme                = IMPES
+set Linear solver tolerance                    = 1e-11
 
+set Use years in output instead of seconds     = false
 set CFL number                             = 0.8
 
 ############### Parameters describing the model
@@ -21,8 +23,8 @@ subsection Geometry model
   set Model name = spherical shell
 
   subsection Spherical shell
-    set Inner radius = 0.1
-    set Outer radius = 0.5
+    set Inner radius = 1
+    set Outer radius = 5
     set Opening angle = 360
 
     # use a number of cells the is guaranteed to not create any
@@ -55,7 +57,7 @@ subsection Material model
   subsection EGPHVL
     # Do not change these set of parameters! EGP && HL
     set Viscosity jump = 1
-    set Reference density = 1
+    set Reference density = 0
   end
 end
 
@@ -63,7 +65,7 @@ end
 subsection Gravity model
   set Model name = radial constant
   subsection Radial constant
-    set Magnitude = 1
+    set Magnitude = 0
   end
 
   subsection Function
@@ -118,29 +120,35 @@ end
 ############### Parameters describing the discretization
 
 subsection Discretization
-  set Stokes velocity polynomial degree       = 2
-  set Use locally conservative discretization = true
-  set Use discontinuous composition discretization = true
+  set Stokes velocity polynomial degree       = 3
+  set Use locally conservative discretization = false
+#  set Use discontinuous composition discretization = true
 end
 
 
 subsection Mesh refinement
   set Coarsening fraction                      = 0
   set Initial adaptive refinement              = 0
-  set Initial global refinement                = 5
+  set Initial global refinement = 5
 end
 
 
 ############### Parameters describing what to do with the solution
 
 subsection Postprocess
-  set List of postprocessors = visualization, tracers, EGPHVLPostprocessor
+  set List of postprocessors = visualization, EGPHVLPostprocessor, richardson extrapolation
+  subsection Richardson extrapolation
+    set End time = 0
+    set Input file name of interpolated data = interpolated_values_4_onto_5
+    set Output file name of interpolated data =  interpolated_values_5_onto_6
+    set Output file name of errors = Errors_egp_annulus_density_r2_radial_Q3_P2_0.dat
+  end
   
   subsection Visualization
     set Output format                 = vtu
     set Number of grouped files       = 1
     set Time between graphical output = 0
-    set List of output variables = density, viscosity, partition
+    set List of output variables = density, viscosity, partition, gravity
   end
 
   subsection Tracers

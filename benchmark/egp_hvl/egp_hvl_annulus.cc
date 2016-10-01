@@ -30,7 +30,7 @@ namespace aspect
    *
    * The results are published in Kronbichler, Heister and Bangerth paper.
    */
-  namespace InclusionBenchmark
+  namespace EGPHVLBenchmark
   {
     using namespace dealii;
 
@@ -43,28 +43,17 @@ namespace aspect
 
       void analytic_solution(
         double pos[],
-        double _eta_A, double _eta_B,   /* Input parameters: density, viscosity A, viscosity B */
-        double _x_c, int _n,      /* Input parameters: viscosity jump location, wavenumber in x */
-        double vel[], double *pressure,
-        double total_stress[], double strain_rate[] )
+        double vel[], double *pressure)
       {
         /****************************************************************************************/
         /****************************************************************************************/
         /* Output */
-        //vel[0] = -pos[1];
-        //vel[1] =  pos[0];
-
-        vel[0] = 0;
-        vel[1] = 0;
+        vel[0] = -pos[1];
+        vel[1] =  pos[0];
+        
+        double r = sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
+        //(*pressure) = -r*r*r/3 + 0.0173613;
         (*pressure) = 0;
-
-        total_stress[0] = 0.0;
-        total_stress[1] = 0.0;
-        total_stress[2] = 0.0;
-
-        strain_rate[0] = 0;
-        strain_rate[1] = 0;
-        strain_rate[2] = 0;
       }
 
       /**
@@ -72,15 +61,12 @@ namespace aspect
        * of the jump in viscosity $\eta_B$.
        */
       template <int dim>
-      class FunctionStreamline : public Function<dim>
+      class FunctionEGPHVL : public Function<dim>
       {
         public:
-          FunctionStreamline (const double eta_B,
-                         const double background_density)
+          FunctionEGPHVL ()
             :
-            Function<dim>(),
-            eta_B_(eta_B),
-            background_density (background_density)
+            Function<dim>()
           {}
 
           virtual void vector_value (const Point< dim >   &p,
@@ -89,24 +75,13 @@ namespace aspect
             AssertDimension(values.size(), 4);
 
             double pos[2]= {p(0),p(1)};
-            double total_stress[3], strain_rate[3];
-            double eta_A=1.0;
-            double eta_B=1.0;
 
             // call the analytic function for the solution with a zero
             // background density
             AnalyticSolutions::analytic_solution
             (pos,
-             eta_A, eta_B,
-             0.5, 1,
-             &values[0], &values[2], total_stress, strain_rate );
-
-            // then add the background pressure to the value we just got
-            // values[2] = 0.0;
-            // values[2] += (0.5-p[1])*background_density;
+             &values[0], &values[2]);
           }
-        private:
-          double eta_B_, background_density;
       };
     }
 
@@ -336,7 +311,7 @@ namespace aspect
       // Use this function if running 2d spherical shell geometry model.
       double r = p.norm();
       double density = r*r;
-      return density;
+      return 0;
     }
 
 
@@ -471,8 +446,7 @@ namespace aspect
           /**
           * TODO: Unnecssary parameter arguments to constructor.
           **/
-          ref_func.reset (new AnalyticSolutions::FunctionStreamline<dim>(material_model->get_eta_B(),
-                                                                    material_model->get_background_density()));
+          ref_func.reset (new AnalyticSolutions::FunctionEGPHVL<dim>());
         }
       else
         {
@@ -542,7 +516,7 @@ namespace aspect
 // explicit instantiations
 namespace aspect
 {
-  namespace InclusionBenchmark
+  namespace EGPHVLBenchmark
   {
     ASPECT_REGISTER_MATERIAL_MODEL(BenchmarkMaterialModel,
                                    "EGPHVLMaterial",
