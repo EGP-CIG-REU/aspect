@@ -840,9 +840,6 @@ namespace aspect
       Vector<float> cellwise_errors_ul2 (this->get_triangulation().n_active_cells());
       Vector<float> cellwise_errors_pl2 (this->get_triangulation().n_active_cells());
 
-      if ( Utilities::MPI::this_mpi_process(this->get_mpi_communicator()) == 0)
-        std::cout << this->get_triangulation().n_active_cells();
-
       ComponentSelectFunction<dim> comp_u(std::pair<unsigned int, unsigned int>(0,dim),
                                           dim+2);
       ComponentSelectFunction<dim> comp_p(dim, dim+2);
