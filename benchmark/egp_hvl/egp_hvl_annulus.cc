@@ -51,12 +51,10 @@ namespace aspect
         /****************************************************************************************/
         /****************************************************************************************/
         /* Output */
-        //vel[0] = -pos[1];
-        //vel[1] =  pos[0];
+        vel[0] = -pos[1];
+        vel[1] =  pos[0];
 
-        vel[0] = 0;
-        vel[1] = 0;
-        (*pressure) = 0;
+        (*pressure) = -std::sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
 
         total_stress[0] = 0.0;
         total_stress[1] = 0.0;
@@ -335,7 +333,7 @@ namespace aspect
       //return 2.0 * p[1];
       // Use this function if running 2d spherical shell geometry model.
       double r = p.norm();
-      double density = r;
+      double density = 0;
       return density;
     }
 
@@ -408,6 +406,9 @@ namespace aspect
         {
           eta_B = prm.get_double ("Viscosity jump");
           background_density = prm.get_double("Reference density");
+            /**
+             * TODO: parse a function expression that is evaluated for the density function.
+             */
         }
         prm.leave_subsection();
       }

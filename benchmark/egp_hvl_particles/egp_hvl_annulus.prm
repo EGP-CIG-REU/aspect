@@ -10,7 +10,7 @@ set End time                               = 0
 
 set Output directory                       = output_annulus_test
 
-set Pressure normalization                 = volume
+#set Pressure normalization                 = no
 set Nonlinear solver scheme                = IMPES
 #set Nonlinear solver scheme                = Stokes only
 

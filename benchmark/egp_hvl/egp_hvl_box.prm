@@ -6,11 +6,11 @@ set Dimension                              = 2
 
 set Start time                             = 0
 
-#set End time                               = 12.566370614359172
+set End time                               = 0
 
 set Output directory                       = output_egp_hvl_box
 
-set Pressure normalization                 = volume
+#set Pressure normalization                 = volume
 set Nonlinear solver scheme                = IMPES
 
 set Use years in output instead of seconds     = false

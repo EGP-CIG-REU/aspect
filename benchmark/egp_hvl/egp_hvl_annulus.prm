@@ -6,14 +6,16 @@ set Dimension                              = 2
 
 set Start time                             = 0
 
-set End time                               = 100
+set End time                               = 0
 
-set Output directory                       = output_annulus_test_d
+set Output directory                       = output_annulus_test_e
 
-set Pressure normalization                 = volume
+#set Pressure normalization                 = volume
 set Nonlinear solver scheme                = Stokes only
 
 set CFL number                             = 0.8
+
+set Linear solver tolerance                    = 1e-14
 
 ############### Parameters describing the model
 
@@ -21,8 +23,8 @@ subsection Geometry model
   set Model name = spherical shell
 
   subsection Spherical shell
-    set Inner radius = 1
-    set Outer radius = 5
+    set Inner radius = .1
+    set Outer radius = 1
     set Opening angle = 360
   end
 end
@@ -60,16 +62,14 @@ end
 
 
 subsection Gravity model
-  set Model name = radial constant
+  set Model name = function
   subsection Radial constant
     set Magnitude = 1
   end
 
   subsection Function
     set Variable names      = x,y
-#    set Function expression = (y/(x*x+y*y));(-x/(x*x+y*y))
-#    set Function expression = 8*y;-8*x
-    set Function expression = x;y
+    set Function expression = (1/(sqrt(x*x+y*y)))*x;(1/(sqrt(x*x+y*y)))*y
   end
 end
 
@@ -128,14 +128,14 @@ end
 subsection Mesh refinement
   set Coarsening fraction                      = 0
   set Initial adaptive refinement              = 0
-  set Initial global refinement                = 5
+  set Initial global refinement = 3
 end
 
 
 ############### Parameters describing what to do with the solution
 
 subsection Postprocess
-  set List of postprocessors = visualization, tracers, EGPHVLPostprocessor
+  set List of postprocessors = visualization, EGPHVLPostprocessor
   
   subsection Visualization
     set Output format                 = vtu
@@ -153,9 +153,13 @@ subsection Postprocess
     # set Interpolation scheme = least squares
     set Maximum tracers per cell = 36864
 
-    set Particle generator name = uniform radial
+    set Particle generator name = reference cell
 
     subsection Generator
+      subsection Reference cell
+        set Number of tracers per cell per direction = 4
+      end
+
       subsection Uniform box
        set Minimum x = -.49739583333333333334
        set Maximum x = .49739583333333333334
