@@ -56,7 +56,7 @@ namespace aspect
 //        double r = sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
 //        AssertThrow(r==(sqrt(vel[0]*vel[0] + vel[1]*vel[1])),ExcInternalError());
 
-        (*pressure) = -std::sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
+        (*pressure) = 0.5*(1 - std::sqrt(pos[0]*pos[0] + pos[1]*pos[1]));
 
         total_stress[0] = 0.0;
         total_stress[1] = 0.0;

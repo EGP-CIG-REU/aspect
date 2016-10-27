@@ -6,9 +6,9 @@ set Dimension                              = 2
 
 set Start time                             = 0
 
-set End time                               = 0
+set End time                               = 6.283185307179586
 
-set Output directory                       = output_annulus_test
+set Output directory                       = output_ref_lvl_of
 
 #set Pressure normalization                 = no
 set Nonlinear solver scheme                = IMPES
@@ -16,14 +16,18 @@ set Nonlinear solver scheme                = IMPES
 
 set CFL number                             = 0.8
 
+set Linear solver tolerance                    = 1e-14
+
+set Use years in output instead of seconds     = false
+
 ############### Parameters describing the model
 
 subsection Geometry model
   set Model name = spherical shell
 
   subsection Spherical shell
-    set Inner radius = 1
-    set Outer radius = 5
+    set Inner radius = .4
+    set Outer radius = 1
     set Opening angle = 360
 
     # use a number of cells the is guaranteed to not create any
@@ -67,7 +71,7 @@ subsection Gravity model
     set Magnitude = 1
   end
   subsection Function
-    set Function expression = (1/(sqrt(x*x+y*y)))*x;(1/(sqrt(x*x+y*y)))*y
+    set Function expression = -1*(1/(sqrt(x*x+y*y)))*x;-1*(1/(sqrt(x*x+y*y)))*y
   end
 end
 
@@ -102,7 +106,7 @@ subsection Compositional initial conditions
   set Model name = function
   subsection Function
     set Variable names      = x,y
-    set Function expression = 1
+    set Function expression = sqrt(x*x+y*y)
   end
 end
 
@@ -121,11 +125,10 @@ subsection Mesh refinement
   set Initial global refinement                = 5
 end
 
-
 ############### Parameters describing what to do with the solution
 
 subsection Postprocess
-  set List of postprocessors = tracers, visualization, EGPHVLPostprocessor
+  set List of postprocessors = tracers, EGPHVLPostprocessor
   #set List of postprocessors = pressure statistics
   
   subsection Visualization
@@ -133,12 +136,14 @@ subsection Postprocess
     set Number of grouped files       = 1
     set Time between graphical output = 0
     set List of output variables = density, viscosity, partition
+    set Interpolate output            = true
   end
 
   subsection Tracers
     set Number of tracers = 196608
+    set Update ghost particles = true
     set Time between data output = 0
-    set Data output format = vtu
+    set Data output format = none
     set Integration scheme = rk2
     set Interpolation scheme = bilinear
     set Maximum tracers per cell = 49152
@@ -150,7 +155,7 @@ subsection Postprocess
       set Number of components = 1
       set Variable names      = x, y
       set Function constants  = pi=3.1415926
-      set Function expression = 1
+      set Function expression = sqrt(x*x+y*y)
     end
 
     subsection Generator
@@ -179,7 +184,7 @@ subsection Postprocess
 end
 
 subsection Termination criteria
-  set Checkpoint on termination = true
+  set Checkpoint on termination = false
   set Termination criteria      = user request
 
   subsection User request
