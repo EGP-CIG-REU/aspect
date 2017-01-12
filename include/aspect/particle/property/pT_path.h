@@ -86,7 +86,7 @@ namespace aspect
                                         const Point<dim> &position,
                                         const Vector<double> &solution,
                                         const std::vector<Tensor<1,dim> > &gradients,
-                                        std::vector<double> &particle_properties) const;
+                                        const ArrayView<double> &particle_properties) const;
 
           /**
            * This implementation tells the particle manager that
@@ -94,6 +94,14 @@ namespace aspect
            */
           UpdateTimeFlags
           need_update () const;
+
+          /**
+           * Return which data has to be provided to update the property.
+           * The pressure and temperature need the values of their variables.
+           */
+          virtual
+          UpdateFlags
+          get_needed_update_flags () const;
 
           /**
            * Set up the information about the names and number of components

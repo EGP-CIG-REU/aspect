@@ -63,12 +63,8 @@ namespace aspect
            * @param[in] particles The set of particles to generate a graphical
            * representation for.
            *
-           * @param [in] property_component_list A vector of the names and number
-           * of components of each property. Every name entry represents the
-           * name of one particle property that will be written.The number of
-           * components equals one for scalar properties and dim for
-           * vector properties, but any other number is valid as well
-           * (e.g. number of compositional fields).
+           * @param [in] property_information Information object containing names and number
+           * of components of each property.
            *
            * @param[in] current_time Current time of the simulation, given as either
            * years or seconds, as selected in the input file. In other words,
@@ -82,7 +78,7 @@ namespace aspect
           virtual
           std::string
           output_particle_data(const std::multimap<types::LevelInd, Particle<dim> >     &particles,
-                               const std::vector<std::pair<std::string, unsigned int> > &property_component_list,
+                               const Property::ParticlePropertyInformation &property_information,
                                const double current_time);
 
           /**

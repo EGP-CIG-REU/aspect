@@ -6,6 +6,145 @@
  *
  * <ol>
  *
+ * <li> New: ASPECT now also generates a <code>output/particles.visit</code>
+ * file that allows Visit to read in all files from all processors and
+ * all time steps that contain particle data.
+ * <br>
+ * (Wolfgang Bangerth, 2016/12/02)
+ *
+ * <li> Changed: The 'Stokes only' nonlinear solver scheme now uses
+ * the nonlinear solver tolerance parameter (previously it was hard-
+ * coded to 1e-8), and it computes the nonlinear residual as current
+ * residual divided by initial residual, consistent with the 'iterated
+ * Stokes' solver scheme.
+ * <br>
+ * (Juliane Dannberg, Rene Gassmoeller, 2016/11/22)
+ * 
+ * <li> Changed: The adiabatic profile now contains a reference density
+ * profile, and the derivative of this reference density profile. The
+ * InitialProfile adiabatic profile now relies on the adiabatic heating
+ * to decide if the temperature increases with depth. Additionally, an
+ * off-by-one bug was fixed in InitialProfile leading to minor changes
+ * in the adiabatic profiles (relative change of ~1e-4), changing models
+ * that rely on the profile. Models that rely on the adiabatic profile
+ * might be changed by this PR if they are compressible, but do not
+ * use adiabatic heating, or vice versa.
+ * <br>
+ * (Timo Heister, Juliane Dannberg, Rene Gassmoeller, 2016/11/20)
+ *
+ * <li> New: The visco plastic material model now includes an option for
+ * strain-weakening of cohesion and the internal angle of friction. 
+ * Strain-weakeing of these properties is commonly used to help localize 
+ * deformation in regions undergoing plastic failure. Note that using this
+ * option requires tracking the finite strain tensor through particles or
+ * compositional fields.    
+ * <br>
+ * (John Naliboff, 2016/11/10) 
+ *
+ * <li> New: Two particle generators were added. One, generates particles
+ * at the quadrature points for each active cell in the triangulation.
+ * Two, generates a uniform distribution of particles in the unit cell
+ * and transforms each of the particles back to real region in the model
+ * domain for each active cell in the triangulation.
+ * <br>
+ * (Harsha Lokavarapu, 2016/11/10)
+ *
+ * <li> Changed: The exchange of ghost particles that was introduced lately
+ * can be quite expensive for models with many particles,
+ * and is often unnecessary if the particles are used as passive tracers.
+ * Therefore, a new input parameter 'Update ghost particles' controls this
+ * exchange, and its default is set to 'false'. Model parameter files using
+ * active particles will need to be changed accordingly.
+ * <br>
+ * (Rene Gassmoeller, 2016/10/18)
+ *
+ * <li> Improved: The matrix assembly of Stokes and Advection systems has been
+ * optimized, by assembling less (only the relevant) DoFs, and by optimizing
+ * calls to deal.II functions. The overall speedup for box models is between
+ * 20 and 40% of the assembly time, likely somewhat less for curved geometries.
+ * This change will require changes in user written assembler plugins, because
+ * the Stokes system assembly now only loops over Stokes degrees of freedom.
+ * <br>
+ * (Rene Gassmoeller, 2016/10/17)
+ *
+ * <li> Improved: Box models without deformed mesh now use a MappingCartesian,
+ * which assumes all mesh cells are aligned with cartesian coordinate axes.
+ * Matrix assembly and particle transport in such mappings is around 20 % faster
+ * compared to a general MappingQ1 for other box models.
+ * <br>
+ * (Rene Gassmoeller, 2016/10/14)
+ *
+ * <li> Changed: HDF5 particle output files are now named 'particles-...'
+ * instead of 'particle-...' to be consistent with the vtu output. Also 
+ * particle properties with more than one component are now correctly split
+ * into scalar fields in the output files, if they have more or less components
+ * than the number of spatial dimensions in the model.
+ * <br>
+ * (Rene Gassmoeller, 2016/09/20)
+ *
+ * </li>
+ * <li> New: Multiple particle properties can be intialized by specifying
+ * multiple particle property function components as opposed to one particle
+ * property.
+ * <br>
+ * (Harsha Lokavarapu, Gerry Puckett, 2016/09/20)
+ *
+ * <li> Changed: The timestep entry in the statistics file has been moved to
+ * column 3 and is now the timestep used for the timestep corresponding to the
+ * current row.
+ * <br>
+ * (Jonathan Robey, 2016/09/16)
+ * </li>
+ *
+ * <li> Changed: The 'cell average' particle interpolator is now more
+ * tolerant against cells without particles by interpolating properties
+ * from neighboring cells. This is necessary, because during refinement
+ * even children of cells with a reasonable number of particles can be
+ * void of particles.
+ * <br>
+ * (Rene Gassmoeller, Jonathan Perry-Houts, 2016/08/31)
+ *
+ * <li> Changed: Particle properties should now declare which solution
+ * properties they need to update themselves. The particle world then
+ * only computes values and gradients of the solution at
+ * the particle positions if necessary, which can reduce the computational
+ * cost of the particle update for simple particle properties.
+ * <br>
+ * (Rene Gassmoeller, 2016/08/30)
+ *
+ * <li> New: .visit output files now also contain information about
+ * the model time, as long as ASPECT was build with at least
+ * deal.II 8.5.0.pre. Previously, this information was only available
+ * in the Paraview .pvd files.
+ * <br>
+ * (Rene Gassmoeller, Juliane Dannberg, 2016/08/24)
+ *
+ * <li> New: There is now an initial topography plugin that returns
+ * initial topography values based on an ascii data file.
+ * <br>
+ * (Anne Glerum, 2016/08/22)
+ *
+ * <li> Fixed: The point value postprocessor forgot to take into
+ * account the mapping we use when describing curved boundaries.
+ * <br>
+ * (Rene Gassmoeller, Wolfgang Bangerth, 2016/08/16)
+ *
+ * <li> Changed: Particles now also store their location in the
+ * coordinate system of their current cell. This decreases the
+ * number of times this location has to be computed by inverting
+ * the mapping for the current cell, which is expensive.
+ * On average this change will save 40-50% of the overall
+ * particle computing time, while increasing the particle
+ * memory footprint (which is usually small compared to the
+ * system matrix).
+ * <br>
+ * (Rene Gassmoeller, 2016/08/12)
+ *
+ * <li> Fixed: The chunk geometry pull back function now returns
+ * a corrected longitude value when 180 hemisphere is crossed.
+ * <br>
+ * (Anne Glerum, 2016/08/09)
+ *
  * <li> Changed: It is now possible to read in ascii data files of
  * which the coordinates are not equally spaced.
  * <br>
@@ -34,10 +173,16 @@
  * property plugins. Additionally the 'initial composition' property
  * now utilizes the user-provided names of the compositional fields
  * to identify its particle properties (they are now named
- * 'initial <field_name>', where <field_name> is replaced by the user
- * provided name).
+ * 'initial [field_name]', where '[field_name]'
+ * is replaced by the user provided name).
  * <br>
  * (Rene Gassmoeller, 2016/07/18)
+ *
+ * <li> New: Added parameter “Adapt by fraction of cells” to switch between 
+ * refining a certain number of cells based on the fraction of total error 
+ * (default behaviour) and the fraction of total number of cells
+ * <br>
+ * (Lev Karatun, 2016/07/20)
  *
  * <li> Changed: It is now possible to set the gravity to a negative
  * value in order to calculate backward advection.

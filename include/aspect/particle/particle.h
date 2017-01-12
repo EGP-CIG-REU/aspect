@@ -25,6 +25,7 @@
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/types.h>
+#include <deal.II/base/array_view.h>
 
 #include <boost/serialization/vector.hpp>
 
@@ -114,11 +115,14 @@ namespace aspect
          * does not check for duplicate particle IDs so the generator must
          * make sure the IDs are unique over all processes.
          *
-         * @param[in] new_loc Initial location of particle.
+         * @param[in] new_location Initial location of particle.
+         * @param[in] new_reference_location Initial location of the particle
+         * in the coordinate system of the reference cell.
          * @param[in] new_id Globally unique ID number of particle.
          */
-        Particle (const Point<dim> &new_loc,
-                  const types::particle_index &new_id);
+        Particle (const Point<dim> &new_location,
+                  const Point<dim> &new_reference_location,
+                  const types::particle_index new_id);
 
         /**
          * Constructor for Particle, creates a particle from a data vector.
@@ -138,11 +142,29 @@ namespace aspect
         Particle (const void *&begin_data,
                   const unsigned int data_size);
 
+#ifdef DEAL_II_WITH_CXX11
         /**
-         * Destructor for Particle
+         * Copy constructor for Particle, creates a particle from an existing
+         * one.
          */
-        virtual
-        ~Particle ();
+        Particle (const Particle<dim> &particle);
+
+        /**
+         * Move constructor for Particle, creates a particle from an existing
+         * one.
+         */
+        Particle (Particle<dim> &&particle);
+
+        /**
+         * Copy assignment operator.
+         */
+        Particle<dim> &operator=(const Particle<dim> &particle);
+
+        /**
+         * Move assignment operator.
+         */
+        Particle<dim> &operator=(Particle<dim> &&particle);
+#endif
 
         /**
           * Resize the properties member variable to hold the number of doubles
@@ -190,6 +212,23 @@ namespace aspect
         get_location () const;
 
         /**
+         * Set the reference location of this particle. Note that this does not
+         * check whether this is a valid location in the simulation domain.
+         *
+         * @param [in] new_loc The new reference location for this particle.
+         */
+        void
+        set_reference_location (const Point<dim> &new_loc);
+
+        /**
+         * Get the reference location of this particle in its current cell.
+         *
+         * @return The reference location of this particle.
+         */
+        const Point<dim> &
+        get_reference_location () const;
+
+        /**
          * Get the ID number of this particle.
          *
          * @return The id of this particle.
@@ -200,7 +239,8 @@ namespace aspect
         /**
          * Set the properties of this particle.
          *
-         * @param [in] new_properties The new properties for this particle.
+         * @param [in] new_properties A vector containing the
+         * new properties for this particle.
          */
         void
         set_properties (const std::vector<double> &new_properties);
@@ -208,17 +248,17 @@ namespace aspect
         /**
          * Get write-access to properties of this particle.
          *
-         * @return The properties of this particle.
+         * @return An ArrayView of the properties of this particle.
          */
-        std::vector<double> &
+        const ArrayView<double>
         get_properties ();
 
         /**
-         * Get the properties of this particle.
+         * Get read-access to properties of this particle.
          *
-         * @return The properties of this particle.
+         * @return An ArrayView of the properties of this particle.
          */
-        const std::vector<double> &
+        const ArrayView<const double>
         get_properties () const;
 
         /**
@@ -232,6 +272,13 @@ namespace aspect
          * Current particle location
          */
         Point<dim>             location;
+
+        /**
+         * Current particle location in the reference cell.
+         * Storing this reduces the number of times we need to compute this
+         * location, which takes a significant amount of computing time.
+         */
+        Point<dim>             reference_location;
 
         /**
          * Globally unique ID of particle

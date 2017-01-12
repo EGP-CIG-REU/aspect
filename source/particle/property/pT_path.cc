@@ -41,7 +41,7 @@ namespace aspect
                                                 const Point<dim> &,
                                                 const Vector<double> &solution,
                                                 const std::vector<Tensor<1,dim> > &,
-                                                std::vector<double> &data) const
+                                                const ArrayView<double> &data) const
       {
         data[data_position] = solution[this->introspection().component_indices.pressure];
         data[data_position+1] = solution[this->introspection().component_indices.temperature];
@@ -52,6 +52,13 @@ namespace aspect
       PTPath<dim>::need_update() const
       {
         return update_output_step;
+      }
+
+      template <int dim>
+      UpdateFlags
+      PTPath<dim>::get_needed_update_flags () const
+      {
+        return update_values;
       }
 
       template <int dim>

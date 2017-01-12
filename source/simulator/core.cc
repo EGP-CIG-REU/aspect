@@ -27,6 +27,8 @@
 #include <aspect/vof/handler.h>
 #include <aspect/free_surface.h>
 
+#include <aspect/geometry_model/initial_topography_model/zero_topography.h>
+
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -44,6 +46,7 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_cartesian.h>
 
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/derivative_approximation.h>
@@ -99,6 +102,27 @@ namespace aspect
 
       signals.edit_finite_element_variables(variables);
       return variables;
+    }
+
+    /**
+     * Helper function to construct mapping for the model.
+     * The mapping is given by a degree four MappingQ for the case
+     * of a curved mesh, and a cartesian mapping for a rectangular mesh that is
+     * not deformed. Use a MappingQ1 if the mesh is deformed.
+     * If a free surface is enabled, each mapping is later swapped out for a
+     * MappingQ1Eulerian, which allows for mesh deformation during the
+     * computation.
+     */
+    template <int dim>
+    Mapping<dim> *construct_mapping(const GeometryModel::Interface<dim> &geometry_model,
+                                    const InitialTopographyModel::Interface<dim> &initial_topography_model)
+    {
+      if (geometry_model.has_curved_elements())
+        return new MappingQ<dim>(4, true);
+      if (dynamic_cast<const InitialTopographyModel::ZeroTopography<dim>*>(&initial_topography_model) != 0)
+        return new MappingCartesian<dim>();
+
+      return new MappingQ1<dim>();
     }
   }
 
@@ -185,13 +209,7 @@ namespace aspect
                     Triangulation<dim>::smoothing_on_coarsening),
                    parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning),
 
-    //The mapping is given by a degree four MappingQ for the case
-    //of a curved mesh, and a degree one MappingQ for a rectangular mesh.
-    //If a free surface is enabled, this is swapped out for a MappingQ1Eulerian,
-    //which allows for mesh deformation.
-    mapping( ( geometry_model->has_curved_elements() ?
-               static_cast<Mapping<dim> *>(new MappingQ<dim>(4, true) ) :
-               static_cast<Mapping<dim> *>(new MappingQ1<dim>() ) ) ),
+    mapping(construct_mapping<dim>(*geometry_model,*initial_topography_model)),
 
     // define the finite element
     finite_element(introspection.get_fes(), introspection.get_multiplicities()),
@@ -780,6 +798,12 @@ namespace aspect
       statistics.add_value("Time (years)", time / year_in_seconds);
     else
       statistics.add_value("Time (seconds)", time);
+
+    if (parameters.convert_to_years == true)
+      statistics.add_value("Time step size (years)", time_step / year_in_seconds);
+    else
+      statistics.add_value("Time step size (seconds)", time_step);
+
     statistics.add_value("Number of mesh cells",
                          triangulation.n_global_active_cells());
 
@@ -1681,11 +1705,18 @@ namespace aspect
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     mesh_refinement_manager.execute (estimated_error_per_cell);
 
-    parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_fraction (triangulation,
-                                       estimated_error_per_cell,
-                                       parameters.refinement_fraction,
-                                       parameters.coarsening_fraction);
+    if (parameters.adapt_by_fraction_of_cells)
+      parallel::distributed::GridRefinement::
+      refine_and_coarsen_fixed_number   (triangulation,
+                                         estimated_error_per_cell,
+                                         parameters.refinement_fraction,
+                                         parameters.coarsening_fraction);
+    else
+      parallel::distributed::GridRefinement::
+      refine_and_coarsen_fixed_fraction (triangulation,
+                                         estimated_error_per_cell,
+                                         parameters.refinement_fraction,
+                                         parameters.coarsening_fraction);
 
     mesh_refinement_manager.tag_additional_cells ();
 
@@ -2002,8 +2033,10 @@ namespace aspect
 
           break;
         }
+
         case NonlinearSolver::Stokes_only:
         {
+          double initial_stokes_residual = 0.0;
           unsigned int iteration = 0;
 
           do
@@ -2031,12 +2064,22 @@ namespace aspect
 
               assemble_stokes_system();
               build_stokes_preconditioner();
-              const double stokes_residual = solve_stokes();
-              current_linearization_point = solution;
 
-              pcout << "      Nonlinear Stokes residual: " << stokes_residual << std::endl;
-              if (stokes_residual < 1e-8)
+              if (iteration == 0)
+                initial_stokes_residual = compute_initial_stokes_residual();
+
+              const double stokes_residual = solve_stokes();
+
+              const double relative_tolerance = (initial_stokes_residual > 0) ? stokes_residual/initial_stokes_residual : 0.0;
+
+              pcout << "      Relative Stokes residual after nonlinear iteration " << iteration+1
+                    << ": " << relative_tolerance
+                    << std::endl;
+
+              if (relative_tolerance < parameters.nonlinear_tolerance)
                 break;
+
+              current_linearization_point = solution;
 
               ++iteration;
             }
@@ -2322,6 +2365,8 @@ namespace aspect
         default:
           Assert (false, ExcNotImplemented());
       }
+
+    pcout << std::endl;
   }
 
 
@@ -2390,10 +2435,6 @@ namespace aspect
       {
         computing_timer.enter_section ("Setup initial conditions");
 
-        time                      = parameters.start_time;
-        timestep_number           = 0;
-        time_step = old_time_step = 0;
-
         set_initial_temperature_and_compositional_fields ();
         compute_initial_pressure_field ();
 
@@ -2410,92 +2451,31 @@ namespace aspect
         // then do the core work: assemble systems and solve
         solve_timestep ();
 
-        pcout << std::endl;
-
-        // update the time step size
-        // for now the bool (convection/conduction dominated)
-        // returned by compute_time_step is unused, will be
-        // added to statistics later
-        old_time_step = time_step;
-        time_step = std::min (compute_time_step().first,
-                              parameters.maximum_time_step);
-        time_step = termination_manager.check_for_last_time_step(time_step);
-
-        if (parameters.convert_to_years == true)
-          statistics.add_value("Time step size (years)", time_step / year_in_seconds);
-        else
-          statistics.add_value("Time step size (seconds)", time_step);
-
-
-        // see if we have to start over with a new refinement cycle
+        // see if we have to start over with a new adaptive refinement cycle
         // at the beginning of the simulation
-        if ((timestep_number == 0) &&
-            (pre_refinement_step < parameters.initial_adaptive_refinement))
+        if (timestep_number == 0)
           {
-            if (parameters.timing_output_frequency ==0)
-              computing_timer.print_summary ();
-
-            output_statistics();
-
-            if (parameters.run_postprocessors_on_initial_refinement)
-              postprocess ();
-
-            refine_mesh (max_refinement_level);
-            ++pre_refinement_step;
-            goto start_time_iteration;
+            const bool initial_refinement_done = maybe_do_initial_refinement(max_refinement_level);
+            if (initial_refinement_done)
+              goto start_time_iteration;
           }
-
-        // invalidate the value of pre_refinement_step since it will no longer be used from here on
-        if ( timestep_number == 0 )
-          pre_refinement_step = std::numeric_limits<unsigned int>::max();
 
         postprocess ();
 
-        // see if this is a time step where additional refinement is requested
-        // if so, then loop over as many times as this is necessary
-        if ((parameters.additional_refinement_times.size() > 0)
-            &&
-            (parameters.additional_refinement_times.front () < time+time_step))
-          {
-            while ((parameters.additional_refinement_times.size() > 0)
-                   &&
-                   (parameters.additional_refinement_times.front () < time+time_step))
-              {
-                ++max_refinement_level;
-                refine_mesh (max_refinement_level);
+        // get new time step size
+        const double new_time_step = compute_time_step();
 
-                parameters.additional_refinement_times
-                .erase (parameters.additional_refinement_times.begin());
-              }
-          }
-        else
-          // see if this is a time step where regular refinement is necessary, but only
-          // if the previous rule wasn't triggered
-          if (
-            (timestep_number > 0
-             &&
-             (parameters.adaptive_refinement_interval > 0)
-             &&
-             (timestep_number % parameters.adaptive_refinement_interval == 0))
-            ||
-            (timestep_number==0 && parameters.adaptive_refinement_interval == 1)
-          )
-            refine_mesh (max_refinement_level);
+        // see if we want to refine the mesh
+        maybe_refine_mesh(new_time_step,max_refinement_level);
 
-        // every n time steps output a summary of the current
-        // timing information
-        if (((timestep_number > 0) && (parameters.timing_output_frequency != 0) &&
-             (timestep_number % parameters.timing_output_frequency == 0))
-            ||
-            (parameters.timing_output_frequency == 1)||(parameters.timing_output_frequency == 0))
-          {
-            computing_timer.print_summary ();
-            output_statistics();
-          }
+        // see if we want to write a timing summary
+        maybe_write_timing_output();
 
-        // increment time step by one. then prepare
+        // update values for timestep, increment time step by one. then prepare
         // for the next time step by shifting solution vectors
         // by one time step
+        old_time_step = time_step;
+        time_step = new_time_step;
         time += time_step;
         ++timestep_number;
         {
@@ -2509,40 +2489,9 @@ namespace aspect
         // more checkpoint
         const std::pair<bool,bool> termination = termination_manager.execute();
 
-        // periodically generate snapshots so that we can resume here
-        // if the program aborts or is terminated
-        bool do_checkpoint = false;
-
-        // If we base checkpoint frequency on timing, measure the time at process 0
-        // This prevents race conditions where some processes will checkpoint and others won't
-        if (parameters.checkpoint_time_secs > 0)
-          {
-            int global_do_checkpoint = ((std::time(NULL)-last_checkpoint_time) >=
-                                        parameters.checkpoint_time_secs);
-            MPI_Bcast(&global_do_checkpoint, 1, MPI_INT, 0, mpi_communicator);
-
-            do_checkpoint = (global_do_checkpoint == 1);
-          }
-
-        // If we base checkpoint frequency on steps, see if it's time for another checkpoint
-        if ((parameters.checkpoint_time_secs == 0) &&
-            (parameters.checkpoint_steps > 0) &&
-            (timestep_number % parameters.checkpoint_steps == 0))
-          do_checkpoint = true;
-
-        // Do a checkpoint either if indicated by checkpoint parameters, or if this
-        // is the end of simulation and the termination criteria say to checkpoint
-        if (do_checkpoint || (termination.first && termination.second))
-          {
-            create_snapshot();
-            // matrices will be regenerated after a resume, so do that here too
-            // to be consistent. otherwise we would get different results
-            // for a restarted computation than for one that ran straight
-            // through
-            rebuild_stokes_matrix =
-              rebuild_stokes_preconditioner = true;
-            last_checkpoint_time = std::time(NULL);
-          }
+        const bool checkpoint_written = maybe_write_checkpoint(last_checkpoint_time,termination);
+        if (checkpoint_written)
+          last_checkpoint_time = std::time(NULL);
 
         // see if we want to terminate
         if (termination.first)

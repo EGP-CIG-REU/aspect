@@ -817,15 +817,37 @@ namespace aspect
       void compute_Vp_anomaly(Vector<float> &values) const;
 
       /**
-       * Adjust the pressure variable (which is only determined up to a
-       * constant) by adding a constant to it in such a way that the pressure
-       * on the surface has a known average value. Whether a face is part of
-       * the surface is determined by asking whether its depth of its midpoint
-       * (as determined by the geometry model) is less than
+       * Adjust the pressure variable (which is only determined up to
+       * a constant by the equations, though its value may enter
+       * traction boundary conditions) by adding a constant to it in
+       * such a way that the pressure on the surface or within the
+       * entire volume has a known average value. The point of this
+       * function is that the pressure that results from solving the
+       * linear system may not coincide with what we think of as the
+       * "physical pressure"; in particular, we typically think of the
+       * pressure as zero (on average) along the surface because it is
+       * the sum of the hydrostatic and dynamic pressure, where the
+       * former is thought of as zero along the surface. This function
+       * therefore converts from the "mathematical" pressure to the
+       * "physical" pressure so that all following postprocessing
+       * steps can use the latter.
+       *
+       * In the case of the surface average, whether a face is part of
+       * the surface is determined by asking whether its depth of its
+       * midpoint (as determined by the geometry model) is less than
        * 1/3*1/sqrt(dim-1)*diameter of the face. For reasonably curved
-       * boundaries, this rules out side faces that are perpendicular ot the
-       * surface boundary but includes those faces that are along the boundary
-       * even if the real boundary is curved.
+       * boundaries, this rules out side faces that are perpendicular
+       * to the surface boundary but includes those faces that are
+       * along the boundary even if the real boundary is curved.
+       *
+       * Whether the pressure should be normalized based on the
+       * surface or volume average is decided by a parameter in the
+       * input file.
+       *
+       * @note This function stores the pressure adjustment in the @p
+       * pressure_adjustment member variable of the current class. It
+       * is there so that we can later use the negative adjustment in
+       * denormalize_pressure().
        *
        * This function is implemented in
        * <code>source/simulator/helper_functions.cc</code>.
@@ -833,7 +855,7 @@ namespace aspect
       void normalize_pressure(LinearAlgebra::BlockVector &vector);
 
       /**
-       * Invert the action of the function above.
+       * Invert the action of the normalize_pressure() function above.
        *
        * This function modifies @p vector in-place. In some cases, we need
        * locally_relevant values of the pressure. To avoid creating a new vector
@@ -842,11 +864,15 @@ namespace aspect
        * @p vector and @p relevant_vector are expected to already contain
        * the correct pressure values.
        *
+       * @note The adjustment made in this function is done using the
+       * negative of the @p pressure_adjustment member variable
+       * previously set in normalize_pressure().
+       *
        * This function is implemented in
        * <code>source/simulator/helper_functions.cc</code>.
        */
       void denormalize_pressure(LinearAlgebra::BlockVector &vector,
-                                const LinearAlgebra::BlockVector &relevant_vector);
+                                const LinearAlgebra::BlockVector &relevant_vector) const;
 
       /**
        * Apply the bound preserving limiter to the discontinuous galerkin solutions:
@@ -970,17 +996,64 @@ namespace aspect
       get_extrapolated_advection_field_range (const AdvectionField &advection_field) const;
 
       /**
-       * Compute the size of the next time step from the mesh size and the
-       * velocity on each cell. The computed time step has to satisfy the CFL
-       * number chosen in the input parameter file on each cell of the mesh.
-       * If specified in the parameter file, the time step will be the minimum
-       * of the convection *and* conduction time steps. Also returns whether
-       * the timestep is dominated by convection (true) or conduction (false).
+       * Check if timing output should be written in this timestep, and if
+       * so write it.
+       *
+       * This function is implemented in
+       * <code>source/simulator/helper_functions.cc</code>.
+       * */
+      void maybe_write_timing_output () const;
+
+      /**
+       * Check if a checkpoint should be written in this timestep. Is so create
+       * one. Returns whether a checkpoint was written.
        *
        * This function is implemented in
        * <code>source/simulator/helper_functions.cc</code>.
        */
-      std::pair<double,bool> compute_time_step () const;
+      bool maybe_write_checkpoint (const time_t last_checkpoint_time,
+                                   const std::pair<bool,bool> termination_output);
+
+      /**
+       * Check if we should do an initial refinement cycle in this timestep.
+       * This will only be checked in timestep 0, afterwards the variable
+       * pre_refinement_step variable is invalidated, and this function will
+       * return without doing refinement.
+       * An initial refinement cycle is different from a regular one,
+       * because time is not increased. Instead the same timestep is solved
+       * using the new mesh.
+       * Therefore, only output timing information and postprocessor output
+       * if required in the input file. But always output statistics (to have
+       * a history of the number of cells in the statistics file).
+       * This function returns whether an initial refinement was done.
+       *
+       * This function is implemented in
+       * <code>source/simulator/helper_functions.cc</code>.
+       */
+      bool maybe_do_initial_refinement (const unsigned int max_refinement_level);
+
+      /**
+       * Check if refinement is requested in this timestep. If so: Refine mesh.
+       * The @p max_refinement_level might be increased from this time on
+       * if this is an additional refinement cycle.
+       *
+       * This function is implemented in
+       * <code>source/simulator/helper_functions.cc</code>.
+       */
+      void maybe_refine_mesh (const double new_time_step,
+                              unsigned int &max_refinement_level);
+
+      /**
+       * Compute the size of the next time step from the mesh size and the
+       * velocity on each cell. The computed time step has to satisfy the CFL
+       * number chosen in the input parameter file on each cell of the mesh.
+       * If specified in the parameter file, the time step will be the minimum
+       * of the convection *and* conduction time steps.
+       *
+       * This function is implemented in
+       * <code>source/simulator/helper_functions.cc</code>.
+       */
+      double compute_time_step () const;
 
       /**
        * Compute the artificial diffusion coefficient value on a cell given
@@ -1240,7 +1313,7 @@ namespace aspect
        * domain. We use a pointer since different mapping objects may
        * be useful. In particular, when the mesh is deformable we use
        * a MappingQ1Eulerian object to describe the mesh deformation,
-       * swapping it in for the original MappingQ object.
+       * swapping it in for the original MappingQ or MappingCartesian object.
        */
       std_cxx11::unique_ptr<Mapping<dim> >                      mapping;
 

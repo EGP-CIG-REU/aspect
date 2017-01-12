@@ -157,26 +157,56 @@ ADD_CUSTOM_TARGET(indent
 # Depending on whether we link statically or allow for shared libs,
 # we can or can not load plugins via external shared libs. Pass this
 # down during compilation so we can disable it in the code
+SET(ASPECT_USE_SHARED_LIBS ON CACHE BOOL "If ON, we support loading shared plugin files.")
 IF (DEAL_II_STATIC_EXECUTABLE STREQUAL "ON")
   MESSAGE(STATUS "Creating a statically linked executable")
-  MESSAGE(STATUS "Disabling dynamic loading of plugins from the input file")
-  FOREACH(_source_file ${TARGET_SRC})
-    SET_PROPERTY(SOURCE ${_source_file}
-      APPEND PROPERTY COMPILE_DEFINITIONS ASPECT_USE_SHARED_LIBS=0)
-  ENDFOREACH()
-ELSE()
+  SET(ASPECT_USE_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+ENDIF()
+
+INCLUDE (CheckCXXSourceCompiles)
+
+SET(_backup_libs ${CMAKE_REQUIRED_LIBRARIES})
+LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${CMAKE_DL_LIBS})
+CHECK_CXX_SOURCE_COMPILES("
+#include <cstddef>
+#include <dlfcn.h>
+
+int main()
+{
+  void *handle = dlopen (\"somelib.so\", RTLD_LAZY);
+  return handle == NULL || dlerror();
+}
+" HAVE_DLOPEN)
+SET(CMAKE_REQUIRED_LIBRARIES ${_backup_libs})
+
+IF (NOT HAVE_DLOPEN)
+  MESSAGE(STATUS "dlopen() test failed, disabling dynamic plugin loading")
+  SET(ASPECT_USE_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+ENDIF()
+
+IF (ASPECT_USE_SHARED_LIBS)
   MESSAGE(STATUS "Enabling dynamic loading of plugins from the input file")
   FOREACH(_source_file ${TARGET_SRC})
     SET_PROPERTY(SOURCE ${_source_file}
       APPEND PROPERTY COMPILE_DEFINITIONS ASPECT_USE_SHARED_LIBS=1)
   ENDFOREACH()
+ELSE()
+  MESSAGE(STATUS "Disabling dynamic loading of plugins from the input file")
+  FOREACH(_source_file ${TARGET_SRC})
+    SET_PROPERTY(SOURCE ${_source_file}
+      APPEND PROPERTY COMPILE_DEFINITIONS ASPECT_USE_SHARED_LIBS=0)
+  ENDFOREACH()
 ENDIF()
 
 # See whether we can verify that every plugin we load is compiled against
 # the same deal.II library
+SET(ASPECT_HAVE_LINK_H ON CACHE BOOL "If ON, link.h exists and is usable.")
 INCLUDE (CheckIncludeFiles)
 CHECK_INCLUDE_FILES ("link.h" _HAVE_LINK_H)
-IF (_HAVE_LINK_H)
+IF (NOT _HAVE_LINK_H)
+  SET(ASPECT_HAVE_LINK_H OFF CACHE BOOL "" FORCE)
+ENDIF()
+IF (ASPECT_HAVE_LINK_H)
   MESSAGE(STATUS "Enabling checking of compatible deal.II library when loading plugins")
   FOREACH(_source_file ${TARGET_SRC})
     SET_PROPERTY(SOURCE ${_source_file}
@@ -184,7 +214,15 @@ IF (_HAVE_LINK_H)
   ENDFOREACH()
 ENDIF()
 
+
 DEAL_II_INVOKE_AUTOPILOT()
+
+
+IF (ASPECT_USE_SHARED_LIBS)
+  # some systems need to explicitly link to some libraries to use dlopen
+  TARGET_LINK_LIBRARIES(aspect ${CMAKE_DL_LIBS})
+ENDIF()
+
 
 
 # Check if we can raise floating point exceptions.

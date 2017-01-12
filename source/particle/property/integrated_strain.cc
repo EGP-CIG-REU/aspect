@@ -41,7 +41,7 @@ namespace aspect
                                                           const Point<dim> &,
                                                           const Vector<double> &,
                                                           const std::vector<Tensor<1,dim> > &gradients,
-                                                          std::vector<double> &data) const
+                                                          const ArrayView<double> &data) const
       {
         SymmetricTensor<2,dim> old_strain;
         for (unsigned int i = 0; i < SymmetricTensor<2,dim>::n_independent_components ; ++i)
@@ -51,10 +51,7 @@ namespace aspect
         for (unsigned int d=0; d<dim; ++d)
           grad_u[d] = gradients[d];
 
-        // Note: We use the old_timestep, because this function is called as
-        // postprocessor right now, and get_timestep() is already updated for
-        // the next timestep.
-        const double dt = this->get_old_timestep();
+        const double dt = this->get_timestep();
 
         // Here we update the integrated strain by rotating the already existing
         // strain with the rotational (asymmetric) part of the velocity gradient
@@ -80,6 +77,13 @@ namespace aspect
       IntegratedStrain<dim>::need_update() const
       {
         return update_time_step;
+      }
+
+      template <int dim>
+      UpdateFlags
+      IntegratedStrain<dim>::get_needed_update_flags () const
+      {
+        return update_gradients;
       }
 
       template <int dim>

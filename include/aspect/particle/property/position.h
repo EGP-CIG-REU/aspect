@@ -22,7 +22,6 @@
 #define __aspect__particle_property_position_h
 
 #include <aspect/particle/property/interface.h>
-#include <aspect/simulator_access.h>
 
 namespace aspect
 {
@@ -36,7 +35,7 @@ namespace aspect
        * @ingroup ParticleProperties
        */
       template <int dim>
-      class Position : public Interface<dim>, public ::aspect::SimulatorAccess<dim>
+      class Position : public Interface<dim>
       {
         public:
           /**
@@ -82,7 +81,7 @@ namespace aspect
                                         const Point<dim> &position,
                                         const Vector<double> &solution,
                                         const std::vector<Tensor<1,dim> > &gradients,
-                                        std::vector<double> &particle_properties) const;
+                                        const ArrayView<double> &particle_properties) const;
 
           /**
            * This implementation tells the particle manager that

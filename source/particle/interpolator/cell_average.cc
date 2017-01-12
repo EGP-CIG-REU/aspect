@@ -19,6 +19,8 @@
  */
 
 #include <aspect/particle/interpolator/cell_average.h>
+#include <aspect/postprocess/tracers.h>
+#include <aspect/simulator.h>
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -34,6 +36,11 @@ namespace aspect
                                              const std::vector<Point<dim> > &positions,
                                              const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const
       {
+        const Postprocess::Tracers<dim> *tracer_postprocessor = this->template find_postprocessor<Postprocess::Tracers<dim> >();
+
+        const std::multimap<aspect::Particle::types::LevelInd, aspect::Particle::Particle<dim> > &ghost_particles =
+          tracer_postprocessor->get_particle_world().get_ghost_particles();
+
         typename parallel::distributed::Triangulation<dim>::active_cell_iterator found_cell;
 
         if (cell == typename parallel::distributed::Triangulation<dim>::active_cell_iterator())
@@ -56,29 +63,70 @@ namespace aspect
         else
           found_cell = cell;
 
-        const types::LevelInd cell_index = std::make_pair<unsigned int, unsigned int> (found_cell->level(),found_cell->index());
+        const types::LevelInd cell_index = std::make_pair(found_cell->level(),found_cell->index());
+
         const std::pair<typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator,
-              typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator> particle_range = particles.equal_range(cell_index);
+              typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator> particle_range =
+                (cell->is_locally_owned())
+                ?
+                particles.equal_range(cell_index)
+                :
+                ghost_particles.equal_range(cell_index);
 
         const unsigned int n_particles = std::distance(particle_range.first,particle_range.second);
         const unsigned int n_properties = particles.begin()->second.get_properties().size();
         std::vector<double> cell_properties (n_properties,0.0);
 
-        AssertThrow(n_particles != 0,
-                    ExcMessage("At least one cell contained no particles. The 'cell "
-                               "average' interpolation scheme does not support this case. "));
-
-        for (typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator particle = particle_range.first;
-             particle != particle_range.second; ++particle)
+        if (n_particles > 0)
           {
-            const std::vector<double> &particle_properties = particle->second.get_properties();
+            for (typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator particle = particle_range.first;
+                 particle != particle_range.second; ++particle)
+              {
+                const ArrayView<const double> &particle_properties = particle->second.get_properties();
+
+                for (unsigned int i = 0; i < n_properties; ++i)
+                  cell_properties[i] += particle_properties[i];
+              }
 
             for (unsigned int i = 0; i < n_properties; ++i)
-              cell_properties[i] += particle_properties[i];
+              cell_properties[i] /= n_particles;
           }
+        // If there are no particles in this cell use the average of the
+        // neighboring cells.
+        else
+          {
+            std::vector<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> neighbors;
+            GridTools::get_active_neighbors<parallel::distributed::Triangulation<dim> >(found_cell,neighbors);
 
-        for (unsigned int i = 0; i < n_properties; ++i)
-          cell_properties[i] /= n_particles;
+            unsigned int non_empty_neighbors = 0;
+            for (unsigned int i=0; i<neighbors.size(); ++i)
+              {
+                // Only recursively call this function if the neighbor cell contains
+                // particles (else we end up in an endless recursion)
+                if ((neighbors[i]->is_locally_owned())
+                    && (particles.count(std::make_pair(neighbors[i]->level(),neighbors[i]->index())) == 0))
+                  continue;
+                else if ((!neighbors[i]->is_locally_owned())
+                         && (ghost_particles.count(std::make_pair(neighbors[i]->level(),neighbors[i]->index())) == 0))
+                  continue;
+
+                std::vector<double> neighbor_properties = properties_at_points(particles,
+                                                                               std::vector<Point<dim> > (1,neighbors[i]->center(true,false)),
+                                                                               neighbors[i])[0];
+
+                for (unsigned int i = 0; i < n_properties; ++i)
+                  cell_properties[i] += neighbor_properties[i];
+
+                ++non_empty_neighbors;
+              }
+
+            AssertThrow(non_empty_neighbors != 0,
+                        ExcMessage("A cell and all of its neighbors do not contain any particles. "
+                                   "The 'cell average' interpolation scheme does not support this case."));
+
+            for (unsigned int i = 0; i < n_properties; ++i)
+              cell_properties[i] /= non_empty_neighbors;
+          }
 
         return std::vector<std::vector<double> > (positions.size(),cell_properties);
       }

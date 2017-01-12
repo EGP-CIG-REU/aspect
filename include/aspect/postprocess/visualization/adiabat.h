@@ -36,7 +36,7 @@ namespace aspect
     {
       /**
        * A class derived from DataPostprocessor that outputs adiabatic
-       * temperature and pressure.
+       * temperature, pressure, density, and density derivative.
        */
       template <int dim>
       class Adiabat
@@ -59,9 +59,9 @@ namespace aspect
 
           virtual
           void
-          compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                             const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                             const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+          compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
+                                             const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
+                                             const std::vector<std::vector<Tensor<2,dim> > > &solution_hessians,
                                              const std::vector<Point<dim> >                  &normals,
                                              const std::vector<Point<dim> >                  &evaluation_points,
                                              std::vector<Vector<double> >                    &computed_quantities) const;

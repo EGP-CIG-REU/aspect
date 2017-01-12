@@ -207,7 +207,6 @@ namespace aspect
      */
     bool                           include_melt_transport;
 
-    double                         radiogenic_heating_rate;
     std::set<types::boundary_id> fixed_temperature_boundary_indicators;
     std::set<types::boundary_id> fixed_composition_boundary_indicators;
     std::set<types::boundary_id> zero_velocity_boundary_indicators;
@@ -246,6 +245,7 @@ namespace aspect
     unsigned int                   initial_adaptive_refinement;
     double                         refinement_fraction;
     double                         coarsening_fraction;
+    bool                           adapt_by_fraction_of_cells;
     unsigned int                   min_grid_level;
     std::vector<double>            additional_refinement_times;
     unsigned int                   adaptive_refinement_interval;

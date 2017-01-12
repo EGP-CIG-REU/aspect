@@ -16,8 +16,6 @@ subsection Geometry model
 end
 
 subsection Model settings
-  set Include adiabatic heating               = false
-  set Include shear heating                   = false
   set Tangential velocity boundary indicators = left, right
   set Zero velocity boundary indicators       = bottom, top
 end
@@ -106,5 +104,6 @@ subsection Postprocess
     set Minimum tracers per cell = 5
     set Data output format = ascii
     set Integration scheme = euler
+    set Update ghost particles = true
   end
 end

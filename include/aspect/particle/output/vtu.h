@@ -62,12 +62,8 @@ namespace aspect
            * @param[in] particles The set of particles to generate a graphical
            * representation for.
            *
-           * @param [in] property_component_list A vector of the names and number
-           * of components of each property. Every name entry represents the
-           * name of one particle property that will be written.The number of
-           * components equals one for scalar properties and dim for
-           * vector properties, but any other number is valid as well
-           * (e.g. number of compositional fields).
+           * @param [in] property_information Information object containing names and number
+           * of components of each property.
            *
            * @param[in] current_time Current time of the simulation, given as either
            * years or seconds, as selected in the input file. In other words,
@@ -81,7 +77,7 @@ namespace aspect
           virtual
           std::string
           output_particle_data(const std::multimap<types::LevelInd, Particle<dim> >     &particles,
-                               const std::vector<std::pair<std::string, unsigned int> > &property_component_list,
+                               const Property::ParticlePropertyInformation &property_information,
                                const double current_time);
 
           /**
@@ -121,9 +117,11 @@ namespace aspect
           std::vector<std::pair<double,std::string> > times_and_pvtu_file_names;
 
           /**
-           * Like the previous variable, but for the .visit file.
+           * A corresponding variable that we use for the .visit files created
+           * by DataOutInterface::write_visit_record. The second part of a
+           * pair contains all files that together form a time step.
            */
-          std::vector<std::string>                    vtu_file_names;
+          std::vector<std::pair<double,std::vector<std::string> > > times_and_vtu_file_names;
       };
     }
   }
