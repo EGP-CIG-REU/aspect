@@ -1,5 +1,3 @@
------------------------------------------------------------------------------
------------------------------------------------------------------------------
 
 Loading shared library <./libvof_circle_amr.so>
 
@@ -14,7 +12,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Postprocessing:
      Global VoF vol:           0.785 m^3
      VOF Calculation:           IEstL1= 5.49126816e-02 FEstL1= 0.00000000e+00.
-     Writing graphical output: output-vof_circle_amr/solution-00000
+     Writing graphical output: output-vof_circle_amr/solution/solution-00000
 
 Number of active cells: 85 (on 5 levels)
 Number of degrees of freedom: 1,985 (798+108+399+85+255+340)
@@ -26,7 +24,7 @@ Number of degrees of freedom: 1,985 (798+108+399+85+255+340)
 
    Postprocessing:
      Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle_amr/solution-00001
+     Writing graphical output: output-vof_circle_amr/solution/solution-00001
 
 Number of active cells: 187 (on 6 levels)
 Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
@@ -38,7 +36,7 @@ Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
 
    Postprocessing:
      Global VoF vol:           0.785 m^3
-     Writing graphical output: output-vof_circle_amr/solution-00002
+     Writing graphical output: output-vof_circle_amr/solution/solution-00002
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
@@ -1048,7 +1046,7 @@ Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
    Postprocessing:
      Global VoF vol:           0.785 m^3
      VOF Calculation:           IEstL1= 2.55222174e-02 FEstL1= 2.48748654e-02.
-     Writing graphical output: output-vof_circle_amr/solution-00003
+     Writing graphical output: output-vof_circle_amr/solution/solution-00003
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)

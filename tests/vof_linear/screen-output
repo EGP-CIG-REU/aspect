@@ -1,5 +1,3 @@
------------------------------------------------------------------------------
------------------------------------------------------------------------------
 
 Loading shared library <./libvof_linear.so>
 
@@ -14,7 +12,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Postprocessing:
      Global VoF vol:           0.5 m^3
      VOF Calculation:           IEstL1= 2.13316777e-17 FEstL1= 0.00000000e+00.
-     Writing graphical output: output-vof_linear/solution-00000
+     Writing graphical output: output-vof_linear/solution/solution-00000
 
 *** Timestep 1:  t=0.0883883 seconds
    Skipping temperature solve because RHS is zero.
@@ -115,7 +113,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Postprocessing:
      Global VoF vol:           0.125 m^3
      VOF Calculation:           IEstL1= 4.35307172e-17 FEstL1= 4.37069001e-17.
-     Writing graphical output: output-vof_linear/solution-00001
+     Writing graphical output: output-vof_linear/solution/solution-00001
 
 Termination requested by criterion: end time
 
