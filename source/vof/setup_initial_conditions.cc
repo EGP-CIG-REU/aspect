@@ -38,21 +38,21 @@ namespace aspect
       {
         case VoFInitialConditions::VoFInitType::composition:
         {
-          init_vof_compos (*data);
+          init_vof_compos (data[0]);
           break;
         }
         case VoFInitialConditions::VoFInitType::signed_distance_level_set:
         {
-          init_vof_ls (*data);
+          init_vof_ls (data[0]);
           break;
         }
         default:
           Assert(false, ExcNotImplemented ());
       }
 
-    const unsigned int vofN_blockidx = data->reconstruction.block_index;
-    const unsigned int vofLS_blockidx = data->level_set.block_index;
-    update_vof_normals (*data, sim.solution);
+    const unsigned int vofN_blockidx = data[0].reconstruction.block_index;
+    const unsigned int vofLS_blockidx = data[0].level_set.block_index;
+    update_vof_normals (data[0], sim.solution);
     sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
     sim.old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);

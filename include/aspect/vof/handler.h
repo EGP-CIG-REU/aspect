@@ -108,14 +108,16 @@ namespace aspect
       const std_cxx11::unique_ptr<VoFInitialConditions::Interface<dim> >      vof_initial_conditions;
 
       // Store
-      VoFField<dim> *data;
+      unsigned int n_vof_fields;
+      std::vector<VoFField<dim>> data;
 
       // Minimal considered volume fraction
       double vof_epsilon;
 
       double vof_solver_tolerance;
 
-      std::string vof_composition_var;
+      std::vector<std::string> vof_field_names;
+      std::vector<std::string> vof_composition_vars;
 
       // Order for split update
       bool vof_dir_order_dsc;

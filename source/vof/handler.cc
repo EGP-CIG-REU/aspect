@@ -1,4 +1,3 @@
-
 /*
   Copyright (C) 2016 by the authors of the ASPECT code.
 
@@ -97,8 +96,13 @@ namespace aspect
                          "the VoF system gets solved. See 'linear solver "
                          "tolerance' for more details.");
 
+      prm.declare_entry ("VoF field names", "",
+                         Patterns::List(Patterns::Anything()),
+                         "User-defined names for VoF fields.");
+
+      // TODO: Replace with Map
       prm.declare_entry ("VoF composition variable", "",
-                         Patterns::Anything(),
+                         Patterns::List(Patterns::Anything()),
                          "Name of compositional field to write VoF composition to.");
     }
     prm.leave_subsection ();
@@ -114,26 +118,91 @@ namespace aspect
 
       vof_solver_tolerance = prm.get_double("VoF solver tolerance");
 
-      vof_composition_var = prm.get("VoF composition variable");
+      n_vof_fields = 1;
 
-      if (vof_composition_var!="")
+      vof_field_names = Utilities::split_string_list (prm.get("VoF field names"));
+      AssertThrow((vof_field_names.size() == 0) ||
+                  (vof_field_names.size() == n_vof_fields),
+                  ExcMessage("The length of the list of names for the VoF fields "
+                             "needs to either be empty or have length equal to the "
+                             "number of compositional fields."));
+
+      // check that names use only allowed characters, are not empty strings, and are unique
+      for (unsigned int i=0; i<vof_field_names.size(); ++i)
+        {
+          Assert (vof_field_names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                       "0123456789_") == std::string::npos,
+                  ExcMessage("Invalid character in field " + vof_field_names[i] + ". "
+                             "Names of VoF fields should consist of a "
+                             "combination of letters, numbers and underscores."));
+          Assert (vof_field_names[i].size() > 0,
+                  ExcMessage("Invalid name of field " + vof_field_names[i] + ". "
+                             "Names of VoF fields need to be non-empty."));
+          for (unsigned int j=0; j<i; ++j)
+            Assert (vof_field_names[i] != vof_field_names[j],
+                    ExcMessage("Names of VoF fields have to be unique! " + vof_field_names[i] +
+                               " is used more than once."));
+        }
+
+      // default names if not empty
+      if (vof_field_names.size()==0)
+        {
+          for (unsigned int i=0; i<n_vof_fields; ++i)
+            vof_field_names.push_back("F_" + Utilities::int_to_string(i+1));
+        }
+
+      vof_composition_vars = Utilities::split_string_list (prm.get("VoF composition variable"));
+      AssertThrow((vof_composition_vars.size() == 0) ||
+                  (vof_composition_vars.size() == n_vof_fields),
+                  ExcMessage("The length of the list of names for the VoF fields "
+                             "needs to either be empty or have length equal to the "
+                             "number of compositional fields."));
+
+      // check that names use only allowed characters, are not empty strings, and are unique
+      for (unsigned int i=0; i<vof_composition_vars.size(); ++i)
+        {
+          Assert (vof_composition_vars[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                            "0123456789_") == std::string::npos,
+                  ExcMessage("Invalid character in field " + vof_composition_vars[i] + ". "
+                             "Names of VoF fields should consist of a "
+                             "combination of letters, numbers and underscores."));
+
+          for (unsigned int j=0; j<i; ++j)
+            Assert (vof_composition_vars[i] != vof_composition_vars[j],
+                    ExcMessage("Names of VoF fields have to be unique! " + vof_composition_vars[i] +
+                               " is used more than once."));
+        }
+
+      if (vof_composition_vars.size()>0)
         {
           if (!sim.parameters.use_discontinuous_composition_discretization)
             {
               AssertThrow(false, ExcMessage("VoF composition field not implemented for continuous composition."));
             }
 
-          bool field_exists=false;
-
-          for (unsigned int i=0; i<sim.parameters.n_compositional_fields; ++i)
+          for (unsigned int f=0; f<vof_composition_vars.size(); ++f)
             {
-              field_exists = field_exists ||
-                             (vof_composition_var==sim.parameters.names_of_compositional_fields[i]);
-            }
+              bool field_exists=false;
 
-          Assert(field_exists, ExcMessage("VoF composition field variable " +
-                                          vof_composition_var +
-                                          " does not exist."));
+              for (unsigned int i=0; i<sim.parameters.n_compositional_fields; ++i)
+                {
+                  field_exists = field_exists ||
+                                 (vof_composition_vars[f]==sim.parameters.names_of_compositional_fields[i]);
+                }
+
+              Assert(field_exists, ExcMessage("VoF composition field variable " +
+                                              vof_composition_vars[f] +
+                                              " does not exist."));
+            }
+        }
+
+      // no connection if not empty
+      if (vof_composition_vars.size()==0)
+        {
+          for (unsigned int i=0; i<n_vof_fields; ++i)
+            vof_composition_vars.push_back("");
         }
     }
     prm.leave_subsection ();
@@ -161,10 +230,10 @@ namespace aspect
 
     // Gather data
 
-    data = new VoFField<dim>(sim.introspection.variable("vofs"),
-                             sim.introspection.variable("vofsN"),
-                             sim.introspection.variable("vofsLS"),
-                             vof_composition_var);
+    data.push_back(VoFField<dim>(sim.introspection.variable("vofs"),
+                                 sim.introspection.variable("vofsN"),
+                                 sim.introspection.variable("vofsLS"),
+                                 vof_composition_vars[0]));
 
     // Do initial conditions setup
     if (SimulatorAccess<dim> *sim_a = dynamic_cast<SimulatorAccess<dim>*>(vof_initial_conditions.get()))
@@ -180,7 +249,7 @@ namespace aspect
   template <int dim>
   const VoFField<dim> &VoFHandler<dim>::get_field() const
   {
-    return *data;
+    return data[0];
   }
 
   template <int dim>
@@ -199,17 +268,17 @@ namespace aspect
         // Update base to intermediate solution
         if (!vof_dir_order_dsc)
           {
-            assemble_vof_system(*data, dir, update_from_old);
+            assemble_vof_system(data[0], dir, update_from_old);
           }
         else
           {
-            assemble_vof_system(*data, dim-dir-1, update_from_old);
+            assemble_vof_system(data[0], dim-dir-1, update_from_old);
           }
-        solve_vof_system (*data);
+        solve_vof_system (data[0]);
         // Copy current candidate normals.
         // primarily useful for exact linear translation
         sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
-        update_vof_normals (*data, sim.solution);
+        update_vof_normals (data[0], sim.solution);
 
         sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
         sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);
