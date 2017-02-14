@@ -50,7 +50,7 @@ namespace aspect
          */
         virtual
         std::pair<std::string,std::string>
-        execute (TableHandler &statistics);
+        execute (TableHandler &);
 
         /**
          * Declare the parameters this class takes through input files.
@@ -104,7 +104,7 @@ namespace aspect
 
     template <int dim>
     std::pair<std::string, std::string>
-    VoFMMSErr<dim>::execute (TableHandler &statistics)
+    VoFMMSErr<dim>::execute (TableHandler &)
     {
       std::string result_string = "";
       if (!initialized)
