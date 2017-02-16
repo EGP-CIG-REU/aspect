@@ -61,23 +61,26 @@ namespace aspect
   void
   VoFHandler<dim>::edit_finite_element_variables (std::vector<VariableDeclaration<dim> > &vars)
   {
-    vars.push_back(VariableDeclaration<dim>("vofs",
-                                            std_cxx11::shared_ptr<FiniteElement<dim>>(
-                                              new FE_DGQ<dim>(0)),
-                                            1,
-                                            1));
+    for (unsigned int f=0; f<n_vof_fields; ++f)
+      {
+        vars.push_back(VariableDeclaration<dim>("vof_"+vof_field_names[f],
+                                                std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                                  new FE_DGQ<dim>(0)),
+                                                1,
+                                                1));
 
-    vars.push_back(VariableDeclaration<dim>("vofsN",
-                                            std_cxx11::shared_ptr<FiniteElement<dim>>(
-                                              new FE_DGQ<dim>(0)),
-                                            dim+1,
-                                            1));
+        vars.push_back(VariableDeclaration<dim>("vofN_"+vof_field_names[f],
+                                                std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                                  new FE_DGQ<dim>(0)),
+                                                dim+1,
+                                                1));
 
-    vars.push_back(VariableDeclaration<dim>("vofsLS",
-                                            std_cxx11::shared_ptr<FiniteElement<dim>>(
-                                              new FE_DGQ<dim>(1)),
-                                            1,
-                                            1));
+        vars.push_back(VariableDeclaration<dim>("vofLS_"+vof_field_names[f],
+                                                std_cxx11::shared_ptr<FiniteElement<dim>>(
+                                                  new FE_DGQ<dim>(1)),
+                                                1,
+                                                1));
+      }
   }
 
   template <int dim>
@@ -230,10 +233,13 @@ namespace aspect
 
     // Gather data
 
-    data.push_back(VoFField<dim>(sim.introspection.variable("vofs"),
-                                 sim.introspection.variable("vofsN"),
-                                 sim.introspection.variable("vofsLS"),
-                                 vof_composition_vars[0]));
+    for (unsigned int f=0; f<n_vof_fields; ++f)
+      {
+        data.push_back(VoFField<dim>(sim.introspection.variable("vof_"+vof_field_names[f]),
+                                     sim.introspection.variable("vofN_"+vof_field_names[f]),
+                                     sim.introspection.variable("vofLS_"+vof_field_names[f]),
+                                     vof_composition_vars[f]));
+      }
 
     // Do initial conditions setup
     if (SimulatorAccess<dim> *sim_a = dynamic_cast<SimulatorAccess<dim>*>(vof_initial_conditions.get()))
@@ -247,45 +253,64 @@ namespace aspect
   }
 
   template <int dim>
-  const VoFField<dim> &VoFHandler<dim>::get_field() const
+  unsigned int VoFHandler<dim>::get_n_fields() const
   {
-    return data[0];
+    return n_vof_fields;
+  }
+
+  template <int dim>
+  const std::string VoFHandler<dim>::get_field_name(unsigned int field) const
+  {
+    Assert(field < n_vof_fields,
+           ExcMessage("Invalid field index"));
+    return vof_field_names[field];
+  }
+
+  template <int dim>
+  const VoFField<dim> &VoFHandler<dim>::get_field(unsigned int field) const
+  {
+    Assert(field < n_vof_fields,
+           ExcMessage("Invalid field index"));
+    return data[field];
   }
 
   template <int dim>
   void VoFHandler<dim>::do_vof_update ()
   {
-    const unsigned int vof_block_idx = sim.introspection.variable("vofs").block_index;
-    const unsigned int vofN_block_idx = sim.introspection.variable("vofsLS").block_index;
-
-    // Reset current base to values at beginning of timestep
-
-    // Due to dimensionally split formulation, use strang splitting
-    // TODO: Reformulate for unsplit (may require flux limiter)
-    bool update_from_old = true;
-    for (unsigned int dir = 0; dir < dim; ++dir)
+    for (unsigned int f=0; f<n_vof_fields; ++f)
       {
-        // Update base to intermediate solution
-        if (!vof_dir_order_dsc)
-          {
-            assemble_vof_system(data[0], dir, update_from_old);
-          }
-        else
-          {
-            assemble_vof_system(data[0], dim-dir-1, update_from_old);
-          }
-        solve_vof_system (data[0]);
-        // Copy current candidate normals.
-        // primarily useful for exact linear translation
-        sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
-        update_vof_normals (data[0], sim.solution);
+        const unsigned int vof_block_idx = data[f].fraction.block_index;
+        const unsigned int vofN_block_idx = data[f].reconstruction.block_index;
 
-        sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
-        sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);
-        update_from_old = false;
+        // Reset current base to values at beginning of timestep
+
+        // Due to dimensionally split formulation, use strang splitting
+        // TODO: Reformulate for unsplit (may require flux limiter)
+        bool update_from_old = true;
+        for (unsigned int dir = 0; dir < dim; ++dir)
+          {
+            // Update base to intermediate solution
+            if (!vof_dir_order_dsc)
+              {
+                assemble_vof_system(data[0], dir, update_from_old);
+              }
+            else
+              {
+                assemble_vof_system(data[0], dim-dir-1, update_from_old);
+              }
+            solve_vof_system (data[0]);
+            // Copy current candidate normals.
+            // primarily useful for exact linear translation
+            sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
+            update_vof_normals (data[0], sim.solution);
+
+            sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
+            sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);
+            update_from_old = false;
+          }
+        // change dimension iteration order
+        vof_dir_order_dsc = !vof_dir_order_dsc;
       }
-    // change dimension iteration order
-    vof_dir_order_dsc = !vof_dir_order_dsc;
   }
 }
 

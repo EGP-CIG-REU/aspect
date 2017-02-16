@@ -5,7 +5,7 @@
 # 5: Number of Stokes degrees of freedom
 # 6: Number of temperature degrees of freedom
 # 7: Iterations for temperature solver
-# 8: Global VoF vol
+# 8: Global VoF volumes for F_1
  0 0.000000000000e+00 0.000000000000e+00 256 2467 1089 0 7.85367854e-01 
  1 4.419417382416e-02 4.419417382416e-02 256 2467 1089 0 7.85367854e-01 
  2 8.838834764832e-02 4.419417382416e-02 256 2467 1089 0 7.85367854e-01 

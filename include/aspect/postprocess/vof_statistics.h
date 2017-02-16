@@ -46,33 +46,6 @@ namespace aspect
         virtual
         std::pair<std::string,std::string>
         execute (TableHandler &statistics);
-
-        /**
-         * Declare the parameters this class takes through input files.
-         */
-        static
-        void
-        declare_parameters (ParameterHandler &prm);
-
-        /**
-         * Read the parameters this class declares from the parameter file.
-         */
-        virtual
-        void
-        parse_parameters (ParameterHandler &prm);
-
-      private:
-        /**
-         * Parameter that selects between logging current Global VoF and Delta
-         * Global VoF
-         */
-        bool log_vol_delta;
-
-        /**
-         * Initial volume if logging Delta Global VoF
-         */
-        bool initial_vol_computed;
-        double init_vol;
     };
   }
 }

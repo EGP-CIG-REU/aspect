@@ -3162,8 +3162,9 @@ namespace aspect
     // Skip if this composition field is being set from the vof handler
     if (!advection_field.is_temperature() &&
         parameters.vof_tracking_enabled)
-      if (vof_handler->get_field().c_field_name == introspection.name_for_compositional_index(advection_field.compositional_variable))
-        return;
+      for (unsigned int f=0; f<vof_handler->get_n_fields(); ++f)
+        if (vof_handler->get_field(f).c_field_name == introspection.name_for_compositional_index(advection_field.compositional_variable))
+          return;
 
     if (advection_field.is_temperature())
       computing_timer.enter_section ("   Assemble temperature system");

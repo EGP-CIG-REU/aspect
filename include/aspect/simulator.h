@@ -1188,7 +1188,7 @@ namespace aspect
 
       /**
        * Shared pointer for an instance of the VoFHandler. This way,
-       * if we do not need the machinery for doing melt stuff, we do
+       * if we do not need the machinery for doing vof stuff, we do
        * not even allocate it.
        */
       std_cxx11::shared_ptr<VoFHandler<dim> > vof_handler;

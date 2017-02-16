@@ -20,6 +20,7 @@
 
 #include <aspect/postprocess/visualization/vof_values.h>
 #include <aspect/simulator_access.h>
+#include <aspect/vof/handler.h>
 
 
 namespace aspect
@@ -79,27 +80,41 @@ namespace aspect
 
         const FiniteElement<dim> &finite_element = this->get_fe();
 
-        const FEVariable<dim> &vof_var = this->introspection().variable("vofs");
-        const unsigned int vof_ind = vof_var.first_component_index;
-        const FEVariable<dim> &vofLS_var = this->introspection().variable("vofsLS");
-        const unsigned int vofLS_ind = vofLS_var.first_component_index;
+        unsigned int out_per_field=1;
+        if (include_vofLS)
+          out_per_field += 1;
+        if (include_vofN)
+          out_per_field += dim;
 
-        for (unsigned int q=0; q<n_quadrature_points; ++q)
+        for (unsigned int f=0; f<this->get_vof_handler().get_n_fields(); ++f)
           {
-            unsigned int out_ind = 0;
-            computed_quantities[q][out_ind] = uh[q][vof_ind];
-            ++out_ind;
-            if (include_vofLS)
-              {
-                computed_quantities[q][out_ind] = uh[q][vofLS_ind];
-                ++out_ind;
-              }
+            VoFField<dim> field = this->get_vof_handler().get_field(f);
 
-            if (include_vofN)
+            const FEVariable<dim> &vof_var = field.fraction;
+            const unsigned int vof_ind = vof_var.first_component_index;
+            const FEVariable<dim> &vofLS_var = field.level_set;
+            const unsigned int vofLS_ind = vofLS_var.first_component_index;
+
+            for (unsigned int q=0; q<n_quadrature_points; ++q)
               {
-                Tensor<1, dim, double> normal = -duh[q][vofLS_ind];
-                for (unsigned int i = 0; i<dim; ++i)
-                  computed_quantities[q][out_ind] = normal[i];
+                unsigned int out_ind = f*out_per_field;
+                computed_quantities[q][out_ind] = uh[q][vof_ind];
+                ++out_ind;
+                if (include_vofLS)
+                  {
+                    computed_quantities[q][out_ind] = uh[q][vofLS_ind];
+                    ++out_ind;
+                  }
+
+                if (include_vofN)
+                  {
+                    Tensor<1, dim, double> normal = -duh[q][vofLS_ind];
+                    for (unsigned int i = 0; i<dim; ++i)
+                      {
+                        computed_quantities[q][out_ind] = normal[i];
+                        ++out_ind;
+                      }
+                  }
               }
           }
       }
@@ -115,10 +130,6 @@ namespace aspect
           {
             prm.enter_subsection("VoF values");
             {
-              prm.declare_entry("Names of vofs", "VOF1",
-                                Patterns::List (Patterns::Anything()),
-                                "Names of vectors as they will appear in the output.");
-
               prm.declare_entry("Include internal reconstruction LS", "false",
                                 Patterns::Bool (),
                                 "Include the internal level set data use to save reconstructed interfaces");
@@ -139,34 +150,34 @@ namespace aspect
       void
       VoFValues<dim>::parse_parameters (ParameterHandler &prm)
       {
-        Assert (this->introspection ().variable_exists("vofs"),
-                ExcMessage("VoF values not available"));
-
         prm.enter_subsection("Postprocess");
         {
           prm.enter_subsection("Visualization");
           {
             prm.enter_subsection("VoF values");
             {
-              vof_names = Utilities::split_string_list(prm.get("Names of vofs"), ',');
-              interp.push_back(DataComponentInterpretation::component_is_scalar);
-              AssertThrow(vof_names.size() == 1,
-                          ExcMessage("Only 1 VoF supported"));
-
               include_vofLS = prm.get_bool("Include internal reconstruction LS");
-              if (include_vofLS)
-                {
-                  vof_names.push_back("vofsLS");
-                  interp.push_back(DataComponentInterpretation::component_is_scalar);
-                }
-
               include_vofN = prm.get_bool("Include normals");
-              if (include_vofN)
+
+              for (unsigned int f=0; f<this->get_vof_handler().get_n_fields(); ++f)
                 {
-                  for (unsigned int i=0; i<dim; ++i)
+                  std::string field_name = this->get_vof_handler().get_field_name(f);
+                  vof_names.push_back("vof_"+field_name);
+                  interp.push_back(DataComponentInterpretation::component_is_scalar);
+
+                  if (include_vofLS)
                     {
-                      vof_names.push_back("vofINormal");
-                      interp.push_back(DataComponentInterpretation::component_is_part_of_vector);
+                      vof_names.push_back("vofLS_"+field_name);
+                      interp.push_back(DataComponentInterpretation::component_is_scalar);
+                    }
+
+                  if (include_vofN)
+                    {
+                      for (unsigned int i=0; i<dim; ++i)
+                        {
+                          vof_names.push_back("vofINormal_"+field_name);
+                          interp.push_back(DataComponentInterpretation::component_is_part_of_vector);
+                        }
                     }
                 }
             }

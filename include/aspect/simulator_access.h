@@ -65,6 +65,7 @@ namespace aspect
     template <int dim> class Interface;
   }
   template <int dim> class MeltHandler;
+  template <int dim> class VoFHandler;
 
   /**
    * SimulatorAccess is base class for different plugins like postprocessors.
@@ -566,6 +567,12 @@ namespace aspect
        */
       const MeltHandler<dim> &
       get_melt_handler () const;
+
+      /**
+       * Return a pointer to the VoF handler.
+       */
+      const VoFHandler<dim> &
+      get_vof_handler () const;
 
       /**
        * Return a reference to the lateral averaging object owned

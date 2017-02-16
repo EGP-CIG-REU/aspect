@@ -1083,8 +1083,11 @@ namespace aspect
 
       if (parameters.vof_tracking_enabled)
         {
-          const unsigned int vof_c_index = introspection.variable("vofs").first_component_index;
-          coupling[vof_c_index][vof_c_index] = DoFTools::always;
+          for (unsigned int f=0; f<vof_handler->get_n_fields(); ++f)
+            {
+              const unsigned int vof_c_index = vof_handler->get_field(f).fraction.first_component_index;
+              coupling[vof_c_index][vof_c_index] = DoFTools::always;
+            }
         }
     }
 
@@ -1137,8 +1140,11 @@ namespace aspect
 
         if (parameters.vof_tracking_enabled)
           {
-            const unsigned int vof_c_index = introspection.variable("vofs").first_component_index;
-            face_coupling[vof_c_index][vof_c_index] = DoFTools::always;
+            for (unsigned int f=0; f<vof_handler->get_n_fields(); ++f)
+              {
+                const unsigned int vof_c_index = vof_handler->get_field(f).fraction.first_component_index;
+                face_coupling[vof_c_index][vof_c_index] = DoFTools::always;
+              }
           }
 
 #if DEAL_II_VERSION_GTE(8,5,0)

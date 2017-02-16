@@ -380,8 +380,9 @@ namespace aspect
     // Skip if this composition field is being set from the vof handler
     if (!advection_field.is_temperature() &&
         parameters.vof_tracking_enabled)
-      if (vof_handler->get_field().c_field_name == introspection.name_for_compositional_index(advection_field.compositional_variable))
-        return 0.0;
+      for (unsigned int f=0; f<vof_handler->get_n_fields(); ++f)
+        if (vof_handler->get_field(f).c_field_name == introspection.name_for_compositional_index(advection_field.compositional_variable))
+          return 0.0;
 
     double advection_solver_tolerance = -1;
     unsigned int block_idx = advection_field.block_index(introspection);

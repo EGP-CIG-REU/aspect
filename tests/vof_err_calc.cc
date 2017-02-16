@@ -24,6 +24,7 @@ along with ASPECT; see the file doc/COPYING.  If not see
 #include <aspect/simulator_access.h>
 #include <aspect/postprocess/interface.h>
 #include <aspect/vof/utilities.h>
+#include <aspect/vof/handler.h>
 
 // Deal II includes
 #include <deal.II/base/parsed_function.h>
@@ -228,8 +229,8 @@ namespace aspect
                             update_JxW_values |
                             update_quadrature_points);
 
-      const unsigned int vof_index = this->introspection().variable("vofs").first_component_index;
-      const unsigned int vofN_c_index = this->introspection().variable("vofsN").first_component_index;
+      const unsigned int vof_index = this->get_vof_handler().get_field(0).fraction.first_component_index;
+      const unsigned int vofN_c_index = this->get_vof_handler().get_field(0).reconstruction.first_component_index;
 
       // Initialize state based on provided function
       for (auto cell : dof_handler.active_cell_iterators ())

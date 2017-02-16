@@ -20,6 +20,7 @@
 
 
 #include <aspect/mesh_refinement/vof_boundary.h>
+#include <aspect/vof/handler.h>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/numerics/error_estimator.h>
@@ -55,129 +56,132 @@ namespace aspect
                                               qMidF,
                                               update_values |
                                               update_quadrature_points);
-
-      const FEValuesExtractors::Scalar vof_field = this->introspection().variable("vofs").extractor_scalar();
-      std::vector<double> vof_q_values(qMidC.size());
-
-      // Should be vof_epsilon, look into how to accesss that
-      double voleps = vof_epsilon;
-
-      typename DoFHandler<dim>::active_cell_iterator
-      cell = this->get_dof_handler().begin_active(),
-      endc = this->get_dof_handler().end();
-      unsigned int i=0;
-      for (; cell!=endc; ++cell, ++i)
+      for (unsigned int f=0; f<this->get_vof_handler().get_n_fields(); ++f)
         {
-          // Skip if not local
-          if (!cell->is_locally_owned())
-            continue;
 
-          // Get cell vof
-          double cell_vof;
-          fe_values.reinit(cell);
-          fe_values[vof_field].get_function_values (this->get_solution(),
-                                                    vof_q_values);
-          cell_vof = vof_q_values[0];
+          const FEValuesExtractors::Scalar vof_field = this->get_vof_handler().get_field(f).fraction.extractor_scalar();
+          std::vector<double> vof_q_values(qMidC.size());
 
-          // Handle overshoots
-          if (cell_vof > 1.0)
-            cell_vof = 1.0;
+          // Should be vof_epsilon, look into how to accesss that
+          double voleps = vof_epsilon;
 
-          if (cell_vof < 0.0)
-            cell_vof = 0.0;
-
-          // Check if at interface
-          bool at_interface=false;
-          if (cell_vof>voleps && cell_vof<(1.0-voleps))
+          typename DoFHandler<dim>::active_cell_iterator
+          cell = this->get_dof_handler().begin_active(),
+          endc = this->get_dof_handler().end();
+          unsigned int i=0;
+          for (; cell!=endc; ++cell, ++i)
             {
-              // Fractional volume
-              at_interface=true;
-            }
-          else
-            {
-              // Check neighbors
-              for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+              // Skip if not local
+              if (!cell->is_locally_owned())
+                continue;
+
+              // Get cell vof
+              double cell_vof;
+              fe_values.reinit(cell);
+              fe_values[vof_field].get_function_values (this->get_solution(),
+                                                        vof_q_values);
+              cell_vof = vof_q_values[0];
+
+              // Handle overshoots
+              if (cell_vof > 1.0)
+                cell_vof = 1.0;
+
+              if (cell_vof < 0.0)
+                cell_vof = 0.0;
+
+              // Check if at interface
+              bool at_interface=false;
+              if (cell_vof>voleps && cell_vof<(1.0-voleps))
                 {
-                  if (cell->face(face_no)->at_boundary())
-                    continue;
-
-                  typename DoFHandler<dim>::face_iterator face = cell->face (face_no);
-
-                  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
-
-                  double face_vof, n_face_vof;
-
-                  fe_face_values.reinit(cell, face_no);
-
-                  fe_face_values[vof_field].get_function_values (this->get_solution(),
-                                                                 vof_q_values);
-
-                  face_vof = vof_q_values[0];
-
-                  if (!(face->has_children()))
+                  // Fractional volume
+                  at_interface=true;
+                }
+              else
+                {
+                  // Check neighbors
+                  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                     {
-                      if (!cell->neighbor_is_coarser(face_no))
+                      if (cell->face(face_no)->at_boundary())
+                        continue;
+
+                      typename DoFHandler<dim>::face_iterator face = cell->face (face_no);
+
+                      const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
+
+                      double face_vof, n_face_vof;
+
+                      fe_face_values.reinit(cell, face_no);
+
+                      fe_face_values[vof_field].get_function_values (this->get_solution(),
+                                                                     vof_q_values);
+
+                      face_vof = vof_q_values[0];
+
+                      if (!(face->has_children()))
                         {
+                          if (!cell->neighbor_is_coarser(face_no))
+                            {
 
-                          const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
+                              const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 
-                          fe_face_values.reinit(neighbor, neighbor2);
+                              fe_face_values.reinit(neighbor, neighbor2);
 
-                          fe_face_values[vof_field].get_function_values (this->get_solution(),
-                                                                         vof_q_values);
+                              fe_face_values[vof_field].get_function_values (this->get_solution(),
+                                                                             vof_q_values);
 
-                          n_face_vof = vof_q_values[0];
-                        }
-                      else
-                        {
-                          std::pair<unsigned int, unsigned int> n2pair = cell->neighbor_of_coarser_neighbor(face_no);
-                          fe_subface_values.reinit(neighbor, n2pair.first, n2pair.second);
+                              n_face_vof = vof_q_values[0];
+                            }
+                          else
+                            {
+                              std::pair<unsigned int, unsigned int> n2pair = cell->neighbor_of_coarser_neighbor(face_no);
+                              fe_subface_values.reinit(neighbor, n2pair.first, n2pair.second);
 
-                          fe_subface_values[vof_field].get_function_values (this->get_solution(),
-                                                                            vof_q_values);
+                              fe_subface_values[vof_field].get_function_values (this->get_solution(),
+                                                                                vof_q_values);
 
-                          n_face_vof = vof_q_values[0];
-                        }
-
-                      if (n_face_vof > 1.0)
-                        n_face_vof = 1.0;
-                      if (n_face_vof < 0.0)
-                        n_face_vof = 0.0;
-
-                      if (abs(n_face_vof-cell_vof)>=voleps)
-                        at_interface=true;
-                    }
-                  else
-                    {
-                      const unsigned int neighbor2 = cell->neighbor_face_no(face_no);
-
-                      for (unsigned int subface_no=0; subface_no<face->number_of_children(); ++subface_no)
-                        {
-                          const typename DoFHandler<dim>::active_cell_iterator neighbor_child
-                            = cell->neighbor_child_on_subface (face_no, subface_no);
-
-                          fe_face_values.reinit (neighbor_child, neighbor2);
-
-                          fe_face_values[vof_field].get_function_values (this->get_solution(),
-                                                                         vof_q_values);
+                              n_face_vof = vof_q_values[0];
+                            }
 
                           if (n_face_vof > 1.0)
                             n_face_vof = 1.0;
                           if (n_face_vof < 0.0)
                             n_face_vof = 0.0;
 
-                          n_face_vof = vof_q_values[0];
-
                           if (abs(n_face_vof-cell_vof)>=voleps)
                             at_interface=true;
                         }
+                      else
+                        {
+                          const unsigned int neighbor2 = cell->neighbor_face_no(face_no);
+
+                          for (unsigned int subface_no=0; subface_no<face->number_of_children(); ++subface_no)
+                            {
+                              const typename DoFHandler<dim>::active_cell_iterator neighbor_child
+                                = cell->neighbor_child_on_subface (face_no, subface_no);
+
+                              fe_face_values.reinit (neighbor_child, neighbor2);
+
+                              fe_face_values[vof_field].get_function_values (this->get_solution(),
+                                                                             vof_q_values);
+
+                              if (n_face_vof > 1.0)
+                                n_face_vof = 1.0;
+                              if (n_face_vof < 0.0)
+                                n_face_vof = 0.0;
+
+                              n_face_vof = vof_q_values[0];
+
+                              if (abs(n_face_vof-cell_vof)>=voleps)
+                                at_interface=true;
+                            }
+                        }
                     }
                 }
-            }
 
-          if (at_interface)
-            {
-              indicators(i) = 1.0;
+              if (at_interface)
+                {
+                  indicators(i) = 1.0;
+                }
             }
         }
     }
