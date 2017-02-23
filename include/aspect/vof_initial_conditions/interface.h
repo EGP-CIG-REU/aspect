@@ -107,7 +107,7 @@ namespace aspect
          * Return the initial value as a function of position.
          */
         virtual
-        double initial_value (const Point<dim> &position) const = 0;
+        double initial_value (const Point<dim> &position, const unsigned int n_field) const = 0;
 
 
         /**

@@ -77,8 +77,8 @@ namespace aspect
 
       // Functions for initialization of state
       void set_initial_vofs ();
-      void init_vof_compos (const VoFField<dim> field);
-      void init_vof_ls (const VoFField<dim> field);
+      void init_vof_compos (const VoFField<dim> field, const unsigned int f_ind);
+      void init_vof_ls (const VoFField<dim> field, const unsigned int f_ind);
 
       // Do interface reconstruction
       void update_vof_normals (const VoFField<dim> field,

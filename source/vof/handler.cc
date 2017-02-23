@@ -89,6 +89,10 @@ namespace aspect
   {
     prm.enter_subsection ("VoF config");
     {
+      prm.declare_entry ("Number of fields", "1",
+                         Patterns::Integer(0),
+                         "The number of fields to be handled usingg VoF interface tracking.");
+
       prm.declare_entry ("Small volume", "1e-6",
                          Patterns::Double (0, 1),
                          "Minimum significant volume. VOFs below this considered to be zero.");
@@ -121,7 +125,7 @@ namespace aspect
 
       vof_solver_tolerance = prm.get_double("VoF solver tolerance");
 
-      n_vof_fields = 1;
+      n_vof_fields = prm.get_integer("Number of fields");
 
       vof_field_names = Utilities::split_string_list (prm.get("VoF field names"));
       AssertThrow((vof_field_names.size() == 0) ||
@@ -292,25 +296,25 @@ namespace aspect
             // Update base to intermediate solution
             if (!vof_dir_order_dsc)
               {
-                assemble_vof_system(data[0], dir, update_from_old);
+                assemble_vof_system(data[f], dir, update_from_old);
               }
             else
               {
-                assemble_vof_system(data[0], dim-dir-1, update_from_old);
+                assemble_vof_system(data[f], dim-dir-1, update_from_old);
               }
-            solve_vof_system (data[0]);
+            solve_vof_system (data[f]);
             // Copy current candidate normals.
             // primarily useful for exact linear translation
             sim.solution.block(vofN_block_idx) = sim.old_solution.block(vofN_block_idx);
-            update_vof_normals (data[0], sim.solution);
+            update_vof_normals (data[f], sim.solution);
 
             sim.current_linearization_point.block(vof_block_idx) = sim.solution.block(vof_block_idx);
             sim.current_linearization_point.block(vofN_block_idx) = sim.solution.block(vofN_block_idx);
             update_from_old = false;
           }
-        // change dimension iteration order
-        vof_dir_order_dsc = !vof_dir_order_dsc;
       }
+    // change dimension iteration order
+    vof_dir_order_dsc = !vof_dir_order_dsc;
   }
 }
 

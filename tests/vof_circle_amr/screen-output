@@ -10,9 +10,9 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 0 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 5.49126816e-02 FEstL1= 0.00000000e+00.
-     Writing graphical output: output-vof_circle_amr/solution/solution-00000
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 5.49126816e-02/0.00000000e+00
+     Writing graphical output:       output-vof_circle_amr/solution/solution-00000
 
 Number of active cells: 85 (on 5 levels)
 Number of degrees of freedom: 1,985 (798+108+399+85+255+340)
@@ -23,7 +23,7 @@ Number of degrees of freedom: 1,985 (798+108+399+85+255+340)
    Solving VoF system... 0 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
      Writing graphical output: output-vof_circle_amr/solution/solution-00001
 
 Number of active cells: 187 (on 6 levels)
@@ -35,7 +35,7 @@ Number of degrees of freedom: 4,283 (1,710+222+855+187+561+748)
    Solving VoF system... 0 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
      Writing graphical output: output-vof_circle_amr/solution/solution-00002
 
 Number of active cells: 175 (on 6 levels)
@@ -47,7 +47,7 @@ Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
@@ -58,7 +58,7 @@ Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
@@ -69,7 +69,7 @@ Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
@@ -80,7 +80,7 @@ Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,220 (1,686+219+843+184+552+736)
@@ -91,7 +91,7 @@ Number of degrees of freedom: 4,220 (1,686+219+843+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
@@ -102,7 +102,7 @@ Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 190 (on 6 levels)
 Number of degrees of freedom: 4,366 (1,746+227+873+190+570+760)
@@ -113,7 +113,7 @@ Number of degrees of freedom: 4,366 (1,746+227+873+190+570+760)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,624 (1,846+239+923+202+606+808)
@@ -124,7 +124,7 @@ Number of degrees of freedom: 4,624 (1,846+239+923+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 205 (on 6 levels)
 Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
@@ -135,7 +135,7 @@ Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
@@ -146,7 +146,7 @@ Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
@@ -157,7 +157,7 @@ Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 193 (on 6 levels)
 Number of degrees of freedom: 4,487 (1,806+234+903+193+579+772)
@@ -168,8 +168,8 @@ Number of degrees of freedom: 4,487 (1,806+234+903+193+579+772)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 7.53567712e-03 FEstL1= 5.22722648e-03.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 7.53567712e-03/5.22722648e-03
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
@@ -180,7 +180,7 @@ Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
@@ -191,7 +191,7 @@ Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 205 (on 6 levels)
 Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
@@ -202,7 +202,7 @@ Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
@@ -213,7 +213,7 @@ Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,807 (1,914+248+957+211+633+844)
@@ -224,7 +224,7 @@ Number of degrees of freedom: 4,807 (1,914+248+957+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 190 (on 6 levels)
 Number of degrees of freedom: 4,410 (1,774+229+887+190+570+760)
@@ -235,7 +235,7 @@ Number of degrees of freedom: 4,410 (1,774+229+887+190+570+760)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
@@ -246,7 +246,7 @@ Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -257,7 +257,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -268,7 +268,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
@@ -279,7 +279,7 @@ Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
@@ -290,8 +290,8 @@ Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 1.00163834e-02 FEstL1= 8.14639951e-03.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 1.00163834e-02/8.14639951e-03
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
@@ -302,7 +302,7 @@ Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 169 (on 6 levels)
 Number of degrees of freedom: 3,981 (1,614+208+807+169+507+676)
@@ -313,7 +313,7 @@ Number of degrees of freedom: 3,981 (1,614+208+807+169+507+676)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -324,7 +324,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -335,7 +335,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
@@ -346,7 +346,7 @@ Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 172 (on 6 levels)
 Number of degrees of freedom: 3,992 (1,606+207+803+172+516+688)
@@ -357,7 +357,7 @@ Number of degrees of freedom: 3,992 (1,606+207+803+172+516+688)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -368,7 +368,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -379,7 +379,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -390,7 +390,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -401,7 +401,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
@@ -412,8 +412,8 @@ Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 1.26909829e-02 FEstL1= 1.12689363e-02.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 1.26909829e-02/1.12689363e-02
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
@@ -424,7 +424,7 @@ Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
@@ -435,7 +435,7 @@ Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -446,7 +446,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -457,7 +457,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 223 (on 6 levels)
 Number of degrees of freedom: 5,085 (2,026+262+1,013+223+669+892)
@@ -468,7 +468,7 @@ Number of degrees of freedom: 5,085 (2,026+262+1,013+223+669+892)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 220 (on 6 levels)
 Number of degrees of freedom: 5,022 (2,002+259+1,001+220+660+880)
@@ -479,7 +479,7 @@ Number of degrees of freedom: 5,022 (2,002+259+1,001+220+660+880)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 214 (on 6 levels)
 Number of degrees of freedom: 4,922 (1,970+255+985+214+642+856)
@@ -490,7 +490,7 @@ Number of degrees of freedom: 4,922 (1,970+255+985+214+642+856)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
@@ -501,7 +501,7 @@ Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
@@ -512,7 +512,7 @@ Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
@@ -523,7 +523,7 @@ Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 196 (on 6 levels)
 Number of degrees of freedom: 4,544 (1,826+237+913+196+588+784)
@@ -534,7 +534,7 @@ Number of degrees of freedom: 4,544 (1,826+237+913+196+588+784)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 196 (on 6 levels)
 Number of degrees of freedom: 4,544 (1,826+237+913+196+588+784)
@@ -545,8 +545,8 @@ Number of degrees of freedom: 4,544 (1,826+237+913+196+588+784)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 1.60134343e-02 FEstL1= 1.50308372e-02.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 1.60134343e-02/1.50308372e-02
 
 Number of active cells: 196 (on 6 levels)
 Number of degrees of freedom: 4,544 (1,826+237+913+196+588+784)
@@ -557,7 +557,7 @@ Number of degrees of freedom: 4,544 (1,826+237+913+196+588+784)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
@@ -568,7 +568,7 @@ Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
@@ -579,7 +579,7 @@ Number of degrees of freedom: 4,618 (1,842+239+921+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 205 (on 6 levels)
 Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
@@ -590,7 +590,7 @@ Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 205 (on 6 levels)
 Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
@@ -601,7 +601,7 @@ Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,859 (1,946+252+973+211+633+844)
@@ -612,7 +612,7 @@ Number of degrees of freedom: 4,859 (1,946+252+973+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -623,7 +623,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -634,7 +634,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -645,7 +645,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
@@ -656,7 +656,7 @@ Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
@@ -667,8 +667,8 @@ Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 1.79526664e-02 FEstL1= 1.71349680e-02.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 1.79526664e-02/1.71349680e-02
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
@@ -679,7 +679,7 @@ Number of degrees of freedom: 4,885 (1,962+254+981+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -690,7 +690,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -701,7 +701,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 217 (on 6 levels)
 Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
@@ -712,7 +712,7 @@ Number of degrees of freedom: 4,959 (1,978+256+989+217+651+868)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 223 (on 6 levels)
 Number of degrees of freedom: 5,085 (2,026+262+1,013+223+669+892)
@@ -723,7 +723,7 @@ Number of degrees of freedom: 5,085 (2,026+262+1,013+223+669+892)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 214 (on 6 levels)
 Number of degrees of freedom: 4,922 (1,970+255+985+214+642+856)
@@ -734,7 +734,7 @@ Number of degrees of freedom: 4,922 (1,970+255+985+214+642+856)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 178 (on 6 levels)
 Number of degrees of freedom: 4,118 (1,654+213+827+178+534+712)
@@ -745,7 +745,7 @@ Number of degrees of freedom: 4,118 (1,654+213+827+178+534+712)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -756,7 +756,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -767,7 +767,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
@@ -778,7 +778,7 @@ Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
@@ -789,8 +789,8 @@ Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 2.02284097e-02 FEstL1= 1.93766543e-02.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 2.02284097e-02/1.93766543e-02
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
@@ -801,7 +801,7 @@ Number of degrees of freedom: 4,107 (1,662+214+831+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -812,7 +812,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -823,7 +823,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
@@ -834,7 +834,7 @@ Number of degrees of freedom: 4,181 (1,678+216+839+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
@@ -845,7 +845,7 @@ Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 184 (on 6 levels)
 Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
@@ -856,7 +856,7 @@ Number of degrees of freedom: 4,244 (1,702+219+851+184+552+736)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 211 (on 6 levels)
 Number of degrees of freedom: 4,833 (1,930+250+965+211+633+844)
@@ -867,7 +867,7 @@ Number of degrees of freedom: 4,833 (1,930+250+965+211+633+844)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
@@ -878,7 +878,7 @@ Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 205 (on 6 levels)
 Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
@@ -889,7 +889,7 @@ Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
@@ -900,7 +900,7 @@ Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
@@ -911,7 +911,7 @@ Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 193 (on 6 levels)
 Number of degrees of freedom: 4,487 (1,806+234+903+193+579+772)
@@ -922,8 +922,8 @@ Number of degrees of freedom: 4,487 (1,806+234+903+193+579+772)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 2.24661838e-02 FEstL1= 2.19589852e-02.
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 2.24661838e-02/2.19589852e-02
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
@@ -934,7 +934,7 @@ Number of degrees of freedom: 4,607 (1,850+240+925+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 199 (on 6 levels)
 Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
@@ -945,7 +945,7 @@ Number of degrees of freedom: 4,561 (1,822+236+911+199+597+796)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 205 (on 6 levels)
 Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
@@ -956,7 +956,7 @@ Number of degrees of freedom: 4,681 (1,866+242+933+205+615+820)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 202 (on 6 levels)
 Number of degrees of freedom: 4,624 (1,846+239+923+202+606+808)
@@ -967,7 +967,7 @@ Number of degrees of freedom: 4,624 (1,846+239+923+202+606+808)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 208 (on 6 levels)
 Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
@@ -978,7 +978,7 @@ Number of degrees of freedom: 4,744 (1,890+245+945+208+624+832)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 190 (on 6 levels)
 Number of degrees of freedom: 4,398 (1,766+229+883+190+570+760)
@@ -989,7 +989,7 @@ Number of degrees of freedom: 4,398 (1,766+229+883+190+570+760)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 178 (on 6 levels)
 Number of degrees of freedom: 4,094 (1,638+213+819+178+534+712)
@@ -1000,7 +1000,7 @@ Number of degrees of freedom: 4,094 (1,638+213+819+178+534+712)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
@@ -1011,7 +1011,7 @@ Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 181 (on 6 levels)
 Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
@@ -1022,7 +1022,7 @@ Number of degrees of freedom: 4,157 (1,662+216+831+181+543+724)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
@@ -1033,7 +1033,7 @@ Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
+     Global VoF volumes (m^3): 0.785
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
@@ -1044,9 +1044,9 @@ Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.785//
-     VOF Calculation:           IEstL1= 2.42860690e-02 FEstL1= 2.36319104e-02.
-     Writing graphical output: output-vof_circle_amr/solution/solution-00003
+     Global VoF volumes (m^3):       0.785
+     VoF Calculation(IEstL1/FEstL1): 2.42860690e-02/2.36319104e-02
+     Writing graphical output:       output-vof_circle_amr/solution/solution-00003
 
 Number of active cells: 175 (on 6 levels)
 Number of degrees of freedom: 4,083 (1,646+214+823+175+525+700)

@@ -67,7 +67,7 @@ namespace aspect
          * of compositional field.
          */
         virtual
-        double initial_value (const Point<dim> &position) const;
+        double initial_value (const Point<dim> &position, const unsigned int n_field) const;
 
         /**
          * Declare the parameters this class takes through input files. The

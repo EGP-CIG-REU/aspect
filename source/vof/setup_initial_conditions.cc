@@ -34,33 +34,36 @@ namespace aspect
   template <int dim>
   void VoFHandler<dim>::set_initial_vofs ()
   {
-    switch (vof_initial_conditions->init_type())
+    for (unsigned int f=0; f<n_vof_fields; ++f)
       {
-        case VoFInitialConditions::VoFInitType::composition:
-        {
-          init_vof_compos (data[0]);
-          break;
-        }
-        case VoFInitialConditions::VoFInitType::signed_distance_level_set:
-        {
-          init_vof_ls (data[0]);
-          break;
-        }
-        default:
-          Assert(false, ExcNotImplemented ());
-      }
+        switch (vof_initial_conditions->init_type())
+          {
+            case VoFInitialConditions::VoFInitType::composition:
+            {
+              init_vof_compos (data[f], f);
+              break;
+            }
+            case VoFInitialConditions::VoFInitType::signed_distance_level_set:
+            {
+              init_vof_ls (data[f], f);
+              break;
+            }
+            default:
+              Assert(false, ExcNotImplemented ());
+          }
 
-    const unsigned int vofN_blockidx = data[0].reconstruction.block_index;
-    const unsigned int vofLS_blockidx = data[0].level_set.block_index;
-    update_vof_normals (data[0], sim.solution);
-    sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
-    sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
-    sim.old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
-    sim.old_old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
+        const unsigned int vofN_blockidx = data[f].reconstruction.block_index;
+        const unsigned int vofLS_blockidx = data[f].level_set.block_index;
+        update_vof_normals (data[f], sim.solution);
+        sim.old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
+        sim.old_old_solution.block(vofN_blockidx) = sim.solution.block(vofN_blockidx);
+        sim.old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
+        sim.old_old_solution.block(vofLS_blockidx) = sim.solution.block(vofLS_blockidx);
+      }
   }
 
   template <int dim>
-  void VoFHandler<dim>::init_vof_compos (const VoFField<dim> field)
+  void VoFHandler<dim>::init_vof_compos (const VoFField<dim> field, const unsigned int f_ind)
   {
     unsigned int n_samples = vof_initial_conditions->n_samples ();
 
@@ -101,7 +104,7 @@ namespace aspect
 
         for (unsigned int i = 0; i < fe_init.n_quadrature_points; ++i)
           {
-            double ptvof = vof_initial_conditions->initial_value (fe_init.quadrature_point(i));
+            double ptvof = vof_initial_conditions->initial_value (fe_init.quadrature_point(i), f_ind);
             vof_val += ptvof * (fe_init.JxW (i) / cell_vol);
           }
 
@@ -119,7 +122,7 @@ namespace aspect
   }
 
   template <int dim>
-  void VoFHandler<dim>::init_vof_ls (const VoFField<dim> field)
+  void VoFHandler<dim>::init_vof_ls (const VoFField<dim> field, const unsigned int f_ind)
   {
     unsigned int n_samples = vof_initial_conditions->n_samples ();
 
@@ -156,7 +159,7 @@ namespace aspect
 
         cell_vol = cell->measure ();
         cell_diam = cell->diameter();
-        d_func = vof_initial_conditions->initial_value (cell->barycenter());
+        d_func = vof_initial_conditions->initial_value (cell->barycenter(), f_ind);
         fe_init.reinit (cell);
 
         double vof_val = 0.0;
@@ -187,9 +190,9 @@ namespace aspect
                         xH[di] += 0.5*h;
                         xL[di] -= 0.5*h;
                         double dH = vof_initial_conditions
-                                    ->initial_value (cell->intermediate_point(xH));
+                                    ->initial_value (cell->intermediate_point(xH), f_ind);
                         double dL = vof_initial_conditions
-                                    ->initial_value (cell->intermediate_point(xL));
+                                    ->initial_value (cell->intermediate_point(xL), f_ind);
                         grad[di] = (dL-dH);
                         d += (0.5/dim)*(dH+dL);
                       }
@@ -217,8 +220,8 @@ namespace aspect
 {
 #define INSTANTIATE(dim) \
   template void VoFHandler<dim>::set_initial_vofs ();\
-  template void VoFHandler<dim>::init_vof_ls (const VoFField<dim> field); \
-  template void VoFHandler<dim>::init_vof_compos (const VoFField<dim> field);
+  template void VoFHandler<dim>::init_vof_ls (const VoFField<dim> field, const unsigned int f_ind); \
+  template void VoFHandler<dim>::init_vof_compos (const VoFField<dim> field, const unsigned int f_ind);
 
   ASPECT_INSTANTIATE(INSTANTIATE)
 }

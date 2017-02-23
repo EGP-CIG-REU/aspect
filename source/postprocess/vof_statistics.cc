@@ -93,8 +93,10 @@ namespace aspect
                                  this->get_vof_handler().get_field_name(f);
           statistics.add_value (col_name, global_vof_vol_sums[f]);
 
-          output << global_vof_vol_sums[f]
-                 << "/";
+          output << global_vof_vol_sums[f];
+
+          if (f+1 < n_vof_fields)
+                 output << "/";
 
           // also make sure that the other columns filled by the this object
           // all show up with sufficient accuracy and in scientific notation
@@ -108,8 +110,6 @@ namespace aspect
               }
           }
         }
-
-      output << "/";
 
       return std::pair<std::string, std::string> ("Global VoF volumes (m^3):",
                                                   output.str());

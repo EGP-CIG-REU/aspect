@@ -48,9 +48,9 @@ namespace aspect
     template <int dim>
     double
     Function<dim>::
-    initial_value (const Point<dim> &position) const
+    initial_value (const Point<dim> &position, const unsigned int n_field) const
     {
-      return function->value(position);
+      return function->value(position, n_field);
     }
 
     template <int dim>

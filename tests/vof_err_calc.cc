@@ -72,7 +72,8 @@ namespace aspect
         static std::vector<std::string> error_names ();
         static std::vector<std::string> error_abrev ();
         std::vector<double> calc_error_ls (Function<dim> &func,
-                                           unsigned int n_samp);
+                                           unsigned int n_samp,
+                                           unsigned int f_ind);
 
         // Required variables
         bool initialized;
@@ -108,6 +109,7 @@ namespace aspect
     VoFMMSErr<dim>::execute (TableHandler &)
     {
       std::string result_string = "";
+      std::string label_string = "";
       if (!initialized)
         {
           initialized = true;
@@ -121,28 +123,50 @@ namespace aspect
           if (this->convert_output_to_years())
             curr_time /= year_in_seconds;
           trueSolLS->set_time(curr_time);
-          std::vector<double> err_vals = calc_error_ls (*trueSolLS, n_e_samp);
-          std::vector<double> global_err_vals;
+
+          std::ostringstream label_stream;
           std::ostringstream err_str;
-          int i=0;
+          label_stream << "VoF Calculation(";
+
+          unsigned int n_err = err_abrev.size();
           std::vector<std::string>::iterator it = err_abrev.begin();
-          for (; it!=err_abrev.end(); ++it,++i)
+          for (; it!=err_abrev.end(); )
             {
-              double l_err = err_vals[i];
-              const double global_err
-                = Utilities::MPI::sum (l_err, this->get_mpi_communicator());
-              err_str << " " << *it << "= ";
-              err_str << std::scientific << std::setprecision (8)
-                      << global_err;
+              label_stream << *it;
+              if (++it!=err_abrev.end())
+                label_stream << "/";
             }
-          err_str << ".";
-          result_string += err_str.str ();
+          label_stream << "):";
+          label_string = label_stream.str();
+
+          unsigned int n_vof_fields = this->get_vof_handler().get_n_fields();
+          std::vector<double> local_err_vals (n_vof_fields*n_err);
+          for (unsigned int f=0; f<n_vof_fields; ++f)
+            {
+              std::vector<double> l_err_vals_f = calc_error_ls (*trueSolLS, n_e_samp, f);
+              for (unsigned int i=0; i<n_err; ++i)
+                local_err_vals[f*n_err+i] = l_err_vals_f[i];
+            }
+
+          std::vector<double> global_err_vals(n_vof_fields*n_err);
+          Utilities::MPI::sum (local_err_vals, this->get_mpi_communicator(), global_err_vals);
+
+          for (unsigned int f=0; f<n_vof_fields; ++f)
+            {
+              for (unsigned int i=0; i<n_err; ++i)
+                {
+                  err_str << std::scientific << std::setprecision (8)
+                          << global_err_vals[f*n_err+i];
+                  if (i+1<n_err)
+                    err_str << "/";
+                }
+              if (f+1<n_vof_fields)
+                err_str << "//";
+            }
+          result_string = err_str.str ();
           next_err_t = get_next_t (this->get_time (), err_interval);
         }
-
-      if (result_string != "")
-        return std::make_pair ("VOF Calculation:", result_string);
-      return std::make_pair ("", "");
+      return std::make_pair (label_string, result_string);
     }
 
     template <int dim>
@@ -208,7 +232,8 @@ namespace aspect
 
     template <int dim>
     std::vector<double> VoFMMSErr<dim>::calc_error_ls (Function<dim> &func,
-                                                       unsigned int n_samp)
+                                                       unsigned int n_samp,
+                                                       unsigned int f_ind)
     {
       const LinearAlgebra::BlockVector &solution = this->get_solution();
 
@@ -230,8 +255,8 @@ namespace aspect
                             update_JxW_values |
                             update_quadrature_points);
 
-      const unsigned int vof_index = this->get_vof_handler().get_field(0).fraction.first_component_index;
-      const unsigned int vofN_c_index = this->get_vof_handler().get_field(0).reconstruction.first_component_index;
+      const unsigned int vof_index = this->get_vof_handler().get_field(f_ind).fraction.first_component_index;
+      const unsigned int vofN_c_index = this->get_vof_handler().get_field(f_ind).reconstruction.first_component_index;
 
       // Initialize state based on provided function
       for (auto cell : dof_handler.active_cell_iterators ())
@@ -255,7 +280,7 @@ namespace aspect
 
           cell_vol = cell->measure ();
           cell_diam = cell->diameter();
-          d_func = func.value(cell->barycenter());
+          d_func = func.value(cell->barycenter(), f_ind);
           double nnorm1 = 0;
           for (unsigned int i = 0; i < dim; ++i)
             {
@@ -284,8 +309,8 @@ namespace aspect
                   xL = xU;
                   xH[di] += 0.5 * h;
                   xL[di] -= 0.5 * h;
-                  double dH = func.value(cell->intermediate_point(xH));
-                  double dL = func.value(cell->intermediate_point(xL));
+                  double dH = func.value(cell->intermediate_point(xH), f_ind);
+                  double dL = func.value(cell->intermediate_point(xL), f_ind);
                   grad_t[di] = (dL - dH);
                   d_t += (0.5 / dim) * (dH + dL);
                 }

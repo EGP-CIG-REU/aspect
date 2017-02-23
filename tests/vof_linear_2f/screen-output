@@ -1,119 +1,145 @@
 
-Loading shared library <./libvof_linear.so>
+Loading shared library <./libvof_linear_2f.so>
 
 Number of active cells: 64 (on 4 levels)
-Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
+Number of degrees of freedom: 1,972 (578+81+289+64+192+256+64+192+256)
 
 *** Timestep 0:  t=0 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 0 iterations.
    Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3):       0.5
-     VoF Calculation(IEstL1/FEstL1): 2.13316777e-17/0.00000000e+00
-     Writing graphical output:       output-vof_linear/solution/solution-00000
+     Global VoF volumes (m^3):       0.5/0.281
+     VoF Calculation(IEstL1/FEstL1): 2.13316777e-17/0.00000000e+00//1.27325993e-17/0.00000000e+00
+     Writing graphical output:       output-vof_linear_2f/solution/solution-00000
 
 *** Timestep 1:  t=0.0883883 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.457
+     Global VoF volumes (m^3): 0.457/0.249
 
 *** Timestep 2:  t=0.176777 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.416
+     Global VoF volumes (m^3): 0.416/0.219
 
 *** Timestep 3:  t=0.265165 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3):       0.376
-     VoF Calculation(IEstL1/FEstL1): 2.91993433e-17/2.16840434e-17
+     Global VoF volumes (m^3):       0.376/0.191
+     VoF Calculation(IEstL1/FEstL1): 2.91993433e-17/2.16840434e-17//2.05053111e-17/1.64798730e-17
 
 *** Timestep 4:  t=0.353553 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.339
+     Global VoF volumes (m^3): 0.339/0.164
 
 *** Timestep 5:  t=0.441942 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.303
+     Global VoF volumes (m^3): 0.303/0.14
 
 *** Timestep 6:  t=0.53033 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3):       0.27
-     VoF Calculation(IEstL1/FEstL1): 3.47179217e-17/4.07660017e-17
+     Global VoF volumes (m^3):       0.27/0.118
+     VoF Calculation(IEstL1/FEstL1): 3.47179217e-17/4.07660017e-17//2.00651650e-17/2.68882139e-17
 
 *** Timestep 7:  t=0.618718 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.238
+     Global VoF volumes (m^3): 0.238/0.0971
 
 *** Timestep 8:  t=0.707107 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.209
+     Global VoF volumes (m^3): 0.209/0.0786
 
 *** Timestep 9:  t=0.795495 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3):       0.181
-     VoF Calculation(IEstL1/FEstL1): 5.37490845e-17/4.85722573e-17
+     Global VoF volumes (m^3):       0.181/0.062
+     VoF Calculation(IEstL1/FEstL1): 5.37490845e-17/4.85722573e-17//1.49183148e-17/1.21430643e-17
 
 *** Timestep 10:  t=0.883883 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.156
+     Global VoF volumes (m^3): 0.156/0.0474
 
 *** Timestep 11:  t=0.972272 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.132
+     Global VoF volumes (m^3): 0.132/0.0348
 
 *** Timestep 12:  t=1 seconds
    Skipping temperature solve because RHS is zero.
    Solving VoF system... 1 iterations.
    Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3):       0.125
-     VoF Calculation(IEstL1/FEstL1): 4.35307172e-17/4.37238407e-17
-     Writing graphical output:       output-vof_linear/solution/solution-00001
+     Global VoF volumes (m^3):       0.125/0.0313
+     VoF Calculation(IEstL1/FEstL1): 4.35307172e-17/4.37238407e-17//2.08573393e-17/2.27038711e-17
+     Writing graphical output:       output-vof_linear_2f/solution/solution-00001
 
 Termination requested by criterion: end time
 
