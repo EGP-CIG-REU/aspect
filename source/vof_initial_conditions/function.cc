@@ -19,6 +19,7 @@
 */
 
 
+#include <aspect/vof/handler.h>
 #include <aspect/vof_initial_conditions/function.h>
 #include <aspect/postprocess/interface.h>
 
@@ -29,8 +30,7 @@ namespace aspect
     template <int dim>
     Function<dim>::Function ()
       :
-      n_init_samples (3),
-      function (1)
+      n_init_samples (3)
     {}
 
     template <int dim>
@@ -50,7 +50,7 @@ namespace aspect
     Function<dim>::
     initial_value (const Point<dim> &position) const
     {
-      return function.value(position);
+      return function->value(position);
     }
 
     template <int dim>
@@ -96,7 +96,8 @@ namespace aspect
 
         try
           {
-            function.parse_parameters (prm);
+            function.reset(new Functions::ParsedFunction<dim>(this->get_vof_handler().get_n_fields()));
+            function->parse_parameters (prm);
           }
         catch (...)
           {

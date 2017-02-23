@@ -83,7 +83,7 @@ namespace aspect
         /**
          * Level set function for true solution
          */
-        Functions::ParsedFunction<dim> trueSolLS;
+        std_cxx11::unique_ptr<Functions::ParsedFunction<dim>> trueSolLS;
     };
 
     template <int dim>
@@ -120,8 +120,8 @@ namespace aspect
           double curr_time = this->get_time();
           if (this->convert_output_to_years())
             curr_time /= year_in_seconds;
-          trueSolLS.set_time(curr_time);
-          std::vector<double> err_vals = calc_error_ls (trueSolLS, n_e_samp);
+          trueSolLS->set_time(curr_time);
+          std::vector<double> err_vals = calc_error_ls (*trueSolLS, n_e_samp);
           std::vector<double> global_err_vals;
           std::ostringstream err_str;
           int i=0;
@@ -188,7 +188,8 @@ namespace aspect
             err_interval *= year_in_seconds;
           prm.enter_subsection ("True LS");
           {
-            trueSolLS.parse_parameters (prm);
+            trueSolLS.reset(new Functions::ParsedFunction<dim>(this->get_vof_handler().get_n_fields()));
+            trueSolLS->parse_parameters (prm);
           }
           prm.leave_subsection ();
         }
