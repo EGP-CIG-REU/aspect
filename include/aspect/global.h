@@ -19,8 +19,8 @@
 */
 
 
-#ifndef __aspect__global_h
-#define __aspect__global_h
+#ifndef _aspect_global_h
+#define _aspect_global_h
 
 #ifdef ASPECT_USE_PETSC
 #  include <deal.II/lac/petsc_parallel_block_vector.h>
@@ -34,8 +34,10 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/multithread_info.h>
@@ -335,7 +337,12 @@ namespace aspect
 }
 
 
-template < class Stream>
+/**
+ * Print a header into the given stream that will be written both to screen
+ * and to the log file and that provides basic information about what is
+ * running, with how many processes, and using which linear algebra library.
+ */
+template <class Stream>
 void print_aspect_header(Stream &stream)
 {
   const int n_tasks = dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);

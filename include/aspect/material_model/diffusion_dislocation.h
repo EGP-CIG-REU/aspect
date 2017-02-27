@@ -18,8 +18,8 @@
   <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __aspect__model_diffusion_dislocation_h
-#define __aspect__model_diffusion_dislocation_h
+#ifndef _aspect_material_model_diffusion_dislocation_h
+#define _aspect_material_model_diffusion_dislocation_h
 
 #include <aspect/material_model/interface.h>
 #include <aspect/simulator_access.h>
@@ -96,8 +96,6 @@ namespace aspect
         virtual bool is_compressible () const;
 
         virtual double reference_viscosity () const;
-
-        virtual double reference_density () const;
 
         static
         void

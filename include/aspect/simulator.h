@@ -19,8 +19,8 @@
 */
 
 
-#ifndef __aspect__simulator_h
-#define __aspect__simulator_h
+#ifndef _aspect_simulator_h
+#define _aspect_simulator_h
 
 #include <deal.II/base/timer.h>
 #include <deal.II/base/parameter_handler.h>
@@ -115,7 +115,6 @@ namespace aspect
   class Simulator
   {
     public:
-
       /**
        * Constructor.
        *
@@ -266,6 +265,14 @@ namespace aspect
          * field. See Introspection::block_indices for more information.
          */
         unsigned int block_index(const Introspection<dim> &introspection) const;
+
+        /**
+         * Returns an index that runs from 0 (temperature field) to n (nth
+         * compositional field), and uniquely identifies the current advection
+         * field among the list of all advection fields. Can be used to index
+         * vectors that contain entries for all advection fields.
+         */
+        unsigned int field_index() const;
 
         /**
          * Look up the base element within the larger composite finite element
@@ -1140,6 +1147,18 @@ namespace aspect
        */
       bool
       stokes_matrix_depends_on_solution () const;
+
+      /**
+       * This function checks that the user-selected formulations of the
+       * equations are consistent with the other inputs. If an incorrect
+       * selection is detected it throws an exception. It for example assures that
+       * correct heating terms are selected, and the material model supports
+       * the selection of the mass conservation formulation (e.g. incompressible)).
+       * If the parameter 'parameters.formulation' is set to 'custom'
+       * it only ensures very basic consistency.
+       */
+      void
+      check_consistency_of_formulation ();
 
       /**
        * This function is called at the end of each time step and writes the

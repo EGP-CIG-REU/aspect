@@ -19,8 +19,8 @@
 */
 
 
-#ifndef __aspect__heating_model_latent_heat_h
-#define __aspect__heating_model_latent_heat_h
+#ifndef _aspect_heating_model_latent_heat_h
+#define _aspect_heating_model_latent_heat_h
 
 #include <aspect/heating_model/interface.h>
 
@@ -38,7 +38,7 @@ namespace aspect
      *   $ -\rho T frac{\partial S}{\partial T} \frac{D T}{D t}$
      * so that we can add
      *   $ -\rho T frac{\partial S}{\partial T} $
-     * to the $\rho c_p$ term.
+     * to the $\rho C_p$ term.
      *
      * The right-hand side term from latent heating is
      *   $\frac{\partial S}{\partial p} T \rho (u \dot \nabla p)$.

@@ -18,8 +18,8 @@
   <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __aspect__model_simple_compressible_h
-#define __aspect__model_simple_compressible_h
+#ifndef _aspect_material_model_simple_compressible_h
+#define _aspect_material_model_simple_compressible_h
 
 #include <aspect/material_model/interface.h>
 #include <aspect/simulator_access.h>
@@ -44,7 +44,6 @@ namespace aspect
     class SimpleCompressible : public MaterialModel::Interface<dim>, public ::aspect::SimulatorAccess<dim>
     {
       public:
-
         /**
         * Evaluate material properties.
         */
@@ -74,14 +73,6 @@ namespace aspect
          * @{
          */
         virtual double reference_viscosity () const;
-
-        virtual double reference_density () const;
-
-        virtual double reference_thermal_expansion_coefficient () const;
-
-        double reference_thermal_diffusivity () const;
-
-        double reference_cp () const;
         /**
          * @}
          */

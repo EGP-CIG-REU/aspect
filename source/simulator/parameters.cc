@@ -186,7 +186,8 @@ namespace aspect
                        "or for comparing solutions. If the given value is `surface', then "
                        "normalization at the end of each time steps adds a constant value "
                        "to the pressure in such a way that the average pressure at the surface "
-                       "of the domain is zero; the surface of the domain is determined by asking "
+                       "of the domain is what is set in the `Surface pressure' parameter; "
+                       "the surface of the domain is determined by asking "
                        "the geometry model whether a particular face of the geometry has a zero "
                        "or small `depth'. If the value of this parameter is `volume' then the "
                        "pressure is normalized so that the domain average is zero. If `no' is "
@@ -194,6 +195,10 @@ namespace aspect
 
     prm.declare_entry ("Surface pressure", "0",
                        Patterns::Double(),
+                       "The value the pressure is normalized to in each time step when "
+                       "`Pressure normalization' is set to `surface' with default value 0. "
+                       "This setting is ignored in all other cases."
+                       "\n\n"
                        "The mathematical equations that describe thermal convection "
                        "only determine the pressure up to an arbitrary constant. On "
                        "the other hand, for comparison and for looking up material "
@@ -302,6 +307,46 @@ namespace aspect
                        "The relative tolerance up to which the linear system for "
                        "the composition system gets solved. See 'linear solver "
                        "tolerance' for more details.");
+
+
+    prm.enter_subsection("Formulation");
+    {
+      prm.declare_entry ("Formulation", "custom",
+                         Patterns::Selection ("isothermal compression|custom|anelastic liquid approximation|boussinesq approximation"),
+                         "Select a formulation for the basic equations. Different "
+                         "published formulations are available in ASPECT (see the list of "
+                         "possible values for this parameter in the manual for available options). "
+                         "Two ASPECT specific options are\n"
+                         "\\begin{enumerate}\n"
+                         "  \\item `isothermal compression': ASPECT's original "
+                         "formulation, using the explicit compressible mass equation, "
+                         "and the full density for the temperature equation.\n"
+                         "  \\item `custom': A custom selection of `Mass conservation' and "
+                         "`Temperature equation'.\n"
+                         "\\end{enumerate}\n\n"
+                         "\\note{Warning: The `custom' option is "
+                         "implemented for advanced users that want full control over the "
+                         "equations solved. It is possible to choose inconsistent formulations "
+                         "and no error checking is performed on the consistency of the resulting "
+                         "equations.}");
+
+      prm.declare_entry ("Mass conservation", "ask material model",
+                         Patterns::Selection ("incompressible|isothermal compression|"
+                                              "reference density profile|implicit reference density profile|"
+                                              "ask material model"),
+                         "Possible approximations for the density derivatives in the mass "
+                         "conservation equation. Note that this parameter is only evaluated "
+                         "if `Formulation' is set to `custom'. Other formulations ignore "
+                         "the value of this parameter.");
+      prm.declare_entry ("Temperature equation", "real density",
+                         Patterns::Selection ("real density|reference density profile"),
+                         "Possible approximations for the density in the temperature equation. "
+                         "Possible approximations are `real density' and `reference density profile'. "
+                         "Note that this parameter is only evaluated "
+                         "if `Formulation' is set to `custom'. Other formulations ignore "
+                         "the value of this parameter.");
+    }
+    prm.leave_subsection();
 
     // next declare parameters that pertain to the equations to be
     // solved, along with boundary conditions etc. note that at this
@@ -957,6 +1002,41 @@ namespace aspect
     }
     prm.leave_subsection ();
 
+
+    prm.enter_subsection ("Formulation");
+    {
+      // The following options each have a set of conditions to be met in order
+      // for the formulation to be consistent, however, most of
+      // the information is not available at this point. Therefore, the error checking is done
+      // in Simulator<dim>::check_consistency_of_formulation() after the initialization of
+      // material models, heating plugins, and adiabatic conditions.
+      formulation = Formulation::parse(prm.get("Formulation"));
+      if (formulation == Formulation::isothermal_compression)
+        {
+          formulation_mass_conservation = Formulation::MassConservation::isothermal_compression;
+          formulation_temperature_equation = Formulation::TemperatureEquation::real_density;
+        }
+      else if (formulation == Formulation::boussinesq_approximation)
+        {
+          formulation_mass_conservation = Formulation::MassConservation::incompressible;
+          formulation_temperature_equation = Formulation::TemperatureEquation::reference_density_profile;
+        }
+      else if (formulation == Formulation::anelastic_liquid_approximation)
+        {
+          // equally possible: implicit_reference_profile
+          formulation_mass_conservation = Formulation::MassConservation::reference_density_profile;
+          formulation_temperature_equation = Formulation::TemperatureEquation::reference_density_profile;
+        }
+      else if (formulation == Formulation::custom)
+        {
+          formulation_mass_conservation = Formulation::MassConservation::parse(prm.get("Mass conservation"));
+          formulation_temperature_equation = Formulation::TemperatureEquation::parse(prm.get("Temperature equation"));
+        }
+      else AssertThrow(false, ExcNotImplemented());
+    }
+    prm.leave_subsection ();
+
+
     prm.enter_subsection ("Model settings");
     {
       include_melt_transport = prm.get_bool ("Include melt transport");
@@ -965,6 +1045,11 @@ namespace aspect
         nullspace_removal = NullspaceRemoval::none;
         std::vector<std::string> nullspace_names =
           Utilities::split_string_list(prm.get("Remove nullspace"));
+        AssertThrow(Utilities::has_unique_entries(nullspace_names),
+                    ExcMessage("The list of strings for the parameter "
+                               "'Model settings/Remove nullspace' contains entries more than once. "
+                               "This is not allowed. Please check your parameter file."));
+
         for (unsigned int i=0; i<nullspace_names.size(); ++i)
           {
             if (nullspace_names[i]=="net rotation")

@@ -649,6 +649,9 @@ namespace aspect
         prm.print_parameters(prm_out, ParameterHandler::LaTeX);
       }
 
+    // check that the setup of equations, material models, and heating terms is consistent
+    check_consistency_of_formulation();
+
     // now that all member variables have been set up, also
     // connect the functions that will actually do the assembly
     set_assemblers();
@@ -923,15 +926,15 @@ namespace aspect
         }
     }
 
+    // If there is a fixed boundary temperature,
+    // update the temperature boundary condition.
+    if (boundary_temperature.get())
+      boundary_temperature->update();
+
     // if using continuous temperature FE, do the same for the temperature variable:
     // evaluate the current boundary temperature and add these constraints as well
     if (!parameters.use_discontinuous_temperature_discretization)
       {
-        // If there is a fixed boundary temperature,
-        // update the temperature boundary condition.
-        if (boundary_temperature.get())
-          boundary_temperature->update();
-
         // obtain the boundary indicators that belong to Dirichlet-type
         // temperature boundary conditions and interpolate the temperature
         // there
@@ -954,14 +957,14 @@ namespace aspect
           }
       }
 
+    // If there are fixed boundary compositions,
+    // update the composition boundary condition.
+    if (boundary_composition.get())
+      boundary_composition->update();
+
     // now do the same for the composition variable:
     if (!parameters.use_discontinuous_composition_discretization)
       {
-        // If there are fixed boundary compositions,
-        // update the composition boundary condition.
-        if (boundary_composition.get())
-          boundary_composition->update();
-
         // obtain the boundary indicators that belong to Dirichlet-type
         // composition boundary conditions and interpolate the composition
         // there

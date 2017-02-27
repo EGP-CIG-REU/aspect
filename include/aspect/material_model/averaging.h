@@ -18,8 +18,8 @@
   <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __aspect__averaging_h
-#define __aspect__averaging_h
+#ifndef _aspect_material_model_averaging_h
+#define _aspect_material_model_averaging_h
 
 #include <aspect/material_model/interface.h>
 #include <aspect/simulator_access.h>
@@ -128,13 +128,6 @@ namespace aspect
          * the mean depth of the model.
          */
         virtual double reference_viscosity () const;
-
-        /**
-         * Method to calculate reference density for the depth-dependent model. Because the depth-
-         * dependent model deos not modify density, the reference density is equivalent to the
-         * base model's reference density.
-         */
-        virtual double reference_density () const;
 
 
 

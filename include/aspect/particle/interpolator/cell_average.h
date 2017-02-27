@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __aspect__particle_interpolator_cell_average_h
-#define __aspect__particle_interpolator_cell_average_h
+#ifndef _aspect_particle_interpolator_cell_average_h
+#define _aspect_particle_interpolator_cell_average_h
 
 #include <aspect/particle/interpolator/interface.h>
 #include <aspect/simulator_access.h>
@@ -47,7 +47,11 @@ namespace aspect
           std::vector<std::vector<double> >
           properties_at_points(const std::multimap<types::LevelInd, Particle<dim> > &particles,
                                const std::vector<Point<dim> > &positions,
+                               const ComponentMask &selected_properties,
                                const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const;
+
+          // avoid -Woverloaded-virtual:
+          using Interface<dim>::properties_at_points;
       };
     }
   }

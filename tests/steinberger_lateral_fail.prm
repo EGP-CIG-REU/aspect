@@ -54,13 +54,13 @@ subsection Material model
     set Data directory                   = $ASPECT_SOURCE_DIR/data/material-model/steinberger/test-steinberger-compressible/
     set Material file names              = testdata.txt
     # Use overresolved viscosity prefactor file
-    set Lateral viscosity file name      = test-viscosity-prefactor-overres.txt 
+    set Lateral viscosity file name      = test-viscosity-prefactor.txt 
     set Radial viscosity file name       = test-radial-visc.txt
     set Bilinear interpolation           = true
     set Latent heat                      = false
-    set Compressible                     = true
     set Reference viscosity              = 1e21
     set Use lateral average temperature for viscosity = true
+    set Number lateral average bands = 100
   end
 end
 

@@ -22,6 +22,7 @@
 #include <aspect/postprocess/depth_average.h>
 #include <aspect/lateral_averaging.h>
 #include <aspect/global.h>
+#include <aspect/utilities.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -252,7 +253,7 @@ namespace aspect
               std::ofstream f(filename.c_str(), std::ofstream::out);
 
               //Write the header
-              f << "#       time" << "       depth";
+              f << "#       time" << "        depth";
               for ( unsigned int i = 0; i < variables.size(); ++i)
                 f << " " << variables[i];
               f << std::endl;
@@ -266,9 +267,9 @@ namespace aspect
                     {
                       f << std::setw(12)
                         << (this->convert_output_to_years() ? point->time/year_in_seconds : point->time)
-                        << std::setw(12) << depth;
+                        << ' ' << std::setw(12) << depth;
                       for ( unsigned int i = 0; i < variables.size(); ++i )
-                        f << std::setw(12) << point->values[i][d];
+                        f << ' ' << std::setw(12) << point->values[i][d];
                       f << std::endl;
                       depth+= max_depth/static_cast<double>(point->values[0].size() );
                     }
@@ -355,6 +356,11 @@ namespace aspect
           n_depth_zones = prm.get_integer ("Number of zones");
 
           output_variables = Utilities::split_string_list(prm.get("List of output variables"));
+          AssertThrow(Utilities::has_unique_entries(output_variables),
+                      ExcMessage("The list of strings for the parameter "
+                                 "'Postprocess/Depth average/List of output variables' contains entries more than once. "
+                                 "This is not allowed. Please check your parameter file."));
+
           if ( std::find( output_variables.begin(), output_variables.end(), "all") != output_variables.end())
             output_all_variables = true;
           else

@@ -19,6 +19,7 @@
  */
 
 #include <aspect/particle/property/interface.h>
+#include <aspect/utilities.h>
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -249,14 +250,21 @@ namespace aspect
 
         // Initialize our property information
         property_information = ParticlePropertyInformation(info);
+
+        // Create the memory pool that will store all particle properties
+        property_pool.reset(new PropertyPool(property_information.n_components()));
       }
 
       template <int dim>
       void
       Manager<dim>::initialize_one_particle (Particle<dim> &particle) const
       {
-        std::vector<double> particle_properties (0);
-        particle.set_n_property_components(property_information.n_components());
+        if (property_information.n_components() == 0)
+          return;
+
+        std::vector<double> particle_properties;
+        particle_properties.reserve(property_information.n_components());
+
         for (typename std::list<std_cxx11::shared_ptr<Interface<dim> > >::const_iterator
              p = property_list.begin(); p!=property_list.end(); ++p)
           {
@@ -264,7 +272,7 @@ namespace aspect
                                                    particle_properties);
           }
 
-        Assert(particle_properties.size() == get_n_property_components(),
+        Assert(particle_properties.size() == property_information.n_components(),
                ExcMessage("The reported numbers of particle property components do not sum up "
                           "to the number of particle properties that were initialized by "
                           "the property plugins. Check the selected property plugins for "
@@ -280,7 +288,13 @@ namespace aspect
                                               const Interpolator::Interface<dim> &interpolator,
                                               const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const
       {
-        std::vector<double> particle_properties (0);
+        particle.set_property_pool(*property_pool);
+
+        if (property_information.n_components() == 0)
+          return;
+
+        std::vector<double> particle_properties;
+        particle_properties.reserve(property_information.n_components());
 
         unsigned int property_index = 0;
         for (typename std::list<std_cxx11::shared_ptr<Interface<dim> > >::const_iterator
@@ -317,6 +331,7 @@ namespace aspect
 
                   const std::vector<std::vector<double> > interpolated_properties = interpolator.properties_at_points(particles,
                                                                                     std::vector<Point<dim> > (1,particle.get_location()),
+                                                                                    ComponentMask(property_information.n_components(),true),
                                                                                     found_cell);
                   for (unsigned int property_component = 0; property_component < property_information.get_components_by_plugin_index(property_index); ++property_component)
                     particle_properties.push_back(interpolated_properties[0][property_information.get_position_by_plugin_index(property_index)+property_component]);
@@ -400,6 +415,13 @@ namespace aspect
       }
 
       template <int dim>
+      PropertyPool &
+      Manager<dim>::get_property_pool () const
+      {
+        return *property_pool;
+      }
+
+      template <int dim>
       unsigned int
       Manager<dim>::get_property_component_by_name(const std::string &name) const
       {
@@ -462,6 +484,10 @@ namespace aspect
           {
             // now also see which derived quantities we are to compute
             prop_names = Utilities::split_string_list(prm.get("List of tracer properties"));
+            AssertThrow(Utilities::has_unique_entries(prop_names),
+                        ExcMessage("The list of strings for the parameter "
+                                   "'Postprocess/Tracers/List of tracer properties' contains entries more than once. "
+                                   "This is not allowed. Please check your parameter file."));
 
             // see if 'all' was selected (or is part of the list). if so
             // simply replace the list with one that contains all names

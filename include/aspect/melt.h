@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016 by the authors of the ASPECT code.
+  Copyright (C) 2016, 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef __aspect__melt_h
-#define __aspect__melt_h
+#ifndef _aspect_melt_h
+#define _aspect_melt_h
 
 #include <aspect/simulator_access.h>
 #include <aspect/global.h>
@@ -325,7 +325,7 @@ namespace aspect
        * initialization can be done together with the other objects related to melt
        * transport.
        */
-      std::auto_ptr<FluidPressureBoundaryConditions::Interface<dim> > fluid_pressure_boundary_conditions;
+      std_cxx11::unique_ptr<FluidPressureBoundaryConditions::Interface<dim> > fluid_pressure_boundary_conditions;
   };
 
 }

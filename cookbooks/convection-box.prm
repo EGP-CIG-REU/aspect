@@ -99,7 +99,6 @@ subsection Model settings
   set Tangential velocity boundary indicators = left, right, bottom, top
 end
 
-
 # The following two sections describe first the
 # direction (vertical) and magnitude of gravity and the
 # material model (i.e., density, viscosity, etc). We have
@@ -109,7 +108,7 @@ subsection Gravity model
   set Model name = vertical
 
   subsection Vertical
-    set Magnitude = 1e14   # = Ra / Thermal expansion coefficient
+    set Magnitude = 1e4   # = Ra / Thermal expansion coefficient
   end
 end
 
@@ -122,7 +121,7 @@ subsection Material model
     set Reference specific heat       = 1
     set Reference temperature         = 0
     set Thermal conductivity          = 1
-    set Thermal expansion coefficient = 1e-10
+    set Thermal expansion coefficient = 1
     set Viscosity                     = 1
   end
 end

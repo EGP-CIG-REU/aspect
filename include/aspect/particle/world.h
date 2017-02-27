@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __aspect__particle_world_h
-#define __aspect__particle_world_h
+#ifndef _aspect_particle_world_h
+#define _aspect_particle_world_h
 
 #include <aspect/global.h>
 #include <aspect/particle/particle.h>
@@ -28,6 +28,7 @@
 #include <aspect/particle/integrator/interface.h>
 #include <aspect/particle/interpolator/interface.h>
 #include <aspect/particle/property/interface.h>
+#include <aspect/particle/property_pool.h>
 #include <aspect/particle/output/interface.h>
 
 #include <aspect/simulator_access.h>

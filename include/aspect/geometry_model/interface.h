@@ -19,8 +19,8 @@
 */
 
 
-#ifndef __aspect__geometry_model_interface_h
-#define __aspect__geometry_model_interface_h
+#ifndef _aspect_geometry_model_interface_h
+#define _aspect_geometry_model_interface_h
 
 #include <aspect/plugins.h>
 #include <deal.II/base/parameter_handler.h>
@@ -273,7 +273,6 @@ namespace aspect
         /**
          * If true, the queried point (in Cartesian coordinates)
          * lies in the domain specified by the geometry.
-         * The default implementation of this function will return @p false.
          */
         virtual
         bool

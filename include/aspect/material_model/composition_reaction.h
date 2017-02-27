@@ -18,9 +18,8 @@
   <http://www.gnu.org/licenses/>.
 */
 
-
-#ifndef __aspect__model_composition_reaction_h
-#define __aspect__model_composition_reaction_h
+#ifndef _aspect_material_model_composition_reaction_h
+#define _aspect_material_model_composition_reaction_h
 
 #include <aspect/material_model/interface.h>
 #include <aspect/simulator_access.h>
@@ -75,15 +74,6 @@ namespace aspect
          * @{
          */
         virtual double reference_viscosity () const;
-
-        virtual double reference_density () const;
-
-        virtual double reference_thermal_expansion_coefficient () const;
-
-//TODO: should we make this a virtual function as well? where is it used?
-        double reference_thermal_diffusivity () const;
-
-        double reference_cp () const;
         /**
          * @}
          */

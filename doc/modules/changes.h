@@ -6,6 +6,105 @@
  *
  * <ol>
  *
+ * <li> New: Blankenbach benchmarks were added.
+ * <br>
+ * (Timo Heister, 2017/02/16)
+ *
+ * <li> New: The particle property interpolation interface can now be
+ * queried for only a part (or only one) of the particle properties.
+ * This makes interpolation more efficient, because the compositional
+ * fields are solved one-by-one and therefore oftentimes only one
+ * of the properties is actually needed. Interpolating all needed
+ * properties in one call is still more efficient in the general case. 
+ * <br>
+ * (Rene Gassmoeller, 2017/02/15)
+ *
+ * <li> Removed: The material model interface contained the functions
+ * 'reference_density', 'reference_thermal_expansion_coefficient',
+ * 'viscosity_ratio', and 'thermodynamic_phase'. Additionally many
+ * material models implemented functions like 'reference_cp', and
+ * 'reference_thermal_diffusivity'. These functions were not used in
+ * any place and could be inconsistent with the model properties,
+ * because they had no input to figure out the real model conditions.
+ * Therefore they were removed. Additionally, the postprocessors
+ * visualizing the 'viscosity_ratio' and 'thermodynamic_phase' functions
+ * were removed, because there is no material model in the current version
+ * that actually implements these functions, and they are not tested.
+ * The new recommended way to determine a reference
+ * material property for a given model is to evaluate the material model
+ * at reference conditions (given by the adiabatic profile) as implemented
+ * in the 'basic statistics' postprocessor. Existing user plugins that
+ * implement these funtions will continue to work, as long as the
+ * functions are only used within that plugin. User plugins that called these
+ * interface functions from outside can either cast the material model 
+ * reference to a particular material model that implements these functions, 
+ * or use the recommended approach to determine reference properties described
+ * above.
+ * <br>
+ * (Rene Gassmoeller, 2017/02/09)
+ *
+ * <li> Changed: The 'basic statistics' postprocessor now uses a better
+ * defined reference state to compute properties like the Rayleigh number.
+ * In particular, it computes material properties for the prescribed 
+ * adiabatic temperature and pressure conditions at the surface, instead 
+ * of using the deprecated reference_property() functions of the material 
+ * model interface. This way it can also be used for other material models
+ * than the 'simple' model, and also highlights possible inconsistencies
+ * between the reference profile and reference temperatures assumed in the
+ * matherial model. During the rework the multiplicative output while doing
+ * initial adaptive refinement steps was also removed.
+ * <br>
+ * (Rene Gassmoeller, 2017/02/08)
+ *
+ * <li> Removed: The 'steinberger' material model contained an option to
+ * use it for incompressible models. This option included a somewhat
+ * complicated density scaling, and relied on the availability of a
+ * compressible adiabatic profile in incompressible models. This profile
+ * is not longer available with the recent changes to the adiabatic
+ * reference profile, and the feature is too obscure to justify a fix.
+ * Therefore, it was removed and the 'steinberger' material model now
+ * only works for compressible formulations.
+ * <br>
+ * (Rene Gassmoeller, 2017/02/07)
+ *
+ * <li> New: A cookbook for continental extension was added, which uses
+ * uses the visco plastic material to simulate the thermal-mechanical
+ * evolution of a continental plate extending at a constant velocity.
+ * <br>
+ * (John Naliboff, 2017/01/20)
+ *
+ * <li> Changed: The finite strain cookbook used a way to compute 
+ * the finite strain that was only appropriate for a small amount of
+ * strain. This was fixed to a proper finite strain computation.
+ * Added tests and benchmarks for the new formulation, and updated
+ * the according particle property in the same way. Also updated
+ * and extended the cookbook description in the manual.
+ * <br> (Rene Gassmoeller, 2017/01/19)
+ *
+ * <li> New: Added a "heat flux densities" postprocessor.
+ * <br> (Timo Heister, 2016/12/26)
+ *
+ * <li> New: ASPECT now allows querying its own version number as well as
+ * the version of all of the underlying libraries using the
+ * <code>--version</code> or <code>-v</code> command line flags.
+ * <br>
+ * Similarly, using <code>--help</code> or <code>-h</code> allows
+ * querying command line usage of ASPECT.
+ * <br> (Wolfgang Bangerth, 2016/12/19-31)
+ *
+ * <li> New: A material model for incompressible (using the Boussinesq
+ * approximation) and compressible computations (with ALA or TALA) for a
+ * nondimensionalized problem. This can be used for several benchmark problems
+ * like Blankenbach, King, etc..
+ * <br> (Timo Heister, Juliane Dannberg, Rene Gassmoeller, 2016/12/18)
+ *
+ * <li> New: ASPECT now supports the choice between different formulations for
+ * the governing equations including boussinesq and anelastic liquid
+ * approximation. For this, the adiabatic conditions have been extended to
+ * provide values and gradients of the reference density. Several benchmarks
+ * for these formulations have been added.
+ * <br> (Juliane Dannberg, Rene Gassmoeller, Timo Heister, 2016/12/14)
+ *
  * <li> New: ASPECT now also generates a <code>output/particles.visit</code>
  * file that allows Visit to read in all files from all processors and
  * all time steps that contain particle data.
