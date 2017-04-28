@@ -1,8 +1,8 @@
 
-Loading shared library <./libvof_linear.so>
+Loading shared library <./libvof_linear_c.so>
 
 Number of active cells: 64 (on 4 levels)
-Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
+Number of degrees of freedom: 2,036 (578+81+289+576+64+192+256)
 
 *** Timestep 0:  t=0 seconds
    Skipping temperature solve because RHS is zero.
@@ -11,8 +11,9 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF volumes (m^3):       0.5
+     Compositions min/max/mass:      0/1/0.5
      VoF Calculation(IEstL1/FEstL1): 2.13316777e-17/0.00000000e+00
-     Writing graphical output:       output-vof_linear/solution/solution-00000
+     Writing graphical output:       output-vof_linear_c/solution/solution-00000
 
 *** Timestep 1:  t=0.0883883 seconds
    Skipping temperature solve because RHS is zero.
@@ -20,7 +21,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.457
+     Global VoF volumes (m^3):  0.457
+     Compositions min/max/mass: -2.776e-17/1/0.4568
 
 *** Timestep 2:  t=0.176777 seconds
    Skipping temperature solve because RHS is zero.
@@ -28,7 +30,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.416
+     Global VoF volumes (m^3):  0.416
+     Compositions min/max/mass: -1.388e-17/1/0.4155
 
 *** Timestep 3:  t=0.265165 seconds
    Skipping temperature solve because RHS is zero.
@@ -37,6 +40,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF volumes (m^3):       0.376
+     Compositions min/max/mass:      -1.995e-17/1/0.3762
      VoF Calculation(IEstL1/FEstL1): 2.91993433e-17/2.16840434e-17
 
 *** Timestep 4:  t=0.353553 seconds
@@ -45,7 +49,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.339
+     Global VoF volumes (m^3):  0.339
+     Compositions min/max/mass: -2.082e-17/1/0.3388
 
 *** Timestep 5:  t=0.441942 seconds
    Skipping temperature solve because RHS is zero.
@@ -53,7 +58,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.303
+     Global VoF volumes (m^3):  0.303
+     Compositions min/max/mass: -2.082e-17/1/0.3034
 
 *** Timestep 6:  t=0.53033 seconds
    Skipping temperature solve because RHS is zero.
@@ -62,6 +68,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF volumes (m^3):       0.27
+     Compositions min/max/mass:      -2.082e-17/1/0.27
      VoF Calculation(IEstL1/FEstL1): 3.47179217e-17/4.07660017e-17
 
 *** Timestep 7:  t=0.618718 seconds
@@ -70,7 +77,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.238
+     Global VoF volumes (m^3):  0.238
+     Compositions min/max/mass: -2.082e-17/1/0.2385
 
 *** Timestep 8:  t=0.707107 seconds
    Skipping temperature solve because RHS is zero.
@@ -78,7 +86,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.209
+     Global VoF volumes (m^3):  0.209
+     Compositions min/max/mass: -2.082e-17/1/0.2089
 
 *** Timestep 9:  t=0.795495 seconds
    Skipping temperature solve because RHS is zero.
@@ -87,6 +96,7 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF volumes (m^3):       0.181
+     Compositions min/max/mass:      -2.776e-17/1/0.1814
      VoF Calculation(IEstL1/FEstL1): 5.37490845e-17/4.85722573e-17
 
 *** Timestep 10:  t=0.883883 seconds
@@ -95,7 +105,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.156
+     Global VoF volumes (m^3):  0.156
+     Compositions min/max/mass: -2.776e-17/1/0.1557
 
 *** Timestep 11:  t=0.972272 seconds
    Skipping temperature solve because RHS is zero.
@@ -103,7 +114,8 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
    Solving VoF system... 1 iterations.
 
    Postprocessing:
-     Global VoF volumes (m^3): 0.132
+     Global VoF volumes (m^3):  0.132
+     Compositions min/max/mass: -2.776e-17/1/0.132
 
 *** Timestep 12:  t=1 seconds
    Skipping temperature solve because RHS is zero.
@@ -112,8 +124,9 @@ Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
 
    Postprocessing:
      Global VoF volumes (m^3):       0.125
+     Compositions min/max/mass:      -2.776e-17/1/0.125
      VoF Calculation(IEstL1/FEstL1): 4.35307172e-17/4.37238407e-17
-     Writing graphical output:       output-vof_linear/solution/solution-00001
+     Writing graphical output:       output-vof_linear_c/solution/solution-00001
 
 Termination requested by criterion: end time
 

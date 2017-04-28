@@ -67,16 +67,12 @@ namespace aspect
       template <int dim>
       void
       VoFValues<dim>::
-      compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                         const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                         const std::vector<std::vector<Tensor<2,dim> > > &,
-                                         const std::vector<Point<dim> > &,
-                                         const std::vector<Point<dim> > &,
-                                         std::vector<Vector<double> >                    &computed_quantities) const
+      evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &input_data,
+              std::vector<Vector<double>> &computed_quantities) const
       {
-        const unsigned int n_quadrature_points = uh.size();
+        const unsigned int n_quadrature_points = input_data.solution_values.size();
         Assert (computed_quantities.size() == n_quadrature_points, ExcInternalError ());
-        Assert (uh[0].size() == this->introspection().n_components, ExcInternalError ());
+        Assert (input_data.solution_values[0].size() == this->introspection().n_components, ExcInternalError ());
 
         const FiniteElement<dim> &finite_element = this->get_fe();
 
@@ -98,17 +94,17 @@ namespace aspect
             for (unsigned int q=0; q<n_quadrature_points; ++q)
               {
                 unsigned int out_ind = f*out_per_field;
-                computed_quantities[q][out_ind] = uh[q][vof_ind];
+                computed_quantities[q][out_ind] = input_data.solution_values[q][vof_ind];
                 ++out_ind;
                 if (include_vofLS)
                   {
-                    computed_quantities[q][out_ind] = uh[q][vofLS_ind];
+                    computed_quantities[q][out_ind] = input_data.solution_values[q][vofLS_ind];
                     ++out_ind;
                   }
 
                 if (include_vofN)
                   {
-                    Tensor<1, dim, double> normal = -duh[q][vofLS_ind];
+                    Tensor<1, dim, double> normal = -input_data.solution_gradients[q][vofLS_ind];
                     for (unsigned int i = 0; i<dim; ++i)
                       {
                         computed_quantities[q][out_ind] = normal[i];
