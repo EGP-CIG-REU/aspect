@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2014, 2015, 2016, 2017 by the authors of the ASPECT code.
+  Copyright (C) 2014 - 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -277,10 +277,13 @@ namespace aspect
            * @param x X coordinates of interpolation points.
            * @param y Values in the interpolation points.
            * @param cubic_spline Whether to construct a cubic spline or just do linear interpolation
+           * @param monotone_spline Wether the cubic spline should be a monotone cubic spline.
+           * Requires cubic_spline to be set to true.
            */
           void set_points(const std::vector<double> &x,
                           const std::vector<double> &y,
-                          bool cubic_spline = true);
+                          const bool cubic_spline = true,
+                          const bool monotone_spline = false);
           /**
            * Evaluate spline at point @p x.
            */

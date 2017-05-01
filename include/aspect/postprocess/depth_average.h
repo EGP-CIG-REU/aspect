@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011, 2012, 2016 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -119,7 +119,7 @@ namespace aspect
         std::vector<std::string> output_variables;
 
         /**
-         * Whether to calculate all available quantites when averaging.
+         * Whether to calculate all available quantities when averaging.
          */
         bool output_all_variables;
 

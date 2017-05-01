@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 by the authors of the ASPECT code.
+  Copyright (C) 2015 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -22,5 +22,13 @@
 #define _aspect_compat_h
 
 #include <aspect/global.h>
+
+// C++11 related includes. Can be removed when we require C++11.
+#include <deal.II/base/std_cxx11/array.h>
+#include <deal.II/base/std_cxx11/bind.h>
+#include <deal.II/base/std_cxx11/function.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
+
 
 #endif

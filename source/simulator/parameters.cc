@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -280,17 +280,17 @@ namespace aspect
                        "This approximate inverse of the S block is used in the preconditioning "
                        "used in the GMRES solver.");
 
-    prm.declare_entry ("Number of cheap Stokes solver steps", "30",
+    prm.declare_entry ("Number of cheap Stokes solver steps", "200",
                        Patterns::Integer(0),
                        "As explained in the ASPECT paper (Kronbichler, Heister, and Bangerth, "
                        "GJI 2012) we first try to solve the Stokes system in every time "
                        "step using a GMRES iteration with a poor but cheap "
                        "preconditioner. By default, we try whether we can converge the GMRES "
-                       "solver in 30 such iterations before deciding that we need a better "
-                       "preconditioner. This is sufficient for simple problems with constant "
+                       "solver in 200 such iterations before deciding that we need a better "
+                       "preconditioner. This is sufficient for simple problems with variable "
                        "viscosity and we never need the second phase with the more expensive "
                        "preconditioner. On the other hand, for more complex problems, and in "
-                       "particular for problems with strongly varying viscosity, the 30 "
+                       "particular for problems with strongly nonlinear viscosity, the 200 "
                        "cheap iterations don't actually do very much good and one might skip "
                        "this part right away. In that case, this parameter can be set to "
                        "zero, i.e., we immediately start with the better but more expensive "
@@ -592,6 +592,19 @@ namespace aspect
                          "Whether or not the postproccessors should be executed after "
                          "each of the initial adaptive refinement cycles that are run at "
                          "the start of the simulation.");
+    }
+    prm.leave_subsection();
+
+    prm.enter_subsection ("Postprocess");
+    {
+      prm.declare_entry ("Run postprocessors on nonlinear iterations", "false",
+                         Patterns::Bool (),
+                         "Whether or not the postproccessors should be executed after "
+                         "each of the nonlinear iterations done within one time step. "
+                         "As this is mainly an option for the purposes of debugging, "
+                         "it is not supported when the 'Time between graphical output' "
+                         "is larger than zero, or when the postprocessor is not intended "
+                         "to be run more than once per timestep.");
     }
     prm.leave_subsection();
 
@@ -1002,6 +1015,11 @@ namespace aspect
     }
     prm.leave_subsection ();
 
+    prm.enter_subsection ("Postprocess");
+    {
+      run_postprocessors_on_nonlinear_iterations = prm.get_bool("Run postprocessors on nonlinear iterations");
+    }
+    prm.leave_subsection ();
 
     prm.enter_subsection ("Formulation");
     {

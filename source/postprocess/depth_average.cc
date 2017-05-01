@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -354,6 +354,18 @@ namespace aspect
           if (this->convert_output_to_years())
             output_interval *= year_in_seconds;
           n_depth_zones = prm.get_integer ("Number of zones");
+
+          if (output_interval > 0.0)
+            {
+              // as we increase the the time indicating when to write the next graphical output
+              // every time we execute the depth average postprocessor, there is no good way to
+              // figure out when to write graphical output for the nonlinear iterations if we do
+              // not want to output every time step
+              AssertThrow(this->get_parameters().run_postprocessors_on_nonlinear_iterations == false,
+                          ExcMessage("Postprocessing nonlinear iterations is only supported if every time "
+                                     "step is visualized, or in other words, if the 'Time between graphical "
+                                     "output' in the Depth average postprocessor is set to zero."));
+            }
 
           output_variables = Utilities::split_string_list(prm.get("List of output variables"));
           AssertThrow(Utilities::has_unique_entries(output_variables),

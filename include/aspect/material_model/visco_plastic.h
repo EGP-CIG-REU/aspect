@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -114,7 +114,9 @@ namespace aspect
         void
         parse_parameters (ParameterHandler &prm);
 
-      private:
+        double get_min_strain_rate() const;
+
+      protected:
 
         double reference_T;
 

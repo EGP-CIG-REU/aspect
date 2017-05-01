@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011, 2012, 2015, 2016 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -206,6 +206,12 @@ namespace aspect
        */
       unsigned int
       get_timestep_number () const;
+
+      /**
+       * Return the current nonlinear iteration number of a time step.
+       */
+      unsigned int
+      get_nonlinear_iteration () const;
 
       /**
        * Return a reference to the triangulation in use by the simulator

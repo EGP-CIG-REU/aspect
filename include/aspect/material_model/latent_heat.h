@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 by the authors of the ASPECT code.
+  Copyright (C) 2013 - 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -114,6 +114,8 @@ namespace aspect
         double thermal_alpha;
         double reference_specific_heat;
         double reference_compressibility;
+        double max_viscosity;
+        double min_viscosity;
 
         /**
          * The thermal conductivity.

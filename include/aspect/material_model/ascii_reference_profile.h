@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016 by the authors of the ASPECT code.
+  Copyright (C) 2016 - 2017 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -36,9 +36,9 @@ namespace aspect
      * and computes properties based on this profile.
      *
      * The viscosity is computed as
-     * \begin{equation}
+     * \f[
      * \eta(z,T) = \eta_r(z) \eta_0 \exp\left(-A \frac{T - T_\text{adi}}{T_\text{adi}}\right)."
-     * \end{equation}
+     * \f]
      *
      * @ingroup MaterialModels
      */

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 - 2015 by the authors of the ASPECT code.
+  Copyright (C) 2011 - 2016 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -410,6 +410,7 @@ namespace aspect
     std::vector<double>            additional_refinement_times;
     unsigned int                   adaptive_refinement_interval;
     bool                           run_postprocessors_on_initial_refinement;
+    bool                           run_postprocessors_on_nonlinear_iterations;
     /**
      * @}
      */
