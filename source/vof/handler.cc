@@ -221,6 +221,7 @@ namespace aspect
   {
     // Do checks on required assumptions
     AssertThrow(dim==2,ExcMessage("Volume of Fluid Interface Tracking is currently only functional for dim=2."));
+    AssertThrow(this->get_parameters().CFL_number < 1.0, ExcMessage("Volume of Fluid Interface Tracking requires CFL < 1."));
 
     AssertThrow(!sim.material_model->is_compressible(), ExcMessage("Volume of Fluid Interface Tracking currently assumes incompressiblity."));
 
