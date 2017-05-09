@@ -26,6 +26,8 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/grid_tools.h>
+
 namespace aspect
 {
   namespace MeshRefinement
@@ -114,7 +116,7 @@ namespace aspect
                         }
                       if (abs(cell_vof-neighbor_vof)>=voleps)
                         {
-                          at_interface=true
+                          at_interface=true;
                         }
                     }
                 }
@@ -142,7 +144,7 @@ namespace aspect
     template <int dim>
     void
     VoFBoundary<dim>::
-    declare_parameters (ParameterHandler &prm)
+    declare_parameters (ParameterHandler &/*prm*/)
     {
     }
 
