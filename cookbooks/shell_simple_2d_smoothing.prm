@@ -5,7 +5,7 @@
 set Dimension                              = 2
 set Use years in output instead of seconds = false
 set End time                               = 1.5e16
-set Output directory                       = output
+set Output directory                       = output-shell_simple_2d_smoothing
 
 subsection Discretization
   set Temperature polynomial degree = 2
@@ -19,7 +19,7 @@ subsection Compositional fields
   set Number of fields = 1
 end
 
-subsection Compositional initial conditions
+subsection Initial composition model
   set Model name = function
 
   subsection Function
@@ -68,7 +68,7 @@ subsection Boundary temperature model
 end
 
 
-subsection Initial conditions
+subsection Initial temperature model
   set Model name = spherical hexagonal perturbation
 end
 

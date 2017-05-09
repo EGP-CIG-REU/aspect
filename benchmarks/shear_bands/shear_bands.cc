@@ -1,4 +1,4 @@
-#include <aspect/compositional_initial_conditions/interface.h>
+#include <aspect/initial_composition/interface.h>
 #include <aspect/geometry_model/box.h>
 #include <aspect/simulator_access.h>
 #include <aspect/global.h>
@@ -257,7 +257,7 @@ namespace aspect
      * a certain amplitude.
      */
     template <int dim>
-    class ShearBandsInitialCondition : public CompositionalInitialConditions::Interface<dim>,
+    class ShearBandsInitialCondition : public InitialComposition::Interface<dim>,
       public ::aspect::SimulatorAccess<dim>
     {
       public:
@@ -369,7 +369,7 @@ namespace aspect
     template <int dim>
     double
     ShearBandsInitialCondition<dim>::
-    initial_composition (const Point<dim> &position, const unsigned int n_comp) const
+    initial_composition (const Point<dim> &position, const unsigned int /*n_comp*/) const
     {
       return background_porosity + interpolate_noise->value(position);
     }
@@ -379,7 +379,7 @@ namespace aspect
     void
     ShearBandsInitialCondition<dim>::declare_parameters (ParameterHandler &prm)
     {
-      prm.enter_subsection("Compositional initial conditions");
+      prm.enter_subsection("Initial composition model");
       {
         prm.enter_subsection("Shear bands initial condition");
         {
@@ -411,7 +411,7 @@ namespace aspect
     void
     ShearBandsInitialCondition<dim>::parse_parameters (ParameterHandler &prm)
     {
-      prm.enter_subsection("Compositional initial conditions");
+      prm.enter_subsection("Initial composition model");
       {
         prm.enter_subsection("Shear bands initial condition");
         {
@@ -431,7 +431,7 @@ namespace aspect
      * field with a certain amplitude.
      */
     template <int dim>
-    class PlaneWaveMeltBandsInitialCondition : public CompositionalInitialConditions::Interface<dim>,
+    class PlaneWaveMeltBandsInitialCondition : public InitialComposition::Interface<dim>,
       public ::aspect::SimulatorAccess<dim>
     {
       public:
@@ -525,7 +525,7 @@ namespace aspect
     template <int dim>
     double
     PlaneWaveMeltBandsInitialCondition<dim>::
-    initial_composition (const Point<dim> &position, const unsigned int n_comp) const
+    initial_composition (const Point<dim> &position, const unsigned int /*n_comp*/) const
     {
       return background_porosity * (1.0 + amplitude * cos(wave_number*position[0]*sin(initial_band_angle)
                                                           + wave_number*position[1]*cos(initial_band_angle)));
@@ -536,7 +536,7 @@ namespace aspect
     void
     PlaneWaveMeltBandsInitialCondition<dim>::declare_parameters (ParameterHandler &prm)
     {
-      prm.enter_subsection("Compositional initial conditions");
+      prm.enter_subsection("Initial composition model");
       {
         prm.enter_subsection("Plane wave melt bands initial condition");
         {
@@ -565,7 +565,7 @@ namespace aspect
     void
     PlaneWaveMeltBandsInitialCondition<dim>::parse_parameters (ParameterHandler &prm)
     {
-      prm.enter_subsection("Compositional initial conditions");
+      prm.enter_subsection("Initial composition model");
       {
         prm.enter_subsection("Plane wave melt bands initial condition");
         {
@@ -599,7 +599,7 @@ namespace aspect
 
     template <int dim>
     std::pair<std::string,std::string>
-    ShearBandsPostprocessor<dim>::execute (TableHandler &statistics)
+    ShearBandsPostprocessor<dim>::execute (TableHandler &/*statistics*/)
     {
       // write output that can be used to calculate the angle of the shear bands
       const unsigned int max_lvl = this->get_triangulation().n_global_levels();
@@ -748,27 +748,21 @@ namespace aspect
                       ExcMessage("Postprocessor shear bands growth rate only works with the material model shear bands."));
         }
 
-      if (dynamic_cast<const PlaneWaveMeltBandsInitialCondition<dim> *>(&this->get_compositional_initial_conditions()) != NULL)
-        {
-          const PlaneWaveMeltBandsInitialCondition<dim> *
-          initial_conditions
-            = dynamic_cast<const PlaneWaveMeltBandsInitialCondition<dim> *>(&this->get_compositional_initial_conditions());
+      const PlaneWaveMeltBandsInitialCondition<dim> *
+      initial_composition
+        = this->get_initial_composition_manager().template find_initial_composition_model<PlaneWaveMeltBandsInitialCondition<dim> > ();
 
-          amplitude           = initial_conditions->get_wave_amplitude();
-          initial_band_angle  = initial_conditions->get_initial_band_angle();
-        }
-      else
-        {
-          AssertThrow(false,
-                      ExcMessage("Postprocessor shear bands growth rate only works with the initial conditions model "
-                                 "plane wave melt bands."));
-        }
+      AssertThrow(initial_composition != NULL,
+                  ExcMessage("Postprocessor shear bands growth rate only works with the plane wave melt bands initial composition."));
+
+      amplitude           = initial_composition->get_wave_amplitude();
+      initial_band_angle  = initial_composition->get_initial_band_angle();
     }
 
 
     template <int dim>
     std::pair<std::string,std::string>
-    ShearBandsGrowthRate<dim>::execute (TableHandler &statistics)
+    ShearBandsGrowthRate<dim>::execute (TableHandler &/*statistics*/)
     {
       // compute analytical melt band growth rate
       const double time = this->get_time();
@@ -776,13 +770,13 @@ namespace aspect
       const Point<dim> lower_boundary_point = this->get_geometry_model().representative_point(this->get_geometry_model().maximal_depth());
 
       // get the map of boundary indicators and velocity bounfary conditions
-      const std::map<types::boundary_id,std_cxx11::shared_ptr<VelocityBoundaryConditions::Interface<dim> > >
-      bvs = this->get_prescribed_velocity_boundary_conditions();
+      const std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryVelocity::Interface<dim> > >
+      bvs = this->get_prescribed_boundary_velocity();
       types::boundary_id upper_boundary = this->get_geometry_model().translate_symbolic_boundary_name_to_id("top");
       types::boundary_id lower_boundary = this->get_geometry_model().translate_symbolic_boundary_name_to_id("bottom");
 
       // get the velocities at the upper and lower boundary
-      typename std::map<types::boundary_id,std_cxx11::shared_ptr<VelocityBoundaryConditions::Interface<dim> > >::const_iterator
+      typename std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryVelocity::Interface<dim> > >::const_iterator
       it = bvs.find(upper_boundary);
       const double max_velocity = it->second->boundary_velocity(it->first,upper_boundary_point).norm();
       it = bvs.find(lower_boundary);
@@ -884,14 +878,14 @@ namespace aspect
                                   "presicted from linear stability analysis (Spiegelman, 2003), "
                                   "and compares modelled and analytical solution.")
 
-    ASPECT_REGISTER_COMPOSITIONAL_INITIAL_CONDITIONS(ShearBandsInitialCondition,
-                                                     "shear bands initial condition",
-                                                     "Composition is set to background porosity plus "
-                                                     "white noise.")
+    ASPECT_REGISTER_INITIAL_COMPOSITION_MODEL(ShearBandsInitialCondition,
+                                              "shear bands initial condition",
+                                              "Composition is set to background porosity plus "
+                                              "white noise.")
 
-    ASPECT_REGISTER_COMPOSITIONAL_INITIAL_CONDITIONS(PlaneWaveMeltBandsInitialCondition,
-                                                     "plane wave melt bands initial condition",
-                                                     "Composition is set to background porosity plus "
-                                                     "plane wave.")
+    ASPECT_REGISTER_INITIAL_COMPOSITION_MODEL(PlaneWaveMeltBandsInitialCondition,
+                                              "plane wave melt bands initial condition",
+                                              "Composition is set to background porosity plus "
+                                              "plane wave.")
   }
 }

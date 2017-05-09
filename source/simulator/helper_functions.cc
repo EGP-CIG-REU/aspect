@@ -29,6 +29,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/grid/grid_tools.h>
@@ -221,21 +222,6 @@ namespace aspect
     // only write the statistics file from processor zero
     if (Utilities::MPI::this_mpi_process(mpi_communicator)!=0)
       return;
-
-    if (parameters.convert_to_years == true)
-      {
-        statistics.set_precision("Time (years)", 12);
-        statistics.set_scientific("Time (years)", true);
-        statistics.set_precision("Time step size (years)", 12);
-        statistics.set_scientific("Time step size (years)", true);
-      }
-    else
-      {
-        statistics.set_precision("Time (seconds)", 12);
-        statistics.set_scientific("Time (seconds)", true);
-        statistics.set_precision("Time step size (seconds)", 12);
-        statistics.set_scientific("Time step size (seconds)", true);
-      }
 
     // formatting the table we're about to output and writing the
     // actual file may take some time, so do it on a separate
@@ -694,10 +680,10 @@ namespace aspect
 
 
   template <int dim>
-  void Simulator<dim>::normalize_pressure (LinearAlgebra::BlockVector &vector)
+  double Simulator<dim>::normalize_pressure (LinearAlgebra::BlockVector &vector) const
   {
     if (parameters.pressure_normalization == "no")
-      return;
+      return 0;
 
     const FEValuesExtractors::Scalar &extractor_pressure =
       (parameters.include_melt_transport ?
@@ -776,7 +762,8 @@ namespace aspect
       AssertThrow (false, ExcMessage("Invalid pressure normalization method: " +
                                      parameters.pressure_normalization));
 
-    // sum up the integrals from each processor
+    // sum up the integrals from each processor and compute the result we care about
+    double pressure_adjustment = numbers::signaling_nan<double>();
     {
       const double my_temp[2] = {my_pressure, my_area};
       double temp[2];
@@ -875,8 +862,11 @@ namespace aspect
         distributed_vector.compress(VectorOperation::insert);
       }
 
-    // now get back to the original vector
+    // now get back to the original vector and return the adjustment used
+    // in the computations above
     vector = distributed_vector;
+
+    return pressure_adjustment;
   }
 
 
@@ -884,7 +874,8 @@ namespace aspect
   template <int dim>
   void
   Simulator<dim>::
-  denormalize_pressure (LinearAlgebra::BlockVector &vector,
+  denormalize_pressure (const double                      pressure_adjustment,
+                        LinearAlgebra::BlockVector       &vector,
                         const LinearAlgebra::BlockVector &relevant_vector) const
   {
     if (parameters.pressure_normalization == "no")
@@ -1157,7 +1148,7 @@ namespace aspect
     // TODO for Timo: can we create the ghost vector inside of denormalize_pressure
     // (only in cases where we need it)
     ghosted.block(block_p) = remap.block(block_p);
-    denormalize_pressure (remap, ghosted);
+    denormalize_pressure (this->pressure_adjustment, remap, ghosted);
     current_constraints.set_zero (remap);
 
     remap.block (block_p) /= pressure_scaling;
@@ -1537,8 +1528,10 @@ namespace aspect
 {
 #define INSTANTIATE(dim) \
   template struct Simulator<dim>::AdvectionField; \
-  template void Simulator<dim>::normalize_pressure(LinearAlgebra::BlockVector &vector); \
-  template void Simulator<dim>::denormalize_pressure(LinearAlgebra::BlockVector &vector, const LinearAlgebra::BlockVector &relevant_vector) const; \
+  template double Simulator<dim>::normalize_pressure(LinearAlgebra::BlockVector &vector) const; \
+  template void Simulator<dim>::denormalize_pressure(const double pressure_adjustment, \
+                                                     LinearAlgebra::BlockVector &vector, \
+                                                     const LinearAlgebra::BlockVector &relevant_vector) const; \
   template double Simulator<dim>::get_maximal_velocity (const LinearAlgebra::BlockVector &solution) const; \
   template std::pair<double,double> Simulator<dim>::get_extrapolated_advection_field_range (const AdvectionField &advection_field) const; \
   template void Simulator<dim>::maybe_write_timing_output () const; \

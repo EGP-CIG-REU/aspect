@@ -269,22 +269,26 @@ namespace aspect
 
     prm.declare_entry ("Linear solver A block tolerance", "1e-2",
                        Patterns::Double(0,1),
-                       "A relative tolerance up to which the approximate inverse of the A block "
-                       "of the Stokes system is computed. This approximate A is used in the "
-                       "preconditioning used in the GMRES solver.");
+                       "A relative tolerance up to which the approximate inverse of the $A$ block "
+                       "of the Stokes system is computed. This approximate $A$ is used in the "
+                       "preconditioning used in the GMRES solver. The exact definition of this "
+                       "block preconditioner for the Stokes equation can be found in "
+                       "\\cite{KHB12}.");
 
     prm.declare_entry ("Linear solver S block tolerance", "1e-6",
                        Patterns::Double(0,1),
-                       "A relative tolerance up to which the approximate inverse of the S block "
-                       "(Schur complement matrix, $S = BA^{-1}B^{T}$) of the Stokes system is computed. "
-                       "This approximate inverse of the S block is used in the preconditioning "
-                       "used in the GMRES solver.");
+                       "A relative tolerance up to which the approximate inverse of the $S$ block "
+                       "(i.e., the Schur complement matrix $S = BA^{-1}B^{T}$) of the Stokes "
+                       "system is computed. This approximate inverse of the $S$ block is used "
+                       "in the preconditioning used in the GMRES solver. The exact definition of "
+                       "this block preconditioner for the Stokes equation can be found in "
+                       "\\cite{KHB12}.");
 
     prm.declare_entry ("Number of cheap Stokes solver steps", "200",
                        Patterns::Integer(0),
-                       "As explained in the ASPECT paper (Kronbichler, Heister, and Bangerth, "
-                       "GJI 2012) we first try to solve the Stokes system in every time "
-                       "step using a GMRES iteration with a poor but cheap "
+                       "As explained in the paper that describes ASPECT (Kronbichler, Heister, and Bangerth, "
+                       "2012, see \\cite{KHB12}) we first try to solve the Stokes system in every "
+                       "time step using a GMRES iteration with a poor but cheap "
                        "preconditioner. By default, we try whether we can converge the GMRES "
                        "solver in 200 such iterations before deciding that we need a better "
                        "preconditioner. This is sufficient for simple problems with variable "
@@ -295,6 +299,13 @@ namespace aspect
                        "this part right away. In that case, this parameter can be set to "
                        "zero, i.e., we immediately start with the better but more expensive "
                        "preconditioner.");
+
+    prm.declare_entry ("Maximum number of expensive Stokes solver steps", "1000",
+                       Patterns::Integer(0),
+                       "This sets the maximum number of iterations used in the expensive Stokes solver. "
+                       "If this value is set too low for the size of the problem, the Stokes solver will "
+                       "not converge and return an error message pointing out that the user didn't allow "
+                       "a sufficiently large number of iterations for the iterative solver to converge.");
 
     prm.declare_entry ("Temperature solver tolerance", "1e-12",
                        Patterns::Double(0,1),
@@ -454,7 +465,7 @@ namespace aspect
                          "use in your model.");
       prm.declare_entry ("Prescribed velocity boundary indicators", "",
                          Patterns::Map (Patterns::Anything(),
-                                        Patterns::Selection(VelocityBoundaryConditions::get_names<dim>())),
+                                        Patterns::Selection(BoundaryVelocity::get_names<dim>())),
                          "A comma separated list denoting those boundaries "
                          "on which the velocity is prescribed, i.e., where unknown "
                          "external forces act to prescribe a particular velocity. This is "
@@ -487,7 +498,7 @@ namespace aspect
                          "to true, velocity should be given in m/yr. ");
       prm.declare_entry ("Prescribed traction boundary indicators", "",
                          Patterns::Map (Patterns::Anything(),
-                                        Patterns::Selection(TractionBoundaryConditions::get_names<dim>())),
+                                        Patterns::Selection(BoundaryTraction::get_names<dim>())),
                          "A comma separated list denoting those boundaries "
                          "on which a traction force is prescribed, i.e., where "
                          "known external forces act, resulting in an unknown velocity. This is "
@@ -713,7 +724,7 @@ namespace aspect
                            Patterns::Integer (1, 2),
                            "The exponent $\\alpha$ in the entropy viscosity stabilization. Valid "
                            "options are 1 or 2. The recommended setting is 2. (This parameter does "
-                           "not correspond to any variable in the 2012 GJI paper by Kronbichler, "
+                           "not correspond to any variable in the 2012 paper by Kronbichler, "
                            "Heister and Bangerth that describes ASPECT, see \\cite{KHB12}. "
                            "Rather, the paper always uses 2 as the exponent in the definition "
                            "of the entropy, following equation (15) of the paper. The full "
@@ -724,8 +735,9 @@ namespace aspect
                            Patterns::Double (0),
                            "The $c_R$ factor in the entropy viscosity "
                            "stabilization. (For historical reasons, the name used here is different "
-                           "from the one used in the 2012 GJI paper by Kronbichler, "
-                           "Heister and Bangerth that describes ASPECT. This parameter corresponds "
+                           "from the one used in the 2012 paper by Kronbichler, "
+                           "Heister and Bangerth that describes ASPECT, see \\cite{KHB12}. "
+                           "This parameter corresponds "
                            "to the factor $\\alpha_E$ in the formulas following equation (15) of "
                            "the paper. After further experiments, we have also chosen to use a "
                            "different value than described there.) Units: None.");
@@ -734,8 +746,9 @@ namespace aspect
                            "The $\\beta$ factor in the artificial viscosity "
                            "stabilization. An appropriate value for 2d is 0.078 "
                            "and 0.117 for 3d. (For historical reasons, the name used here is different "
-                           "from the one used in the 2012 GJI paper by Kronbichler, "
-                           "Heister and Bangerth that describes ASPECT. This parameter corresponds "
+                           "from the one used in the 2012 paper by Kronbichler, "
+                           "Heister and Bangerth that describes ASPECT, see \\cite{KHB12}. "
+                           "This parameter corresponds "
                            "to the factor $\\alpha_\\text {max}$ in the formulas following equation (15) of "
                            "the paper. After further experiments, we have also chosen to use a "
                            "different value than described there: It can be chosen as stated there for "
@@ -746,8 +759,9 @@ namespace aspect
                            "The strain rate scaling factor in the artificial viscosity "
                            "stabilization. This parameter determines how much the strain rate (in addition "
                            "to the velocity) should influence the stabilization. (This parameter does "
-                           "not correspond to any variable in the 2012 GJI paper by Kronbichler, "
-                           "Heister and Bangerth that describes ASPECT. Rather, the paper always uses "
+                           "not correspond to any variable in the 2012 paper by Kronbichler, "
+                           "Heister and Bangerth that describes ASPECT, see \\cite{KHB12}. "
+                           "Rather, the paper always uses "
                            "0, i.e. they specify the maximum dissipation $\\nu_h^\\text{max}$ as "
                            "$\\nu_h^\\text{max}\\vert_K = \\alpha_\\text{max} h_K \\|\\mathbf u\\|_{\\infty,K}$. "
                            "Here, we use "
@@ -978,6 +992,7 @@ namespace aspect
     linear_solver_A_block_tolerance = prm.get_double ("Linear solver A block tolerance");
     linear_solver_S_block_tolerance = prm.get_double ("Linear solver S block tolerance");
     n_cheap_stokes_solver_steps     = prm.get_integer ("Number of cheap Stokes solver steps");
+    n_expensive_stokes_solver_steps = prm.get_integer ("Maximum number of expensive Stokes solver steps");
     temperature_solver_tolerance    = prm.get_double ("Temperature solver tolerance");
     composition_solver_tolerance    = prm.get_double ("Composition solver tolerance");
 
@@ -1595,11 +1610,11 @@ namespace aspect
             std::pair<std::string,std::string>(comp,value);
         }
 
-      const std::vector<std::string> x_prescribed_traction_boundary_indicators
+      const std::vector<std::string> x_prescribed_boundary_traction_indicators
         = Utilities::split_string_list
           (prm.get ("Prescribed traction boundary indicators"));
-      for (std::vector<std::string>::const_iterator p = x_prescribed_traction_boundary_indicators.begin();
-           p != x_prescribed_traction_boundary_indicators.end(); ++p)
+      for (std::vector<std::string>::const_iterator p = x_prescribed_boundary_traction_indicators.begin();
+           p != x_prescribed_boundary_traction_indicators.end(); ++p)
         {
           // each entry has the format (white space is optional):
           // <id> [x][y][z] : <value (might have spaces)>
@@ -1673,14 +1688,14 @@ namespace aspect
                                               + error));
             }
 
-          AssertThrow (prescribed_traction_boundary_indicators.find(boundary_id)
-                       == prescribed_traction_boundary_indicators.end(),
+          AssertThrow (prescribed_boundary_traction_indicators.find(boundary_id)
+                       == prescribed_boundary_traction_indicators.end(),
                        ExcMessage ("Boundary indicator <" + Utilities::int_to_string(boundary_id) +
                                    "> appears more than once in the list of indicators "
                                    "for nonzero traction boundaries."));
 
           // finally, put it into the list
-          prescribed_traction_boundary_indicators[boundary_id] =
+          prescribed_boundary_traction_indicators[boundary_id] =
             std::pair<std::string,std::string>(comp,value);
         }
 
@@ -1703,15 +1718,15 @@ namespace aspect
     GeometryModel::declare_parameters <dim>(prm);
     InitialTopographyModel::declare_parameters <dim>(prm);
     GravityModel::declare_parameters<dim> (prm);
-    InitialConditions::declare_parameters<dim> (prm);
-    CompositionalInitialConditions::declare_parameters<dim> (prm);
+    InitialTemperature::Manager<dim>::declare_parameters (prm);
+    InitialComposition::Manager<dim>::declare_parameters (prm);
     VoFInitialConditions::declare_parameters<dim> (prm);
     PrescribedStokesSolution::declare_parameters<dim> (prm);
     BoundaryTemperature::declare_parameters<dim> (prm);
     BoundaryComposition::declare_parameters<dim> (prm);
     AdiabaticConditions::declare_parameters<dim> (prm);
-    VelocityBoundaryConditions::declare_parameters<dim> (prm);
-    TractionBoundaryConditions::declare_parameters<dim> (prm);
+    BoundaryVelocity::declare_parameters<dim> (prm);
+    BoundaryTraction::declare_parameters<dim> (prm);
   }
 }
 

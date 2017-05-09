@@ -38,10 +38,10 @@
 #include <aspect/gravity_model/interface.h>
 #include <aspect/boundary_temperature/interface.h>
 #include <aspect/boundary_composition/interface.h>
-#include <aspect/initial_conditions/interface.h>
-#include <aspect/compositional_initial_conditions/interface.h>
-#include <aspect/velocity_boundary_conditions/interface.h>
-#include <aspect/traction_boundary_conditions/interface.h>
+#include <aspect/initial_temperature/interface.h>
+#include <aspect/initial_composition/interface.h>
+#include <aspect/boundary_velocity/interface.h>
+#include <aspect/boundary_traction/interface.h>
 #include <aspect/mesh_refinement/interface.h>
 #include <aspect/postprocess/interface.h>
 #include <aspect/heating_model/interface.h>
@@ -56,10 +56,24 @@ namespace aspect
   template <int dim> class Simulator;
   template <int dim> struct SimulatorSignals;
   template <int dim> class LateralAveraging;
+
   namespace HeatingModel
   {
     template <int dim> class Manager;
   }
+
+  namespace InitialTemperature
+  {
+    template <int dim> class Manager;
+    template <int dim> class Interface;
+  }
+
+  namespace InitialComposition
+  {
+    template <int dim> class Manager;
+    template <int dim> class Interface;
+  }
+
   namespace AdiabaticConditions
   {
     template <int dim> class Interface;
@@ -516,23 +530,41 @@ namespace aspect
        * Return a reference to the object that describes traction
        * boundary conditions.
        */
-      const std::map<types::boundary_id,std_cxx11::shared_ptr<TractionBoundaryConditions::Interface<dim> > > &
-      get_traction_boundary_conditions () const;
+      const std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryTraction::Interface<dim> > > &
+      get_boundary_traction () const;
 
       /**
        * Return a pointer to the object that describes the temperature initial
        * values.
+       *
+       * @deprecated Use <code> get_initial_temperature_manager </code> instead.
        */
-      const InitialConditions::Interface<dim> &
-      get_initial_conditions () const;
+      const InitialTemperature::Interface<dim> &
+      get_initial_temperature () const DEAL_II_DEPRECATED;
 
+      /**
+       * Return a pointer to the manager of the initial temperature models.
+       * This can then i.e. be used to get the names of the initial temperature
+       * models used in a computation, or to compute the initial temperature
+       * for a given position.
+       */
+      const InitialTemperature::Manager<dim> &
+      get_initial_temperature_manager () const;
 
       /**
        * Return a pointer to the object that describes the composition initial
        * values.
        */
-      const CompositionalInitialConditions::Interface<dim> &
-      get_compositional_initial_conditions () const;
+      const InitialComposition::Interface<dim> &
+      get_initial_composition () const DEAL_II_DEPRECATED;
+
+      /**
+       * Return a pointer to the manager of the initial composition model.
+       * This can then i.e. be used to get the names of the initial composition
+       * models used in a computation.
+       */
+      const InitialComposition::Manager<dim> &
+      get_initial_composition_manager () const;
 
       /**
        * Return a set of boundary indicators that describes which of the
@@ -556,10 +588,10 @@ namespace aspect
       get_free_surface_boundary_indicators () const;
 
       /**
-       * Return the map of prescribed_velocity_boundary_conditions
+       * Return the map of prescribed_boundary_velocity
        */
-      const std::map<types::boundary_id,std_cxx11::shared_ptr<VelocityBoundaryConditions::Interface<dim> > >
-      get_prescribed_velocity_boundary_conditions () const;
+      const std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryVelocity::Interface<dim> > >
+      get_prescribed_boundary_velocity () const;
 
       /**
        * Return a pointer to the manager of the heating model.

@@ -27,6 +27,8 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/symmetric_tensor.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -39,6 +41,8 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/base/tensor_function.h>
 
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #include <aspect/global.h>
 #include <aspect/simulator_access.h>
 #include <aspect/lateral_averaging.h>
@@ -50,12 +54,12 @@
 #include <aspect/gravity_model/interface.h>
 #include <aspect/boundary_temperature/interface.h>
 #include <aspect/boundary_composition/interface.h>
-#include <aspect/initial_conditions/interface.h>
-#include <aspect/compositional_initial_conditions/interface.h>
+#include <aspect/initial_temperature/interface.h>
+#include <aspect/initial_composition/interface.h>
 #include <aspect/prescribed_stokes_solution/interface.h>
-#include <aspect/velocity_boundary_conditions/interface.h>
-#include <aspect/fluid_pressure_boundary_conditions/interface.h>
-#include <aspect/traction_boundary_conditions/interface.h>
+#include <aspect/boundary_velocity/interface.h>
+#include <aspect/boundary_fluid_pressure/interface.h>
+#include <aspect/boundary_traction/interface.h>
 #include <aspect/mesh_refinement/interface.h>
 #include <aspect/termination_criteria/interface.h>
 #include <aspect/postprocess/interface.h>
@@ -361,17 +365,17 @@ namespace aspect
 
       /**
        * A function that is responsible for initializing the
-       * tracers and their properties before the first time step. We want this
+       * particles and their properties before the first time step. We want this
        * to happen before the first timestep in case other properties depend
        * on them, but it can only happen after the other initial conditions
-       * have been set up, because tracer properties likely depend on the
-       * initial conditions. If the tracer postprocessor has not been selected
+       * have been set up, because particle properties likely depend on the
+       * initial conditions. If the particle postprocessor has not been selected
        * this function simply does nothing.
        *
        * This function is implemented in
        * <code>source/simulator/initial_conditions.cc</code>.
        */
-      void initialize_tracers ();
+      void initialize_particles ();
 
       /**
        * A function that initializes the pressure variable before the first
@@ -851,18 +855,45 @@ namespace aspect
        * surface or volume average is decided by a parameter in the
        * input file.
        *
-       * @note This function stores the pressure adjustment in the @p
-       * pressure_adjustment member variable of the current class. It
-       * is there so that we can later use the negative adjustment in
+       * @note This function is called after setting the initial
+       * pressure field in compute_initial_pressure_field() and at the end
+       * of solve_stokes(). This makes sense because these are exactly the
+       * places where the pressure is modified or re-computed.
+       *
+       * @return This function returns the pressure adjustment by value.
+       * This is so that its negative can later be used again in
        * denormalize_pressure().
        *
        * This function is implemented in
        * <code>source/simulator/helper_functions.cc</code>.
        */
-      void normalize_pressure(LinearAlgebra::BlockVector &vector);
+      double normalize_pressure(LinearAlgebra::BlockVector &vector) const;
 
       /**
-       * Invert the action of the normalize_pressure() function above.
+       * Invert the action of the normalize_pressure() function above. This
+       * means that we move from a pressure that satisfies the pressure
+       * normalization (e.g., has a zero average pressure, or a zero average
+       * surface pressure) to one that does not actually satisfy this
+       * normalization, and this doesn't seem to make sense because we are
+       * not interested in such a pressure.
+       *
+       * Indeed, this function is only called at the very beginning of
+       * solve_stokes() before we compute the initial (linear) residual
+       * of the linear system $Ax=b$ that corresponds to the Stokes system,
+       * where $x$ is the variable for which the pressure is adjusted
+       * back to the "wrong" form. Because stokes_system() calls
+       * normalize_pressure() at the end of its operations, no such
+       * "wrong" pressure ever escapes the realm of solve_stokes(). The
+       * "wrong" pressure is then used for two purposes in that function:
+       * (i) To compute the initial Stokes residual, which makes sense
+       * because it can only be zero (if we solved the same linear system
+       * twice) if we re-use the exact same pressure as we got from the
+       * previous solve -- i.e., before we called normalize_pressure()
+       * at the end of the solve. (ii) To initialize the solution vector
+       * before calling the GMRES solver, which also makes sense because
+       * the best guess vector for GMRES is the one that had previously
+       * come out of GMRES, namely the one on which we later called
+       * normalize_pressure().
        *
        * This function modifies @p vector in-place. In some cases, we need
        * locally_relevant values of the pressure. To avoid creating a new vector
@@ -872,13 +903,18 @@ namespace aspect
        * the correct pressure values.
        *
        * @note The adjustment made in this function is done using the
-       * negative of the @p pressure_adjustment member variable
-       * previously set in normalize_pressure().
+       * negative of the @p pressure_adjustment function argument that
+       * would typically have been computed and returned by the
+       * normalize_pressure() function. This value is typically stored in
+       * the member variable @p last_pressure_normalization_adjustment,
+       * but the current function doesn't read this variable but instead
+       * gets the adjustment variable from the given argument.
        *
        * This function is implemented in
        * <code>source/simulator/helper_functions.cc</code>.
        */
-      void denormalize_pressure(LinearAlgebra::BlockVector &vector,
+      void denormalize_pressure(const double                      pressure_adjustment,
+                                LinearAlgebra::BlockVector       &vector,
                                 const LinearAlgebra::BlockVector &relevant_vector) const;
 
       /**
@@ -1274,12 +1310,12 @@ namespace aspect
       const std_cxx11::unique_ptr<GravityModel::Interface<dim> >              gravity_model;
       const std_cxx11::unique_ptr<BoundaryTemperature::Interface<dim> >       boundary_temperature;
       const std_cxx11::unique_ptr<BoundaryComposition::Interface<dim> >       boundary_composition;
-      const std_cxx11::unique_ptr<InitialConditions::Interface<dim> >         initial_conditions;
       const std_cxx11::unique_ptr<PrescribedStokesSolution::Interface<dim> >  prescribed_stokes_solution;
-      const std_cxx11::unique_ptr<CompositionalInitialConditions::Interface<dim> >                     compositional_initial_conditions;
+      InitialComposition::Manager<dim>                                        initial_composition_manager;
+      InitialTemperature::Manager<dim>                                        initial_temperature_manager;
       const std_cxx11::unique_ptr<AdiabaticConditions::Interface<dim> >       adiabatic_conditions;
-      std::map<types::boundary_id,std_cxx11::shared_ptr<VelocityBoundaryConditions::Interface<dim> > > velocity_boundary_conditions;
-      std::map<types::boundary_id,std_cxx11::shared_ptr<TractionBoundaryConditions::Interface<dim> > > traction_boundary_conditions;
+      std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryVelocity::Interface<dim> > > boundary_velocity;
+      std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryTraction::Interface<dim> > > boundary_traction;
 
       /**
        * @}

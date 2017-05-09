@@ -193,9 +193,7 @@ namespace aspect
                           0
                           :
                           BoundaryComposition::create_boundary_composition<dim>(prm)),
-    initial_conditions (InitialConditions::create_initial_conditions<dim>(prm)),
     prescribed_stokes_solution (PrescribedStokesSolution::create_prescribed_stokes_solution<dim>(prm)),
-    compositional_initial_conditions (CompositionalInitialConditions::create_initial_conditions<dim>(prm)),
     adiabatic_conditions (AdiabaticConditions::create_adiabatic_conditions<dim>(prm)),
 
     time (std::numeric_limits<double>::quiet_NaN()),
@@ -254,8 +252,8 @@ namespace aspect
         velocity_bi.insert(p->first);
 
       for (std::map<types::boundary_id,std::pair<std::string, std::string> >::const_iterator
-           r = parameters.prescribed_traction_boundary_indicators.begin();
-           r != parameters.prescribed_traction_boundary_indicators.end();
+           r = parameters.prescribed_boundary_traction_indicators.begin();
+           r != parameters.prescribed_boundary_traction_indicators.end();
            ++r)
         traction_bi.insert(r->first);
 
@@ -285,8 +283,8 @@ namespace aspect
                 velocity_selector.insert(*it_selector);
 
               for (std::string::const_iterator
-                   it_selector  = parameters.prescribed_traction_boundary_indicators[*it].first.begin();
-                   it_selector != parameters.prescribed_traction_boundary_indicators[*it].first.end();
+                   it_selector  = parameters.prescribed_boundary_traction_indicators[*it].first.begin();
+                   it_selector != parameters.prescribed_boundary_traction_indicators[*it].first.end();
                    ++it_selector)
                 traction_selector.insert(*it_selector);
 
@@ -363,6 +361,29 @@ namespace aspect
                                      "> is listed as having more "
                                      "than one type of velocity or traction boundary condition in the input file."));
           }
+
+      // Check that the periodic boundaries do not have other boundary conditions set
+      typedef std::set< std::pair< std::pair< types::boundary_id, types::boundary_id>, unsigned int> >
+      periodic_boundary_set;
+      periodic_boundary_set pbs = geometry_model->get_periodic_boundary_pairs();
+
+      for (periodic_boundary_set::iterator p = pbs.begin(); p != pbs.end(); ++p)
+        {
+          //Throw error if we are trying to use the same boundary for more than one boundary condition
+          AssertThrow( is_element( (*p).first.first, parameters.fixed_temperature_boundary_indicators ) == false &&
+                       is_element( (*p).first.second, parameters.fixed_temperature_boundary_indicators ) == false &&
+                       is_element( (*p).first.first, parameters.fixed_composition_boundary_indicators ) == false &&
+                       is_element( (*p).first.second, parameters.fixed_composition_boundary_indicators ) == false &&
+                       is_element( (*p).first.first, boundary_indicator_lists[0] ) == false && // zero velocity
+                       is_element( (*p).first.second, boundary_indicator_lists[0] ) == false && // zero velocity
+                       is_element( (*p).first.first, boundary_indicator_lists[1] ) == false && // tangential velocity
+                       is_element( (*p).first.second, boundary_indicator_lists[1] ) == false && // tangential velocity
+                       is_element( (*p).first.first, boundary_indicator_lists[2] ) == false && // free surface
+                       is_element( (*p).first.second, boundary_indicator_lists[2] ) == false && // free surface
+                       is_element( (*p).first.first, boundary_indicator_lists[3] ) == false && // prescribed traction or velocity
+                       is_element( (*p).first.second, boundary_indicator_lists[3] ) == false,  // prescribed traction or velocity
+                       ExcMessage("Periodic boundaries must not have boundary conditions set."));
+        }
 
       const std::set<types::boundary_id> all_boundary_indicators
         = geometry_model->get_used_boundary_indicators();
@@ -455,6 +476,14 @@ namespace aspect
     gravity_model->parse_parameters (prm);
     gravity_model->initialize ();
 
+    // Create the initial condition plugins
+    initial_temperature_manager.initialize_simulator(*this);
+    initial_temperature_manager.parse_parameters (prm);
+
+    // Create the initial composition plugins
+    initial_composition_manager.initialize_simulator(*this);
+    initial_composition_manager.parse_parameters (prm);
+
     if (boundary_temperature.get())
       {
         if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(boundary_temperature.get()))
@@ -469,19 +498,6 @@ namespace aspect
           sim->initialize_simulator (*this);
         boundary_composition->parse_parameters (prm);
         boundary_composition->initialize ();
-      }
-
-    if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(initial_conditions.get()))
-      sim->initialize_simulator (*this);
-    initial_conditions->parse_parameters (prm);
-    initial_conditions->initialize ();
-
-    if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(compositional_initial_conditions.get()))
-      sim->initialize_simulator (*this);
-    if (compositional_initial_conditions.get())
-      {
-        compositional_initial_conditions->parse_parameters (prm);
-        compositional_initial_conditions->initialize ();
       }
 
     // Make sure we only have a prescribed Stokes plugin if needed
@@ -567,10 +583,10 @@ namespace aspect
          p != parameters.prescribed_velocity_boundary_indicators.end();
          ++p)
       {
-        VelocityBoundaryConditions::Interface<dim> *bv
-          = VelocityBoundaryConditions::create_velocity_boundary_conditions<dim>
+        BoundaryVelocity::Interface<dim> *bv
+          = BoundaryVelocity::create_boundary_velocity<dim>
             (p->second.second);
-        velocity_boundary_conditions[p->first].reset (bv);
+        boundary_velocity[p->first].reset (bv);
         if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(bv))
           sim->initialize_simulator(*this);
         bv->parse_parameters (prm);
@@ -578,14 +594,14 @@ namespace aspect
       }
 
     for (std::map<types::boundary_id,std::pair<std::string,std::string> >::const_iterator
-         p = parameters.prescribed_traction_boundary_indicators.begin();
-         p != parameters.prescribed_traction_boundary_indicators.end();
+         p = parameters.prescribed_boundary_traction_indicators.begin();
+         p != parameters.prescribed_boundary_traction_indicators.end();
          ++p)
       {
-        TractionBoundaryConditions::Interface<dim> *bv
-          = TractionBoundaryConditions::create_traction_boundary_conditions<dim>
+        BoundaryTraction::Interface<dim> *bv
+          = BoundaryTraction::create_boundary_traction<dim>
             (p->second.second);
-        traction_boundary_conditions[p->first].reset (bv);
+        boundary_traction[p->first].reset (bv);
         if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(bv))
           sim->initialize_simulator(*this);
         bv->parse_parameters (prm);
@@ -797,33 +813,6 @@ namespace aspect
 
     nonlinear_iteration = 0;
 
-    // set global statistics about this time step
-    statistics.add_value("Time step number", timestep_number);
-    if (parameters.convert_to_years == true)
-      statistics.add_value("Time (years)", time / year_in_seconds);
-    else
-      statistics.add_value("Time (seconds)", time);
-
-    if (parameters.convert_to_years == true)
-      statistics.add_value("Time step size (years)", time_step / year_in_seconds);
-    else
-      statistics.add_value("Time step size (seconds)", time_step);
-
-    statistics.add_value("Number of mesh cells",
-                         triangulation.n_global_active_cells());
-
-    unsigned int n_stokes_dofs = introspection.system_dofs_per_block[0];
-    if (introspection.block_indices.velocities != introspection.block_indices.pressure)
-      n_stokes_dofs += introspection.system_dofs_per_block[introspection.block_indices.pressure];
-
-    statistics.add_value("Number of Stokes degrees of freedom", n_stokes_dofs);
-    statistics.add_value("Number of temperature degrees of freedom",
-                         introspection.system_dofs_per_block[introspection.block_indices.temperature]);
-    if (parameters.n_compositional_fields > 0)
-      statistics.add_value("Number of degrees of freedom for all compositions",
-                           parameters.n_compositional_fields
-                           * introspection.system_dofs_per_block[introspection.block_indices.compositional_fields[0]]);
-
     // then interpolate the current boundary velocities. copy constraints
     // into current_constraints and then add to current_constraints
     compute_current_constraints ();
@@ -833,7 +822,7 @@ namespace aspect
     // to make sure that the time dependent velocity boundary conditions
     // end up in the right hand side in the right way; we currently do
     // that by re-assembling the entire system
-    if (!velocity_boundary_conditions.empty())
+    if (!boundary_velocity.empty())
       rebuild_stokes_matrix = rebuild_stokes_preconditioner = true;
 
 
@@ -854,9 +843,9 @@ namespace aspect
     // that end up in the bilinear form. we update those that end up in
     // the constraints object when calling compute_current_constraints()
     // above
-    for (typename std::map<types::boundary_id,std_cxx11::shared_ptr<TractionBoundaryConditions::Interface<dim> > >::iterator
-         p = traction_boundary_conditions.begin();
-         p != traction_boundary_conditions.end(); ++p)
+    for (typename std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryTraction::Interface<dim> > >::iterator
+         p = boundary_traction.begin();
+         p != boundary_traction.end(); ++p)
       p->second->update ();
   }
 
@@ -872,16 +861,16 @@ namespace aspect
     {
       // set the current time and do the interpolation
       // for the prescribed velocity fields
-      for (typename std::map<types::boundary_id,std_cxx11::shared_ptr<VelocityBoundaryConditions::Interface<dim> > >::iterator
-           p = velocity_boundary_conditions.begin();
-           p != velocity_boundary_conditions.end(); ++p)
+      for (typename std::map<types::boundary_id,std_cxx11::shared_ptr<BoundaryVelocity::Interface<dim> > >::iterator
+           p = boundary_velocity.begin();
+           p != boundary_velocity.end(); ++p)
         {
           p->second->update ();
           VectorFunctionFromVelocityFunctionObject<dim> vel
           (introspection.n_components,
-           std_cxx11::bind (static_cast<Tensor<1,dim> (VelocityBoundaryConditions::Interface<dim>::*)(
+           std_cxx11::bind (static_cast<Tensor<1,dim> (BoundaryVelocity::Interface<dim>::*)(
                               const types::boundary_id,
-                              const Point<dim> &) const> (&VelocityBoundaryConditions::Interface<dim>::boundary_velocity),
+                              const Point<dim> &) const> (&BoundaryVelocity::Interface<dim>::boundary_velocity),
                             p->second,
                             p->first,
                             std_cxx11::_1));
@@ -1436,19 +1425,6 @@ namespace aspect
 
       for (periodic_boundary_set::iterator p = pbs.begin(); p != pbs.end(); ++p)
         {
-          //Throw error if we are trying to use the same boundary for more than one boundary condition
-          Assert( is_element( (*p).first.first, parameters.fixed_temperature_boundary_indicators ) == false &&
-                  is_element( (*p).first.second, parameters.fixed_temperature_boundary_indicators ) == false &&
-                  is_element( (*p).first.first, parameters.zero_velocity_boundary_indicators ) == false &&
-                  is_element( (*p).first.second, parameters.zero_velocity_boundary_indicators ) == false &&
-                  is_element( (*p).first.first, parameters.tangential_velocity_boundary_indicators ) == false &&
-                  is_element( (*p).first.second, parameters.tangential_velocity_boundary_indicators ) == false &&
-                  parameters.prescribed_velocity_boundary_indicators.find( (*p).first.first)
-                  == parameters.prescribed_velocity_boundary_indicators.end() &&
-                  parameters.prescribed_velocity_boundary_indicators.find( (*p).first.second)
-                  == parameters.prescribed_velocity_boundary_indicators.end(),
-                  ExcMessage("Periodic boundaries must not have boundary conditions set."));
-
           DoFTools::make_periodicity_constraints(dof_handler,
                                                  (*p).first.first,  //first boundary id
                                                  (*p).first.second, //second boundary id
@@ -1981,9 +1957,9 @@ namespace aspect
         distr_solution = old_solution;
         LinearAlgebra::BlockVector distr_old_solution (system_rhs);
         distr_old_solution = old_old_solution;
-        distr_solution .sadd ((1 + time_step/old_time_step),
-                              -time_step/old_time_step,
-                              distr_old_solution);
+        distr_solution.sadd ((1 + time_step/old_time_step),
+                             -time_step/old_time_step,
+                             distr_old_solution);
         current_linearization_point = distr_solution;
       }
 

@@ -46,7 +46,7 @@ subsection Boundary temperature model
   set Model name = box
 end
 
-subsection Initial conditions
+subsection Initial temperature model
   set Model name = function
   subsection Function
     set Function expression = 0
@@ -65,7 +65,7 @@ subsection Compositional fields
   set Mapped particle properties = advection_particle2:velocity [1], advection_particle:function
 end
 
-subsection Compositional initial conditions
+subsection Initial composition model
   set Model name = function
   subsection Function
     set Variable names      = x,z
@@ -101,17 +101,17 @@ end
 ############### Parameters describing what to do with the solution
 
 subsection Postprocess
-  set List of postprocessors = velocity statistics, composition statistics,tracers
+  set List of postprocessors = velocity statistics, composition statistics,particles
 
   subsection Visualization
     set Time between graphical output = 70
   end
 
-  subsection Tracers
-    set Number of tracers = 100000
+  subsection Particles
+    set Number of particles = 100000
     set Time between data output = 70
     set Data output format = none
-    set List of tracer properties = velocity, function, initial composition
+    set List of particle properties = velocity, function, initial composition
     set Interpolation scheme = cell average
     set Update ghost particles = true
 

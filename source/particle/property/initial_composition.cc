@@ -32,7 +32,7 @@ namespace aspect
                                                                 std::vector<double> &data) const
       {
         for (unsigned int i = 0; i < this->n_compositional_fields(); i++)
-          data.push_back(this->get_compositional_initial_conditions().initial_composition(position,i));
+          data.push_back(this->get_initial_composition_manager().initial_composition(position,i));
       }
 
       template <int dim>
@@ -69,9 +69,9 @@ namespace aspect
     {
       ASPECT_REGISTER_PARTICLE_PROPERTY(InitialComposition,
                                         "initial composition",
-                                        "Implementation of a plugin in which the tracer "
+                                        "Implementation of a plugin in which the particle "
                                         "property is given as the initial composition "
-                                        "at the particle's initial position. The tracer "
+                                        "at the particle's initial position. The particle "
                                         "gets as many properties as there are "
                                         "compositional fields.")
     }

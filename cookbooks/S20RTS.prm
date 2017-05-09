@@ -11,7 +11,7 @@ set Dimension                              = 3
 # the instantaneous solution.
 set End time                               = 0
 set Use years in output instead of seconds = true
-set Output directory                       = output
+set Output directory                       = output-S20RTS
 
 # The following variables describe the tolerance of
 # the linear solver as well as how the pressure should
@@ -59,7 +59,7 @@ end
 # wave velocity model (Ritsema et al., 2000). S20RTS is defined
 # by spherical harmonics up to degree 20 that are radially interpolated
 # with a cubic spline. 
-subsection Initial conditions
+subsection Initial temperature model
   set Model name = S40RTS perturbation
     subsection S40RTS perturbation
 

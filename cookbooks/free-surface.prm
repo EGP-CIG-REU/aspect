@@ -12,7 +12,7 @@ set Dimension = 2
 set CFL number                             = 0.1
 
 set End time                               = 1e8
-set Output directory                       = output
+set Output directory                       = output-free-surface
 
 # Pressure normalization must be set to ``no'' for free surface
 # models, as we assume the pressure is zero at the free surface
@@ -66,7 +66,7 @@ end
 
 # Our temperature initial conditions are simply a blob of hot 
 # rock in the center of the domain
-subsection Initial conditions
+subsection Initial temperature model
   set Model name = function
   subsection Function 
     set Variable names      = x,y
