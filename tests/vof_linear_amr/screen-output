@@ -1,0 +1,84 @@
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+Loading shared library <./libvof_linear_amr.so>
+
+Number of active cells: 64 (on 4 levels)
+Number of degrees of freedom: 1,460 (578+81+289+64+192+256)
+
+*** Timestep 0:  t=0 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+
+Number of active cells: 16 (on 3 levels)
+Number of degrees of freedom: 396 (162+25+81+16+48+64)
+
+*** Timestep 0:  t=0 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 0 iterations.
+   Solving VoF system... 0 iterations.
+
+   Postprocessing:
+     Global VoF volumes (m^3):       0.5
+     VoF Calculation(IEstL1/FEstL1): 3.56431464e-17/0.00000000e+00
+     Writing graphical output:       output-vof_linear_amr/solution/solution-00000
+
+Number of active cells: 4 (on 2 levels)
+Number of degrees of freedom: 116 (50+9+25+4+12+16)
+
+*** Timestep 1:  t=0.176777 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF volumes (m^3): 0.416
+
+Number of active cells: 4 (on 2 levels)
+Number of degrees of freedom: 116 (50+9+25+4+12+16)
+
+*** Timestep 2:  t=0.53033 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF volumes (m^3):       0.27
+     VoF Calculation(IEstL1/FEstL1): 2.76033869e-04/1.31838984e-16
+
+Number of active cells: 4 (on 2 levels)
+Number of degrees of freedom: 116 (50+9+25+4+12+16)
+
+*** Timestep 3:  t=0.883883 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF volumes (m^3):       0.156
+     VoF Calculation(IEstL1/FEstL1): 7.68929803e-04/3.16587034e-17
+
+Number of active cells: 4 (on 2 levels)
+Number of degrees of freedom: 116 (50+9+25+4+12+16)
+
+*** Timestep 4:  t=1 seconds
+   Skipping temperature solve because RHS is zero.
+   Solving VoF system... 1 iterations.
+   Solving VoF system... 1 iterations.
+
+   Postprocessing:
+     Global VoF volumes (m^3):       0.125
+     VoF Calculation(IEstL1/FEstL1): 9.76562500e-04/8.42425088e-17
+     Writing graphical output:       output-vof_linear_amr/solution/solution-00001
+
+Number of active cells: 4 (on 2 levels)
+Number of degrees of freedom: 116 (50+9+25+4+12+16)
+
+Termination requested by criterion: end time
+
+
++---------------------------------------------+------------+------------+
++---------------------------------+-----------+------------+------------+
++---------------------------------+-----------+------------+------------+
+

@@ -1,0 +1,33 @@
+# 1: Time step number
+# 2: Time (seconds)
+# 3: Time step size (seconds)
+# 4: Number of mesh cells
+# 5: Number of Stokes degrees of freedom
+# 6: Number of temperature degrees of freedom
+# 7: Iterations for temperature solver
+# 8: Global VoF volumes for F_1
+# 9: Visualization file name
+ 0 0.000000000000e+00 0.000000000000e+00 142 1481 653 0 5.00000000e-01 output-vof_linear_amr/solution/solution-00000 
+ 1 4.419417382416e-02 4.419417382416e-02 130 1381 609 0 4.78147054e-01 output-vof_linear_amr/solution/solution-00001 
+ 2 8.838834764832e-02 4.419417382416e-02 142 1481 653 0 4.56782389e-01 output-vof_linear_amr/solution/solution-00002 
+ 3 1.325825214725e-01 4.419417382416e-02 130 1381 609 0 4.35906005e-01 output-vof_linear_amr/solution/solution-00003 
+ 4 1.767766952966e-01 4.419417382416e-02 124 1331 587 0 4.15517902e-01 output-vof_linear_amr/solution/solution-00004 
+ 5 2.209708691208e-01 4.419417382416e-02 133 1404 619 0 3.95618081e-01 output-vof_linear_amr/solution/solution-00005 
+ 6 2.651650429450e-01 4.419417382416e-02 124 1331 587 0 3.76206541e-01 output-vof_linear_amr/solution/solution-00006 
+ 7 3.093592167691e-01 4.419417382416e-02 133 1404 619 0 3.57283282e-01 output-vof_linear_amr/solution/solution-00007 
+ 8 3.535533905933e-01 4.419417382416e-02 124 1331 587 0 3.38848305e-01 output-vof_linear_amr/solution/solution-00008 
+ 9 3.977475644174e-01 4.419417382416e-02 133 1404 619 0 3.20901608e-01 output-vof_linear_amr/solution/solution-00009 
+10 4.419417382416e-01 4.419417382416e-02 115 1236 545 0 3.03443193e-01 output-vof_linear_amr/solution/solution-00010 
+11 4.861359120658e-01 4.419417382416e-02 118 1259 555 0 2.86473060e-01 output-vof_linear_amr/solution/solution-00011 
+12 5.303300858899e-01 4.419417382416e-02 115 1236 545 0 2.69991207e-01 output-vof_linear_amr/solution/solution-00012 
+13 5.745242597141e-01 4.419417382416e-02 118 1259 555 0 2.53997636e-01 output-vof_linear_amr/solution/solution-00013 
+14 6.187184335382e-01 4.419417382416e-02 115 1236 545 0 2.38492346e-01 output-vof_linear_amr/solution/solution-00014 
+15 6.629126073624e-01 4.419417382416e-02 118 1259 555 0 2.23475337e-01 output-vof_linear_amr/solution/solution-00015 
+16 7.071067811865e-01 4.419417382416e-02  97 1060 467 0 2.08946609e-01 output-vof_linear_amr/solution/solution-00016 
+17 7.513009550107e-01 4.419417382416e-02  97 1060 467 0 1.94906163e-01 output-vof_linear_amr/solution/solution-00017 
+18 7.954951288349e-01 4.419417382416e-02  97 1060 467 0 1.81353998e-01 output-vof_linear_amr/solution/solution-00018 
+19 8.396893026590e-01 4.419417382416e-02  97 1060 467 0 1.68290114e-01 output-vof_linear_amr/solution/solution-00019 
+20 8.838834764832e-01 4.419417382416e-02  97 1060 467 0 1.55714512e-01 output-vof_linear_amr/solution/solution-00020 
+21 9.280776503073e-01 4.419417382416e-02  85  920 405 0 1.43627190e-01 output-vof_linear_amr/solution/solution-00021 
+22 9.722718241315e-01 4.419417382416e-02  76  847 373 0 1.32028150e-01 output-vof_linear_amr/solution/solution-00022 
+23 1.000000000000e+00 2.772817586850e-02  85  920 405 0 1.25000000e-01 output-vof_linear_amr/solution/solution-00023 
