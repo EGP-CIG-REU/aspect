@@ -37,7 +37,7 @@ subsection Gravity model
   set Model name = vertical
 end
 
-subsection Initial conditions
+subsection Initial temperature model
   set Model name = function
 end
 
@@ -82,7 +82,7 @@ subsection Postprocess
   subsection Visualization
     set Time between graphical output = 2.0
 
-    set List of output variables = vof values
+    set List of output variables = vof values, error indicator
 
     subsection VoF values
       set Include internal reconstruction LS = true

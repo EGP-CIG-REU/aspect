@@ -1,8 +1,9 @@
-# Test advecting a circle under a constant velocity field
+# Test for linear interface under constant velocity
+# Error should be at machine precision
 
 set Dimension                              = 2
 set Start time                             = 0
-set End time                               = 2
+set End time                               = 1
 set Use years in output instead of seconds = false
 set CFL number                             = 0.5
 set Output directory                       = output
@@ -10,19 +11,17 @@ set Output directory                       = output
 set Use VoF tracking = true
 
 subsection Mesh refinement
-  set Initial global refinement          = 4
-  set Initial adaptive refinement        = 0
-  set Time steps between mesh refinement = 0
+  set Initial adaptive refinement        = 1
+  set Initial global refinement          = 3
+  set Time steps between mesh refinement = 1
 end
 
 subsection Geometry model
   set Model name = box
 
   subsection Box
-    set Box origin X coordinate = -2.0
-    set Box origin Y coordinate = -2.0
-    set X extent = 4
-    set Y extent = 4
+    set X extent = 1
+    set Y extent = 1
   end
 end
 
@@ -43,7 +42,7 @@ subsection Prescribed Stokes solution
   subsection Velocity function
     set Variable names = x,y,t
 
-    set Function constants = x0=-1.0, y0=-1.0, xv=1.0, yv=1.0
+    set Function constants = init=1.25, x0=1.0, y0=0.0, xv=-0.25, yv=-0.25
     set Function expression = xv;yv
   end
 end
@@ -56,8 +55,8 @@ subsection VoF initial conditions
   subsection Function
     set Signed distance init = true
     set Variable names = x,y,t
-    set Function constants = x0=-1.0, y0=-1.0, xv=1.0, yv=1.0
-    set Function expression = 0.5-sqrt((x-x0-xv*t)^2+(y-y0-yv*t)^2)
+    set Function constants = init=1.25, x0=1.0, y0=0.0, xv=-0.25, yv=-0.25
+    set Function expression = cos(init*pi)*(x-x0-xv*t)+sin(init*pi)*(y-y0-yv*t)
     set Number initialization samples = 16
   end
 end
@@ -70,14 +69,14 @@ subsection Postprocess
     set Time between error estimates = 0.25
 
     subsection True LS
-        set Variable names = x,y,t
-        set Function constants = x0=-1.0, y0=-1.0, xv=1.0, yv=1.0
-        set Function expression = 0.5-sqrt((x-x0-xv*t)^2+(y-y0-yv*t)^2)
+      set Variable names = x,y,t
+      set Function constants = init=1.25, x0=1.0, y0=0.0, xv=-0.25, yv=-0.25
+      set Function expression = cos(init*pi)*(x-x0-xv*t)+sin(init*pi)*(y-y0-yv*t)
     end
   end
 
   subsection Visualization
-    set Time between graphical output = 2.0
+    set Time between graphical output = 1.0
 
     set List of output variables = vof values
 
