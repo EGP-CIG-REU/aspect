@@ -99,81 +99,22 @@ namespace aspect
               else
                 {
                   // Check neighbors
-                  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+                  std::vector<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> neighbors;
+                  GridTools::get_active_neighbors<parallel::distributed::Triangulation<dim> >(cell,neighbors);
+                  for (unsigned int i=0; i<neighbors.size(); ++i)
                     {
-                      if (cell->face(face_no)->at_boundary())
-                        continue;
-
-                      typename DoFHandler<dim>::face_iterator face = cell->face (face_no);
-
-                      const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
-
-                      double face_vof, n_face_vof;
-
-                      fe_face_values.reinit(cell, face_no);
-
-                      fe_face_values[vof_field].get_function_values (this->get_solution(),
-                                                                     vof_q_values);
-
-                      face_vof = vof_q_values[0];
-
-                      if (!(face->has_children()))
+                      fe_values.reinit(neighbors[i]);
+                      fe_values.get_function_values (this->get_solution(),
+                                                     vof_q_values);
+                      double neighbor_vof = vof_q_values[0];
+                      if (neighbor_vof>voleps && neighbor_vof<(1.0-voleps))
                         {
-                          if (!cell->neighbor_is_coarser(face_no))
-                            {
-
-                              const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
-
-                              fe_face_values.reinit(neighbor, neighbor2);
-
-                              fe_face_values[vof_field].get_function_values (this->get_solution(),
-                                                                             vof_q_values);
-
-                              n_face_vof = vof_q_values[0];
-                            }
-                          else
-                            {
-                              std::pair<unsigned int, unsigned int> n2pair = cell->neighbor_of_coarser_neighbor(face_no);
-                              fe_subface_values.reinit(neighbor, n2pair.first, n2pair.second);
-
-                              fe_subface_values[vof_field].get_function_values (this->get_solution(),
-                                                                                vof_q_values);
-
-                              n_face_vof = vof_q_values[0];
-                            }
-
-                          if (n_face_vof > 1.0)
-                            n_face_vof = 1.0;
-                          if (n_face_vof < 0.0)
-                            n_face_vof = 0.0;
-
-                          if (abs(n_face_vof-cell_vof)>=voleps)
-                            at_interface=true;
+                          // Fractional volume
+                          at_interface=true;
                         }
-                      else
+                      if (abs(cell_vof-neighbor_vof)>=voleps)
                         {
-                          const unsigned int neighbor2 = cell->neighbor_face_no(face_no);
-
-                          for (unsigned int subface_no=0; subface_no<face->number_of_children(); ++subface_no)
-                            {
-                              const typename DoFHandler<dim>::active_cell_iterator neighbor_child
-                                = cell->neighbor_child_on_subface (face_no, subface_no);
-
-                              fe_face_values.reinit (neighbor_child, neighbor2);
-
-                              fe_face_values[vof_field].get_function_values (this->get_solution(),
-                                                                             vof_q_values);
-
-                              if (n_face_vof > 1.0)
-                                n_face_vof = 1.0;
-                              if (n_face_vof < 0.0)
-                                n_face_vof = 0.0;
-
-                              n_face_vof = vof_q_values[0];
-
-                              if (abs(n_face_vof-cell_vof)>=voleps)
-                                at_interface=true;
-                            }
+                          at_interface=true
                         }
                     }
                 }
