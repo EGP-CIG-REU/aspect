@@ -23,7 +23,10 @@
 #include <aspect/vof/handler.h>
 
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/geometry_info.h>
+
 #include <deal.II/numerics/error_estimator.h>
+
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/grid_tools.h>
@@ -39,25 +42,15 @@ namespace aspect
       indicators = 0.0;
 
       const QMidpoint<dim> qMidC;
-      const QMidpoint<dim-1> qMidF;
+
+      std::vector<std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> > vert_cell_map =
+        GridTools::vertex_to_cell_map(this->get_dof_handler().get_triangulation());
 
       FEValues<dim> fe_values (this->get_mapping(),
                                this->get_fe(),
                                qMidC,
                                update_values |
                                update_quadrature_points);
-
-      FEFaceValues<dim> fe_face_values (this->get_mapping(),
-                                        this->get_fe(),
-                                        qMidF,
-                                        update_values |
-                                        update_quadrature_points);
-
-      FESubfaceValues<dim> fe_subface_values (this->get_mapping(),
-                                              this->get_fe(),
-                                              qMidF,
-                                              update_values |
-                                              update_quadrature_points);
       for (unsigned int f=0; f<this->get_vof_handler().get_n_fields(); ++f)
         {
 
@@ -100,12 +93,19 @@ namespace aspect
                 }
               else
                 {
-                  // Check neighbors
-                  std::vector<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> neighbors;
-                  GridTools::get_active_neighbors<parallel::distributed::Triangulation<dim> >(cell,neighbors);
-                  for (unsigned int i=0; i<neighbors.size(); ++i)
+                  // Check neighbors, obtain set of cells sharing verticies with the original
+                  std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> neighbor_set;
+                  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+                  {
+                    neighbor_set.merge(vert_cell_map[cell->vertex_index(i)]);
+                  }
+                  // check for boundary
+                  typename std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator>::iterator
+                  neighbor_it = neighbor_set.begin(),
+                  end_n = neighbor_set.end();
+                  for (; neighbor_it!=end_n; ++neighbor_it)
                     {
-                      typename DoFHandler<dim>::active_cell_iterator neighbor(*(neighbors[i]), &(this->get_dof_handler()));
+                      typename DoFHandler<dim>::active_cell_iterator neighbor(*(*neighbor_it), &(this->get_dof_handler());
                       fe_values.reinit(neighbor);
 
                       fe_values[vof_field].get_function_values(this->get_solution(),
