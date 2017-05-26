@@ -1999,6 +1999,9 @@ namespace aspect
                     AssertThrow(false,ExcNotImplemented());
                 }
             }
+ 
+          if (parameters.vof_tracking_enabled)
+            vof_handler->do_vof_update ();
 
           if (parameters.vof_tracking_enabled)
             vof_handler->do_vof_update ();
@@ -2142,6 +2145,9 @@ namespace aspect
                         AssertThrow(false,ExcNotImplemented());
                     }
                 }
+ 
+          if (parameters.vof_tracking_enabled)
+            vof_handler->do_vof_update ();
 
               if (parameters.vof_tracking_enabled)
                 vof_handler->do_vof_update ();
@@ -2250,6 +2256,9 @@ namespace aspect
                     AssertThrow(false,ExcNotImplemented());
                 }
             }
+ 
+          if (parameters.vof_tracking_enabled)
+            vof_handler->do_vof_update ();
 
           if (parameters.vof_tracking_enabled)
             vof_handler->do_vof_update ();
@@ -2363,6 +2372,9 @@ namespace aspect
                     AssertThrow(false,ExcNotImplemented());
                 }
             }
+ 
+          if (parameters.vof_tracking_enabled)
+            vof_handler->do_vof_update ();
 
           if (parameters.vof_tracking_enabled)
             vof_handler->do_vof_update ();

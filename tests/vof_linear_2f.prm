@@ -33,7 +33,7 @@ subsection Gravity model
   set Model name = vertical
 end
 
-subsection Initial temperature model
+subsection Initial conditions
   set Model name = function
 end
 
@@ -66,7 +66,7 @@ subsection VoF initial conditions
 end
 
 subsection Postprocess
-  set List of postprocessors = vof statistics, vof mms, visualization
+  set List of postprocessors = vof statistics, vof mms
 
   subsection VoF MMS
     set Number error samples = 16

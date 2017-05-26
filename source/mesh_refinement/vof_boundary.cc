@@ -35,107 +35,111 @@ namespace aspect
 {
   namespace MeshRefinement
   {
+    template <int dim>
+    void
+    VoFBoundary<dim>::execute(Vector<float> &indicators) const
+    {
+      indicators = 0.0;
+
+      const QMidpoint<dim> qMidC;
+
+      std::vector<std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> > vert_cell_map =
+        GridTools::vertex_to_cell_map(this->get_dof_handler().get_triangulation());
+
+      FEValues<dim> fe_values (this->get_mapping(),
+                               this->get_fe(),
+                               qMidC,
+                               update_values |
+                               update_quadrature_points);
+      for (unsigned int f=0; f<this->get_vof_handler().get_n_fields(); ++f)
+        {
+
+          const FEValuesExtractors::Scalar vof_field = this->get_vof_handler().get_field(f).fraction.extractor_scalar();
+          std::vector<double> vof_q_values(qMidC.size());
+
+          // Should be vof_epsilon, look into how to accesss that
+          double voleps = vof_epsilon;
+
+          typename DoFHandler<dim>::active_cell_iterator
+          cell = this->get_dof_handler().begin_active(),
+          endc = this->get_dof_handler().end();
+          unsigned int i=0;
+          for (; cell!=endc; ++cell, ++i)
+            {
+              // Skip if not local
+              if (!cell->is_locally_owned())
+                continue;
+
+              // Get cell vof
+              double cell_vof;
+              fe_values.reinit(cell);
+              fe_values[vof_field].get_function_values (this->get_solution(),
+                                                        vof_q_values);
+              cell_vof = vof_q_values[0];
+
+              // Handle overshoots
+              if (cell_vof > 1.0)
+                cell_vof = 1.0;
+
+              if (cell_vof < 0.0)
+                cell_vof = 0.0;
+
+              // Check if at interface
+              bool at_interface=false;
+              if (cell_vof>voleps && cell_vof<(1.0-voleps))
+                {
+                  // Fractional volume
+                  at_interface=true;
+                }
+              else
+                {
+                  // Check neighbors, obtain set of cells sharing verticies with the original
+                  std::vector<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> neighbor_set;
+                  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+                    {
+                      typename  std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> &neighbor_set =
+                        vert_cell_map[cell->vertex_index(i)];
+                      // check for boundary
+                      typename std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator>::iterator
+                      neighbor_it = neighbor_set.begin(),
+                      end_n = neighbor_set.end();
+                      for (; neighbor_it!=end_n; ++neighbor_it)
+                        {
+                          typename DoFHandler<dim>::active_cell_iterator neighbor(*(*neighbor_it), &(this->get_dof_handler()));
+                          fe_values.reinit(neighbor);
+
+                          fe_values[vof_field].get_function_values(this->get_solution(),
+                                                                   vof_q_values);
+
+                          double neighbor_vof = vof_q_values[0];
+
+                          if (neighbor_vof>voleps && neighbor_vof<(1.0-voleps))
+                            at_interface=true;
+
+                          if (abs(neighbor_vof-cell_vof)>=voleps)
+                            at_interface=true;
+                        }
+                    }
+                }
+
+              if (at_interface)
+                {
+                  indicators(i) = 1.0;
+                }
+            }
+        }
+    }
 
     template <int dim>
     void
     VoFBoundary<dim>::tag_additional_cells() const
     {
-        const QMidpoint<dim> qMidC;
+      // Skip if do not have any vof data to use
+      if (this->get_dof_handler().n_dofs()==0)
+        return;
 
-        // Create a map from vertices to adjacent cells
-        const std::vector<std::set<typename Triangulation<dim>::active_cell_iterator> >
-                vertex_to_cells(GridTools::vertex_to_cell_map(this->get_triangulation()));
-
-//        std::vector<std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> > vert_cell_map =
-//                vertex_to_cells(GridTools::vertex_to_cell_map(this->get_dof_handler().get_triangulation()));
-
-        std::set<typename Triangulation<dim>::active_cell_iterator> marked_cells;
-        FEValues<dim> fe_values (this->get_mapping(),
-                                 this->get_fe(),
-                                 qMidC,
-                                 update_values |
-                                 update_quadrature_points);
-        for (unsigned int f=0; f<this->get_vof_handler().get_n_fields(); ++f) {
-
-            const FEValuesExtractors::Scalar vof_field = this->get_vof_handler().get_field(f).fraction.extractor_scalar();
-            std::vector<double> vof_q_values(qMidC.size());
-
-            // Should be vof_epsilon, look into how to access that
-            double voleps = vof_epsilon;
-
-            typename DoFHandler<dim>::active_cell_iterator cell = this->get_dof_handler().begin_active(),
-                    endc = this->get_dof_handler().end();
-            for (; cell != endc; ++cell) {
-                // Skip if not local
-                if (!cell->is_locally_owned())
-                    continue;
-
-                // Get cell vof
-                double cell_vof;
-                fe_values.reinit(cell);
-                fe_values[vof_field].get_function_values(this->get_solution(),
-                                                         vof_q_values);
-                cell_vof = vof_q_values[0];
-
-                // Handle overshoots
-                if (cell_vof > 1.0)
-                    cell_vof = 1.0;
-
-                if (cell_vof < 0.0)
-                    cell_vof = 0.0;
-
-                // Check if at interface
-                if (cell_vof > voleps && cell_vof < (1.0 - voleps))
-                {
-                    // Fractional volume
-                    marked_cells.insert(cell);
-                    cell->clear_coarsen_flag ();
-                    cell->set_refine_flag ();
-                }
-            }
-        }
-        // Now mark for refinement all cells that are a neighbor of a cell that contains the interface
-
-        typename std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator>::const_iterator mcells = marked_cells.begin(),
-                endmc = marked_cells.end();
-        for (; mcells != endmc; mcells++)
-        {
-            typename parallel::distributed::Triangulation<dim>::active_cell_iterator mcell = *mcells;
-            for(unsigned int vertex_index=0; vertex_index<GeometryInfo<dim>::vertices_per_cell;++vertex_index)
-              {
-                  std::set<typename Triangulation<dim>::active_cell_iterator> neighbor_cells = vertex_to_cells[mcell->vertex_index(vertex_index)];
-                  typename std::set<typename Triangulation<dim>::active_cell_iterator>::const_iterator neighbor_cell = neighbor_cells.begin(),
-                  end_neighbor_cell_index= neighbor_cells.end();
-                  for(; neighbor_cell!=end_neighbor_cell_index;neighbor_cell++){
-                      typename Triangulation<dim>::active_cell_iterator itr_tmp = *neighbor_cell;
-                      itr_tmp->clear_coarsen_flag ();
-                      itr_tmp->set_refine_flag ();
-                  }
-              }
-        }
-
-//        typename DoFHandler<dim>::active_cell_iterator
-//                cell = this->get_dof_handler().begin_active(),
-//                endc = this->get_dof_handler().end();
-//        for (; cell != endc; ++cell) {
-//            if (cell->is_locally_owned()){
-//                if (marked_cells_and_neighbors.find(cell) != marked_cells_and_neighbors.end()){
-//                    cell->clear_coarsen_flag();
-//                    cell->set_refine_flag();
-//                }
-//            else
-//            {
-//                if (cell->refine_flag_set())
-//                    cell->set_coarsen_flag();
-//                }
-//            }
-//        }
-
-//        std::set<typename Triangulation<dim>::active_cell_iterator> marked_cells_and_neighbors = marked_cells;
-//        for (cell=marked_cells_and_neighbors);
-//          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-//              marked_cells_and_neighbors.insert (vertex_to_cell_array[cell->vertex(v)])
-
+      // Currently do not need to do strong enforcement of refinement, will
+      // consider at later point
     }
 
     template <int dim>
@@ -151,7 +155,7 @@ namespace aspect
     {
       //TODO: Add check for vof active
       AssertThrow(this->get_parameters().vof_tracking_enabled,
-                  ExcMessage("The 'vof boundary' mesh refinement strategy requires that the 'Use VoF tracking' parameter is enabled."));
+                  ExcMessage("The 'vof boundary' mesh refinement strategy requires the 'Use VoF tracking' parameter be enabled."));
 
       prm.enter_subsection ("VoF config");
       {
@@ -170,7 +174,7 @@ namespace aspect
   namespace MeshRefinement
   {
     ASPECT_REGISTER_MESH_REFINEMENT_CRITERION(VoFBoundary,
-                                              "vof interface",
+                                              "vof boundary",
                                               "A class that implements a mesh refinement criterion, which "
                                               "ensures a minimum level of refinement near the VoF interface boundary.")
   }

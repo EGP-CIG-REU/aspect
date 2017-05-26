@@ -12,7 +12,6 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
    Postprocessing:
      Global VoF volumes (m^3):       0.785
      VoF Calculation(IEstL1/FEstL1): 9.87186594e-03/0.00000000e+00
-     Writing graphical output:       output-vof_circle_1/solution/solution-00000
 
 *** Timestep 1:  t=0.0441942 seconds
    Skipping temperature solve because RHS is zero.
@@ -389,7 +388,6 @@ Number of degrees of freedom: 5,604 (2,178+289+1,089+256+768+1,024)
    Postprocessing:
      Global VoF volumes (m^3):       0.785
      VoF Calculation(IEstL1/FEstL1): 6.83793745e-02/6.68688920e-02
-     Writing graphical output:       output-vof_circle_1/solution/solution-00001
 
 Termination requested by criterion: end time
 

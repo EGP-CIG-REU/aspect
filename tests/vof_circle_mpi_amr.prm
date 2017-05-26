@@ -39,7 +39,7 @@ subsection Gravity model
   set Model name = vertical
 end
 
-subsection Initial temperature model
+subsection Initial conditions
   set Model name = function
 end
 

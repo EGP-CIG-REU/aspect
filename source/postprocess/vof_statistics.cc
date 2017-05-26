@@ -96,7 +96,7 @@ namespace aspect
           output << global_vof_vol_sums[f];
 
           if (f+1 < n_vof_fields)
-                 output << "/";
+            output << "/";
 
           // also make sure that the other columns filled by the this object
           // all show up with sufficient accuracy and in scientific notation

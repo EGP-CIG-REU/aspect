@@ -11,9 +11,11 @@ set Output directory                       = output
 set Use VoF tracking = true
 
 subsection Mesh refinement
+  set Minimum refinement level           = 2
   set Initial adaptive refinement        = 1
   set Initial global refinement          = 3
   set Time steps between mesh refinement = 1
+  set Strategy                                 = vof boundary
 end
 
 subsection Geometry model
@@ -33,7 +35,7 @@ subsection Gravity model
   set Model name = vertical
 end
 
-subsection Initial temperature model
+subsection Initial conditions
   set Model name = function
 end
 
@@ -62,7 +64,7 @@ subsection VoF initial conditions
 end
 
 subsection Postprocess
-  set List of postprocessors = vof statistics, vof mms, visualization
+  set List of postprocessors = vof statistics, vof mms
 
   subsection VoF MMS
     set Number error samples = 16

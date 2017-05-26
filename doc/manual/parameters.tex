@@ -437,7 +437,11 @@ For more information, see the section in the manual that discusses the general m
 
 `ascii data': A model in which the adiabatic profile is read from a file that describes the reference state. Note the required format of the input data: The first lines may contain any number of comments if they begin with '\#', but one of these lines needs to contain the number of points in the reference state as for example '\# POINTS: 3'. Following the comment lines there has to be a single line containing the names of all data columns, separated by arbitrarily many spaces. Column names are not allowed to contain spaces. The file can contain unnecessary columns, but for this plugin it needs to at least provide columns named 'temperature', 'pressure', and 'density'.Note that the data lines in the file need to be sorted in order of increasing depth from 0 to the maximal depth in the model domain. Points in the model that are outside of the provided depth range will be assigned the maximum or minimum depth values, respectively. Points do not need to be equidistant, but the computation of properties is optimized in speed if they are.
 
+<<<<<<< HEAD
 `function': A model in which the adiabatic profile is specified by a user defined function. The supplied function has to contain temperature, pressure, and density as a function of depth in this order.
+=======
+`function': A model in which the adiabatic profile is specified by a user defined function. The supplied function has to contain thetemperature and the pressure as a function of depth.
+>>>>>>> JMR_GitHub/vof-v1.5.0
 
 `initial profile': A model in which the adiabatic profile is calculated once at the start of the model run. The gravity is assumed to be in depth direction and the composition is evaluated at reference points, no lateral averaging is performed. All material parameters are used from the material model plugin.
 
@@ -5912,7 +5916,16 @@ Viscous stress may also be limited by a non-linear stress limiter that has a for
 {\it Value:} 1.5e5, 4.1e5, 6.6e5
 
 
+<<<<<<< HEAD
 {\it Default:} 1.5e5, 4.1e5, 6.6e5
+=======
+`ascii reference profile': A material model that reads in a reference state for density, thermal expansivity, compressibilityand specific heat from a text file. 
+Note the required format of the input data: The first lines may contain any number of comments if they begin with '\#', but one of these lines needs to contain the number of points in the reference state as for example '\# POINTS: 3'. Following the comment lines there has to be a single line containing the names of all data columns, separated by arbitrarily many spaces. Column names are not allowed to contain spaces. The file can contain unnecessary columns, but for this plugin it needs to at least provide the columns named 'density', 'thermal\_expansivity', 'specific\_heat', and 'compressibility'. Note that the data lines in the file need to be sorted in order of increasing depth from 0 to the maximal depth in the model domain. Points in the model that are outside of the provided depth range will be assigned the maximum or minimum depth values, respectively. Points do not need to be equidistant, but the computation of properties is optimized in speed if they are.
+
+The viscosity $\eta$ is computed as \begin{equation}\eta(z,T) = \eta_r(z) \eta_0 \exp\left(-A \frac{T - T_\text{adi}}{T_\text{adi}}\right),\end{equation}where $\eta_r(z)$ is the the depth-dependence, which is a piecewise constant function computed according to the the list of ``Viscosity prefactors'' and ``Transition depths'', $\eta_0$ is the reference viscosity specified by the parameter ``Viscosity''and $A$ describes the dependence on temperature and corresponds to the parameter ``Thermal viscosity exponent''. 
+
+`averaging': The ``averaging'' Material model applies an averaging of the quadrature points within a cell. The values to average are supplied by any of the other available material models. In other words, it is a ``compositing material model''. Parameters related to the average model are read from a subsection ``Material model/Averaging''. 
+>>>>>>> JMR_GitHub/vof-v1.5.0
 
 
 {\it Description:} A list of depths where the viscosity changes. Values must monotonically increase. Units: $m$.
@@ -5970,6 +5983,169 @@ Viscous stress may also be limited by a non-linear stress limiter that has a for
 \end{itemize}
 
 
+
+\subsection{Parameters in section \tt Material model/Ascii reference profile/Ascii data model}
+\label{parameters:Material_20model/Ascii_20reference_20profile/Ascii_20data_20model}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt Data directory}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Ascii data model/Data directory}
+
+
+\index[prmindex]{Data directory}
+\index[prmindexfull]{Material model!Ascii reference profile!Ascii data model/Data directory}
+{\it Value:} \$ASPECT\_SOURCE\_DIR/data/adiabatic-conditions/ascii-data/
+
+
+{\it Default:} \$ASPECT\_SOURCE\_DIR/data/adiabatic-conditions/ascii-data/
+
+
+{\it Description:} The name of a directory that contains the model data. This path may either be absolute (if starting with a '/') or relative to the current directory. The path may also include the special text '\$ASPECT\_SOURCE\_DIR' which will be interpreted as the path in which the ASPECT source files were located when ASPECT was compiled. This interpretation allows, for example, to reference files located in the 'data/' subdirectory of ASPECT. 
+
+
+{\it Possible values:} A directory name
+\item {\it Parameter name:} {\tt Data file name}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Ascii data model/Data file name}
+
+
+\index[prmindex]{Data file name}
+\index[prmindexfull]{Material model!Ascii reference profile!Ascii data model/Data file name}
+{\it Value:} 
+
+
+{\it Default:} 
+
+
+{\it Description:} The file name of the material data. Provide file in format: (Velocity file name).\%s\%d where \%s is a string specifying the boundary of the model according to the names of the boundary indicators (of a box or a spherical shell).\%d is any sprintf integer qualifier, specifying the format of the current file number. 
+
+
+{\it Possible values:} Any string
+\item {\it Parameter name:} {\tt Scale factor}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Ascii data model/Scale factor}
+
+
+\index[prmindex]{Scale factor}
+\index[prmindexfull]{Material model!Ascii reference profile!Ascii data model/Scale factor}
+{\it Value:} 1
+
+
+{\it Default:} 1
+
+
+<<<<<<< HEAD
+{\it Description:} Scalar factor, which is applied to the boundary velocity. You might want to use this to scale the velocities to a reference model (e.g. with free-slip boundary) or another plate reconstruction. Another way to use this factor is to convert units of the input files. The unit is assumed to bem/s or m/yr depending on the 'Use years in output instead of seconds' flag. If you provide velocities in cm/yr set this factor to 0.01.
+=======
+{\it Possible values:} Any one of Morency and Doin, Steinberger, ascii reference profile, averaging, composition reaction, depth dependent, diffusion dislocation, drucker prager, latent heat, latent heat melt, melt global, melt simple, multicomponent, nondimensional, simple, simple compressible, simpler, visco plastic, unspecified
+\end{itemize}
+
+
+
+\subsection{Parameters in section \tt Material model/Ascii reference profile}
+\label{parameters:Material_20model/Ascii_20reference_20profile}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt Thermal conductivity}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Thermal conductivity}
+
+
+\index[prmindex]{Thermal conductivity}
+\index[prmindexfull]{Material model!Ascii reference profile!Thermal conductivity}
+{\it Value:} 4.0
+
+
+{\it Default:} 4.0
+
+
+{\it Description:} Reference conductivity
+
+
+{\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
+\item {\it Parameter name:} {\tt Thermal viscosity exponent}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Thermal viscosity exponent}
+
+
+\index[prmindex]{Thermal viscosity exponent}
+\index[prmindexfull]{Material model!Ascii reference profile!Thermal viscosity exponent}
+{\it Value:} 0.0
+
+
+{\it Default:} 0.0
+
+
+{\it Description:} The temperature dependence of viscosity. Dimensionless exponent.
+
+
+{\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
+\item {\it Parameter name:} {\tt Transition depths}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Transition depths}
+
+
+\index[prmindex]{Transition depths}
+\index[prmindexfull]{Material model!Ascii reference profile!Transition depths}
+{\it Value:} 1.5e5, 4.1e5, 6.6e5
+
+
+{\it Default:} 1.5e5, 4.1e5, 6.6e5
+
+
+{\it Description:} A list of depths where the viscosity changes. Values must monotonically increase. Units: $m$.
+
+
+{\it Possible values:} A list of 0 to 4294967295 elements where each element is [A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$]
+\item {\it Parameter name:} {\tt Use TALA}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Use TALA}
+
+
+\index[prmindex]{Use TALA}
+\index[prmindexfull]{Material model!Ascii reference profile!Use TALA}
+{\it Value:} false
+
+
+{\it Default:} false
+
+
+{\it Description:} Whether to use the TALA instead of the ALA approximation.
+
+
+{\it Possible values:} A boolean value (true or false)
+\item {\it Parameter name:} {\tt Viscosity}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Viscosity}
+
+
+\index[prmindex]{Viscosity}
+\index[prmindexfull]{Material model!Ascii reference profile!Viscosity}
+{\it Value:} 1e21
+
+
+{\it Default:} 1e21
+
+
+{\it Description:} Viscosity
+
+
+{\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
+\item {\it Parameter name:} {\tt Viscosity prefactors}
+\phantomsection\label{parameters:Material model/Ascii reference profile/Viscosity prefactors}
+
+
+\index[prmindex]{Viscosity prefactors}
+\index[prmindexfull]{Material model!Ascii reference profile!Viscosity prefactors}
+{\it Value:} 10, 0.1, 1, 10
+
+
+{\it Default:} 10, 0.1, 1, 10
+
+
+{\it Description:} A list of prefactors for the viscosity that determine the viscosityprofile. Each prefactor is applied in a depth range specified by the list of `Transition depths', i.e. the first prefactor is applied above the first transition depth, the second one between the first and second transition depth, and so on. To compute the viscosity profile, this prefactor is multiplied by the reference viscosity specified through the parameter `Viscosity'. List must have one more entry than Transition depths. Units: non-dimensional.
+
+
+{\it Possible values:} A list of 0 to 4294967295 elements where each element is [A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$]
+\end{itemize}
+>>>>>>> JMR_GitHub/vof-v1.5.0
+
+
+{\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
+\end{itemize}
 
 \subsection{Parameters in section \tt Material model/Ascii reference profile/Ascii data model}
 \label{parameters:Material_20model/Ascii_20reference_20profile/Ascii_20data_20model}
