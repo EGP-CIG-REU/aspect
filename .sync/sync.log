@@ -1,0 +1,29 @@
+﻿platform: Linux 4.4.0-77-generic #98-Ubuntu SMP Wed Apr 26 08:34:02 UTC 2017 x86_64
+version: 2.4.2.708
+[20170509 14:01:04.767] ZIP: Can't locate [version] in zip, error -100.
+[20170509 14:01:04.770] Directory root is ""
+[20170509 14:01:04.771] test sha1: AE5BD8EFEA5322C4D9986D06680A781392F9A642
+[20170509 14:01:04.772] test sha2: 630DCD2966C4336691125448BBB25B4FF412A49C732DB2C8ABC1B8581BD710DD
+[20170509 14:01:04.773] test aes: 0A940BB5416EF045F1C39458C653EA5A07FEEF74E1D5036E900EEE118E949293
+[20170509 14:01:04.773] diskio_controller created
+[20170509 14:01:04.775] register diskio completion queue with id 1
+[20170509 14:01:04.775] PLC[0x0000000001516930] binding on 0.0.0.0:59333
+[20170509 14:01:04.775] D! Socket::listen[0x0000000001516930][7] bound listening socket 7 to IP 0.0.0.0:59333
+[20170509 14:01:04.775] UDP: bound listening socket 8 to IP 0.0.0.0:59333
+[20170509 14:01:04.775] D! Socket::listen[0x0000000001515f00][9] bound listening socket 9 to IP 127.0.0.1:8888
+[20170509 14:01:04.777] register diskio completion queue with id 2
+[20170509 14:01:04.777] Unsupported or empty sync.dat file
+[20170509 14:01:04.777] My PeerID: 1006DF22568106B10BA04A8028F0CBA49438B1A5
+[20170509 14:01:04.777] LC: LoadLicenses: there is no pro license
+[20170509 14:01:04.778] setup socket 18 for local peer discovery for 127.0.0.1: success
+[20170509 14:01:04.778] setup socket 19 for local peer discovery for 10.42.0.1: success
+[20170509 14:01:04.778] setup socket 20 for local peer discovery for 172.17.0.1: success
+[20170509 14:01:04.779] Scheduler: Apply global rule, download limit: -1, upload limit: -1
+[20170509 14:01:04.780] CoreState: Total memory: 33548247040, used by Sync: 5754880, percentage used: 0.02
+[20170509 14:01:04.780] message thread start
+[20170509 14:01:05.780] Debug log mask has been set to FFFFFFFF
+[20170509 14:01:05.780] Features mask has been set to 0
+[20170509 14:01:16.793] NAT-PMP: Unable to map port with NAT-PMP.
+[20170509 14:01:35.842] OpenSSL: Loaded X509 trusted CA from "/etc/ssl/certs/ca-certificates.crt"
+[20170509 14:01:44.152] ZIP: Can't locate [css/style.css] in zip, error -100.
+[20170509 14:02:06.441] ZIP: Can't locate [css/style.css] in zip, error -100.
