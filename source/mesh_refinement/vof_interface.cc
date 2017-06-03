@@ -19,7 +19,7 @@
 */
 
 
-#include <aspect/mesh_refinement/vof_boundary.h>
+#include <aspect/mesh_refinement/vof_interface.h>
 #include <aspect/vof/handler.h>
 
 #include <deal.II/base/quadrature_lib.h>
@@ -38,7 +38,7 @@ namespace aspect
 
     template <int dim>
     void
-    VoFBoundary<dim>::tag_additional_cells() const
+    VoFInterface<dim>::tag_additional_cells() const
     {
         const QMidpoint<dim> qMidC;
 
@@ -140,14 +140,14 @@ namespace aspect
 
     template <int dim>
     void
-    VoFBoundary<dim>::
+    VoFInterface<dim>::
     declare_parameters (ParameterHandler &/*prm*/)
     {
     }
 
     template <int dim>
     void
-    VoFBoundary<dim>::parse_parameters (ParameterHandler &prm)
+    VoFInterface<dim>::parse_parameters (ParameterHandler &prm)
     {
       //TODO: Add check for vof active
       AssertThrow(this->get_parameters().vof_tracking_enabled,
@@ -169,7 +169,7 @@ namespace aspect
 {
   namespace MeshRefinement
   {
-    ASPECT_REGISTER_MESH_REFINEMENT_CRITERION(VoFBoundary,
+    ASPECT_REGISTER_MESH_REFINEMENT_CRITERION(VoFInterface,
                                               "vof interface",
                                               "A class that implements a mesh refinement criterion, which "
                                               "ensures a minimum level of refinement near the VoF interface boundary.")
