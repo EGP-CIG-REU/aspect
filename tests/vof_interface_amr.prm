@@ -1,0 +1,268 @@
+# Density Stratified Flow with two non-dimensional numbers the Buyoancy
+# number B and the Rayleigh number Ra and the Initial Condition for
+# the temperature that Don Turrcotte proposed on Monday, 2016-08-08.
+
+# At the top, we define the number of space dimensions we would like to
+# work in:
+
+set Dimension                              = 2
+
+# There are several global variables that have to do with what
+# time system we want to work in and what the end time is. We
+# also designate an output directory.
+
+set Use years in output instead of seconds = true
+set Start time                             = 0
+#set End time                               = 0e10
+set CFL number                             = 0.9
+set Output directory                       = output
+
+# Then there are variables that describe the tolerance of
+# the linear solver as well as how the pressure should
+# be normalized. Here, we choose a zero average pressure
+# at the surface of the domain (for the current geometry, the
+# surface is defined as the top boundary).
+
+set Nonlinear solver scheme                = IMPES
+#set Linear solver tolerance                = 1e-7
+#set Temperature solver tolerance           = 1e-10
+
+set Pressure normalization                 = surface
+set Surface pressure                       = 0
+
+
+# Then come a number of sections that deal with the setup
+# of the problem to solve. The first one deals with the
+# geometry of the domain within which we want to solve.
+# The sections that follow all have the same basic setup
+# where we select the name of a particular model (here,
+# the box geometry) and then, in a further subsection,
+# set the parameters that are specific to this particular
+# model.
+
+subsection Geometry model
+  set Model name = box
+
+  subsection Box
+    set X extent = 1e6
+    set X repetitions = 16
+    set Y extent = 1e6       # = D or b or h (in meters m)
+    set Y repetitions = 16
+  end
+end
+
+
+# The next section deals with the initial conditions for the
+# temperature (there are no initial conditions for the
+# velocity variable since the velocity is assumed to always
+# be in a static equilibrium with the temperature field).
+# There are a number of models with the 'function' model
+# a generic one that allows us to enter the actual initial
+# conditions in the form of a formula that can contain
+# constants. We choose a linear temperature profile that
+# matches the boundary conditions defined below plus
+# a small perturbation:
+subsection Initial conditions
+  set Model name = function
+
+  subsection Function
+    set Variable names      = x, z
+    set Function constants  = T1=1.5E3, L=1.0e6, D=1.0e6, pi=3.14159265359, Blsize=0.1e6, k=3, A=0.05, T_ref=0.75E3
+    set Function expression = if(z<Blsize,T1*(1-z/D)+T1*A*sin(pi*z/D)*(1-cos(2*k*pi*x/L)),if(z>D-Blsize,T1*(1-z/D)-A*T1*sin(pi*z/D)*(1-cos(2*k*pi*x/L)),T_ref))
+  end
+end
+
+
+# Then follows a section that describes the boundary conditions
+# for the temperature. The model we choose is called 'box' and
+# allows to set a constant temperature on each of the four sides
+# of the box geometry. In our case, we choose something that is
+# heated from below and cooled from above. (As will be seen
+# in the next section, the actual temperature prescribed here
+# at the left and right does not matter.)
+
+subsection Boundary temperature model
+  set Model name = box
+
+  subsection Box                     # \Delta T = T_1 - T_0
+    set Bottom temperature = 1.5E3   # = T_1
+    set Left temperature   = 0
+    set Right temperature  = 0
+    set Top temperature    = 0       # T_0
+  end
+end
+
+
+# We then also have to prescribe several other parts of the model such as
+# which boundaries actually carry a prescribed boundary temperature, whereas
+# all other parts of the boundary are insulated (i.e., no heat flux through
+# these boundaries; this is also often used to specify symmetry boundaries).
+
+subsection Model settings
+  set Fixed temperature boundary indicators   = bottom, top # left, right 
+
+  # The next parameters then describe on which parts of the
+  # boundary we prescribe a zero or nonzero velocity and
+  # on which parts the flow is allowed to be tangential.
+  # Here, all four sides of the box allow tangential
+  # unrestricted flow but with a zero normal component:
+
+  set Zero velocity boundary indicators       = 
+  set Prescribed velocity boundary indicators =
+  set Tangential velocity boundary indicators = top, bottom, left, right
+
+  # The final part of this section describes whether we
+  # want to include adiabatic heating (from a small
+  # compressibility of the medium) or from shear friction,
+  # as well as the rate of internal heating. We do not
+  # want to use any of these options here:
+
+  set Include adiabatic heating               = false
+  set Include shear heating                   = false
+end
+
+
+# The following two sections describe first the
+# direction (vertical) and magnitude of gravity and the
+# material model (i.e., density, viscosity, etc). We have
+# discussed the settings used here in the introduction to
+# this cookbook in the manual already.
+
+subsection Gravity model
+  set Model name = vertical
+
+  subsection Vertical
+    set Magnitude = 10
+  end
+end
+
+# Set standard BA material model
+
+subsection Formulation
+  set Formulation = boussinesq approximation
+end
+
+# On Thursday July 21, 2016  at 16:29:41 PDT DLT said Ra = 1.0e8 in the mantle,
+# but his depends on what one takes the depth of the mantle to be.
+
+subsection Material model
+  set Model name = simple # Decrease the viscosity \mu by 10 to increas Ra by 10
+
+  subsection Simple model 
+    # \Kappa = k / \rho_0 c_p = 1 mm^2 / s = 1.0e-6 m^2 / s - DLT 7/21/2016
+    set Reference density             = 3000                  # = \rho_0
+    set Reference specific heat       = 1333.333333333333     # = c_p
+    set Reference temperature         = 0.75E3
+    set Thermal conductivity          = 4                     # = k
+    set Thermal expansion coefficient = 3E-5                  # = \alpha_v
+    set Viscosity                     = 1.08E23                  # = \mu or \eta
+                                                              # \mu = 1.0e21 for the mantle
+                                                              # (DLT 7/21/2016)
+    set Density differential for compositional field 1 = 0.0 # = \Delta \rho for B = 0.1
+  end
+  
+  set Material averaging              = none
+end
+
+# This is the new part: We declare that there will
+# be two compositional fields that will be
+# advected along. Their initial conditions are given by
+# a function that is one for the lowermost 0.2 height
+# units of the domain and zero otherwise in the first case,
+# and one in the top most 0.2 height units in the latter.
+subsection Compositional fields
+  set Number of fields  =  1
+  set Names of fields   = VoFC
+end
+
+subsection Compositional initial conditions
+  set Model name  =  function
+end
+
+set Use VoF tracking  =  true
+
+subsection VoF config
+  set Small volume          =  1e-14
+  set VoF solver tolerance  =  1e-14
+  set VoF composition variable  =  VoFC
+end
+
+subsection VoF initial conditions
+  set Model name  =  function
+
+  subsection Function
+    set Signed distance init  =  true
+    set Variable names  =  x,y,t
+    set Function constants   =  d=1.0e6, k=0, a=0.01, L=1e6
+    set Function expression  =  (0.5)*d-y
+    set Number initialization samples  =  16
+  end
+end
+
+# We here use a globally refined mesh without
+# adaptive mesh refinement.
+
+subsection Mesh refinement
+  set Initial adaptive refinement        = 1
+  set Strategy                           = vof boundary
+  set Initial global refinement          = 0
+  set Time steps between mesh refinement = 1
+  set Coarsening fraction                = 0.4
+  set Refinement fraction                = 0.6 
+end
+
+subsection Discretization
+  set Use discontinuous composition discretization = true
+  set Use discontinuous temperature discretization = false
+  subsection Stabilization parameters
+    set Use limiter for discontinuous composition solution = false # apply the limiter to the DG solutions
+#    set Global composition maximum = 1.0
+#    set Global composition minimum = 0.0
+  end
+end
+
+
+# The final part is to specify what ASPECT should do with the
+# solution once computed at the end of every time step. The
+# process of evaluating the solution is called `postprocessing'
+# and we choose to compute velocity and temperature statistics,
+# statistics about the heat flux through the boundaries of the
+# domain, and to generate graphical output files for later
+# visualization. 
+
+subsection Postprocess
+  set List of postprocessors = basic statistics, heat flux statistics, velocity statistics, visualization
+
+  subsection Visualization
+    set List of output variables = artificial viscosity, density, viscosity, partition, vof values
+    set Output format                 = vtu 
+    set Number of grouped files       = 1
+    set Time between graphical output = 1e7
+
+    subsection VoF values
+      set Include internal reconstruction LS = true
+      set Include normals  =  false
+    end
+  end
+end
+
+subsection Termination criteria
+  set Checkpoint on termination = true
+#  set Termination criteria = user request
+  subsection User request
+    set File name = terminate-aspect
+  end
+  set End step = 100
+end
+
+subsection Checkpointing
+  # The number of timesteps between performing checkpoints. If 0 and time
+  # between checkpoint is not specified, checkpointing will not be performed.
+  # Units: None.
+  set Steps between checkpoint = 0
+
+  # The wall time between performing checkpoints. If 0, will use the
+  # checkpoint step frequency instead. Units: Seconds.
+  set Time between checkpoint  = 7200
+end
+
