@@ -44,9 +44,9 @@ namespace aspect
         /**
          * Mark cells on or neighboring VoF Boundary for refinement
          */
-        virtual
-        void
-        execute (Vector<float> &indicators) const;
+//        virtual
+//        void
+//        execute (Vector<float> &indicators) const;
 
         /**
          * Mark large unrefined neighboring cells for refinement and prevent

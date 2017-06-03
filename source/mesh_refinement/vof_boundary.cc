@@ -35,12 +35,16 @@ namespace aspect
 {
   namespace MeshRefinement
   {
+//    template <int dim>
+//    void
+//    VoFBoundary<dim>::execute(Vector<float> &indicators) const
+//    {
+//    }
+
     template <int dim>
     void
-    VoFBoundary<dim>::execute(Vector<float> &indicators) const
+    VoFBoundary<dim>::tag_additional_cells() const
     {
-      indicators = 0.0;
-
       const QMidpoint<dim> qMidC;
 
       std::vector<std::set<typename parallel::distributed::Triangulation<dim>::active_cell_iterator> > vert_cell_map =
@@ -124,19 +128,15 @@ namespace aspect
 
               if (at_interface)
                 {
-                  indicators(i) = 1.0;
+                    cell->clear_coarsen_flag ();
+                    cell->set_refine_flag ();
                 }
             }
         }
-    }
 
-    template <int dim>
-    void
-    VoFBoundary<dim>::tag_additional_cells() const
-    {
       // Skip if do not have any vof data to use
-      if (this->get_dof_handler().n_dofs()==0)
-        return;
+//      if (this->get_dof_handler().n_dofs()==0)
+//        return;
 
       // Currently do not need to do strong enforcement of refinement, will
       // consider at later point
