@@ -43,13 +43,16 @@ namespace aspect
       template <int dim>
       void analytic_solution(
         double pos[],
-        double vel[], double *pressure, std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > pressure_function)
+        double vel[],
+        double *pressure,
+        std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > pressure_function,
+        std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > velocity_function)
       {
         /****************************************************************************************/
         /****************************************************************************************/
         /* Output */
-        vel[0] = -pos[1];
-        vel[1] =  pos[0];
+        for (unsigned int i=0; i < dim; i++)
+          vel[i] = velocity_function->value(Point<dim>(pos[0],pos[1]), i);
 
         //(*pressure) = 0;
         (*pressure) = pressure_function->value(Point<dim>(pos[0], pos[1]));
@@ -63,10 +66,12 @@ namespace aspect
       class FunctionStreamline : public Function<dim>
       {
         public:
-          FunctionStreamline (std_cxx11::shared_ptr<Functions::ParsedFunction<dim>> pressure)
+          FunctionStreamline (std_cxx11::shared_ptr<Functions::ParsedFunction<dim>> pressure,
+                              std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > velocity)
             :
             Function<dim>(),
-            pressure_function (pressure)
+            pressure_function (pressure),
+            velocity_function (velocity)
           {}
 
           virtual void vector_value (const Point< dim > &p,
@@ -76,10 +81,11 @@ namespace aspect
 
             AnalyticSolutions::analytic_solution<dim>
             (pos,
-             &values[0], &values[2], pressure_function);
+             &values[0], &values[2], pressure_function, velocity_function);
           }
         private:
           std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > pressure_function;
+          std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > velocity_function;
       };
     }
 
@@ -87,7 +93,7 @@ namespace aspect
     class SimpleAnnulusMaterialModel : public MaterialModel::Interface<dim>
     {
       private:
-        std_cxx11::shared_ptr<Functions::ParsedFunction<dim>>  density_function, pressure_function;
+        std_cxx11::shared_ptr<Functions::ParsedFunction<dim> > density_function, pressure_function, velocity_function;
 
       public:
         /**
@@ -179,6 +185,17 @@ namespace aspect
                 prm.leave_subsection();
               }
               prm.leave_subsection();
+
+              prm.enter_subsection("Analytical velocity");
+              {
+                prm.enter_subsection("Function");
+                {
+                  Functions::ParsedFunction<dim>::declare_parameters (prm, 1);
+                }
+                prm.leave_subsection();
+              }
+              prm.leave_subsection();
+
             }
             prm.leave_subsection();
           }
@@ -216,6 +233,30 @@ namespace aspect
                 {
                   pressure_function.reset(new Functions::ParsedFunction<dim>(1));
                   pressure_function->parse_parameters(prm);
+                }
+                prm.leave_subsection();
+              }
+              prm.leave_subsection();
+
+              prm.enter_subsection("Analytical velocity");
+              {
+                prm.enter_subsection("Function");
+                {
+                  try
+                    {
+                      velocity_function.reset (new Functions::ParsedFunction<dim>(dim));
+                      velocity_function->parse_parameters (prm);
+                    }
+                  catch (...)
+                    {
+                      std::cerr << "ERROR: FunctionParser failed to parse\n"
+                                << "\t'Analytical velocity.Function'\n"
+                                << "with expression\n"
+                                << "\t'" << prm.get("Function expression") << "'\n"
+                                << "More information about the cause of the parse error \n"
+                                << "is shown below.\n";
+                      throw;
+                    }
                 }
                 prm.leave_subsection();
               }
@@ -259,6 +300,11 @@ namespace aspect
         std_cxx11::shared_ptr<Functions::ParsedFunction<dim>>  get_pressure() const
         {
           return pressure_function;
+        }
+
+        std_cxx11::shared_ptr<Functions::ParsedFunction<dim>>  get_velocity() const
+        {
+          return velocity_function;
         }
 
         double get_background_density() const
@@ -308,8 +354,7 @@ namespace aspect
               material_model
                 = dynamic_cast<const SimpleAnnulusMaterialModel<dim> *>(&this->get_material_model());
 
-              material_model->get_pressure();
-              ref_func.reset (new AnalyticSolutions::FunctionStreamline<dim>(material_model->get_pressure()));
+              ref_func.reset (new AnalyticSolutions::FunctionStreamline<dim>(material_model->get_pressure(), material_model->get_velocity()));
             }
           else
             {

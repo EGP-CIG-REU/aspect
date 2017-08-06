@@ -65,6 +65,13 @@ subsection Material model
         set Function expression = -(1/2)*(x^2+y^2) + 2
       end
     end
+
+    subsection Analytical velocity
+      subsection Function
+        set Variable names = x, y
+        set Function expression = -y;x
+      end
+    end
   end
 end
 
