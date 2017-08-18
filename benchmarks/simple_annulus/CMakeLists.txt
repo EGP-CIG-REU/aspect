@@ -32,8 +32,8 @@ ENDIF ()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
-SET(TARGET "simple_annulus")
+SET(TARGET "new_stokes_annulus")
 PROJECT(${TARGET})
 
-ADD_LIBRARY(${TARGET} SHARED simple_annulus.cc)
+ADD_LIBRARY(${TARGET} SHARED new_stokes_annulus.cc)
 ASPECT_SETUP_PLUGIN(${TARGET})

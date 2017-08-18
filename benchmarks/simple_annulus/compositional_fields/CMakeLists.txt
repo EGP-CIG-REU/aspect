@@ -32,8 +32,10 @@ ENDIF ()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
-SET(TARGET "simple_annulus_compositional_fields")
+SET(TARGET "new_stokes_annulus_compositional_fields")
+
 PROJECT(${TARGET})
 
-ADD_LIBRARY(${TARGET} SHARED simple_annulus_compositional_fields.cc)
+ADD_LIBRARY(${TARGET} SHARED new_stokes_annulus_compositional_fields.cc)
+
 ASPECT_SETUP_PLUGIN(${TARGET})
