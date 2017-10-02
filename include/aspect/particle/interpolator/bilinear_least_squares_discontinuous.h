@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _aspect_particle_interpolator_bilinear_least_squares_h
-#define _aspect_particle_interpolator_bilinear_least_squares_h
+#ifndef _aspect_particle_interpolator_bilinear_least_squares_discontinuous_h
+#define _aspect_particle_interpolator_bilinear_least_squares_discontinuous_h
 
 #include <aspect/particle/interpolator/interface.h>
 #include <aspect/simulator_access.h>
@@ -37,7 +37,7 @@ namespace aspect
        * @ingroup ParticleInterpolators
        */
       template <int dim>
-      class BilinearLeastSquares : public Interface<dim>, public aspect::SimulatorAccess<dim>
+      class BilinearLeastSquaresDiscontinuous : public Interface<dim>, public aspect::SimulatorAccess<dim>
       {
         public:
           /**
@@ -74,7 +74,7 @@ namespace aspect
            * and global min for each propery.
            */
           bool use_global_valued_limiter;
-          bool check_for_overshoot_and_undershoot;
+
           /**
            * For each interpolated particle property, a global max and global
            * min are stored as elements of vectors.

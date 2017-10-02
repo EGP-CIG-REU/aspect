@@ -50,7 +50,7 @@ namespace aspect
         double _sigma, /* density */
         double _km, int _n, /* wavelength in z, wavenumber in x */
         double _B, /* viscosity parameter */
-        double vel[], double *presssure,
+        double vel[], double *presssure, double *density,
         double total_stress[], double strain_rate[])
       {
         double Z;
@@ -616,8 +616,12 @@ namespace aspect
           {
             assert(0);
           }
-      }
-
+        
+        if (density != NULL){
+           (*density) = -std::sin(2 * pos[1]) * std::cos(3 * numbers::PI * pos[0]);
+        }
+       }
+      
 
 
       /**
@@ -639,7 +643,7 @@ namespace aspect
             (pos,
              1.0, 2, 3,
              B,
-             &values[0], &values[2], total_stress, strain_rate);
+             &values[0], &values[2], &values[3], total_stress, strain_rate);
           }
       };
 
@@ -767,11 +771,14 @@ namespace aspect
           Vector<float> cellwise_errors_p(this->get_triangulation().n_active_cells());
           Vector<float> cellwise_errors_ul2(this->get_triangulation().n_active_cells());
           Vector<float> cellwise_errors_pl2(this->get_triangulation().n_active_cells());
-
+          Vector<float> cellwise_errors_density (this->get_triangulation().n_active_cells());
+          
           ComponentSelectFunction<dim> comp_u(std::pair<unsigned int, unsigned int>(0, dim),
                                               this->get_fe().n_components());
           ComponentSelectFunction<dim> comp_p(dim,
                                               this->get_fe().n_components());
+           
+          ComponentSelectFunction<dim> comp_density(dim + 1, this->get_fe().n_components());
 
           VectorTools::integrate_difference(this->get_mapping(), this->get_dof_handler(),
                                             this->get_solution(),
@@ -802,6 +809,16 @@ namespace aspect
                                             VectorTools::L2_norm,
                                             &comp_p);
 
+     VectorTools::integrate_difference (this->get_mapping(),this->get_dof_handler(),
+                                             this->get_solution(),
+                                             *ref_func,
+                                             cellwise_errors_density,
+                                             quadrature_formula,
+                                             VectorTools::L2_norm,
+                                             &comp_density);
+
+
+
           const double u_l1 = Utilities::MPI::sum(cellwise_errors_u.l1_norm(), this->get_mpi_communicator());
           const double p_l1 = Utilities::MPI::sum(cellwise_errors_p.l1_norm(), this->get_mpi_communicator());
           const double u_l2 = std::sqrt(
@@ -809,13 +826,17 @@ namespace aspect
           const double p_l2 = std::sqrt(
                                 Utilities::MPI::sum(cellwise_errors_pl2.norm_sqr(), this->get_mpi_communicator()));
 
+     const double density = std::sqrt(Utilities::MPI::sum(cellwise_errors_density.norm_sqr(),this->get_mpi_communicator()));
+
+
+
           std::ostringstream os;
           os << std::scientific << u_l1
              << ", " << p_l1
              << ", " << u_l2
-             << ", " << p_l2;
-
-          return std::make_pair("Errors u_L1, p_L1, u_L2, p_L2:", os.str());
+             << ", " << p_l2
+             << ", " << density;
+          return std::make_pair("Errors u_L1, p_L1, u_L2, p_L2, density_L2:", os.str());
         }
     };
 

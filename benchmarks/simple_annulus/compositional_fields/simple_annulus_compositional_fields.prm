@@ -1,0 +1,168 @@
+set Additional shared libraries            = ./libsimple_annulus_compositional_fields.so
+
+############### Global parameters
+
+set Dimension                              = 2
+
+set Start time                             = 0
+
+set End time                               = 0
+
+set Output directory                       = output
+
+set Nonlinear solver scheme                = Stokes only
+
+set CFL number                             = 0.9
+
+set Linear solver tolerance                = 1e-14
+
+set Use years in output instead of seconds = false
+
+############### Parameters describing the model
+
+subsection Geometry model
+  set Model name = spherical shell
+
+  subsection Spherical shell
+    set Inner radius = 1
+    set Outer radius = 2
+    set Opening angle = 360
+  end
+end
+
+subsection Model settings
+  set Prescribed velocity boundary indicators = inner: function, outer: function
+  set Zero velocity boundary indicators       = 
+  set Tangential velocity boundary indicators = 
+  set Fixed temperature boundary indicators   = inner, outer
+end
+
+subsection Boundary velocity model
+  subsection Function
+    set Function constants  = pi=3.1415926
+    set Variable names      = x,y
+    set Function expression = -y;x
+  end
+end
+
+subsection Material model
+  set Model name = SimpleAnnulusCompositionalMaterial
+
+  subsection Simple annulus
+    # Do not change these set of parameters! EGP && HL
+    set Viscosity jump = 1
+    set Reference density = 1
+
+    subsection Density
+      subsection Function
+        set Variable names = x, y
+        set Function expression = sqrt(x^2 + y^2)
+      end
+    end
+
+    subsection Pressure
+      subsection Function
+        set Variable names = x, y
+        set Function expression = -(1/2)*(x^2+y^2) + 2
+      end
+    end
+  end
+end
+
+
+subsection Gravity model
+  set Model name = function
+
+  subsection Function
+    set Variable names      = x,y
+    set Function expression = -1*(1/(sqrt(x*x+y*y)))*x;-1*(1/(sqrt(x*x+y*y)))*y
+  end
+end
+
+
+############### Parameters describing the temperature field
+
+subsection Boundary temperature model
+  set List of model names = constant
+  subsection Constant
+    set Boundary indicator to temperature mappings = inner : 0, outer : 0
+  end
+end
+
+
+subsection Initial temperature model
+  set Model name = function
+  subsection Function
+    set Coordinate system   = cartesian
+    set Function expression = 0
+  end
+end
+
+subsection Adiabatic conditions model
+  set Model name = function
+  subsection Function
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = depth
+  end
+
+end
+
+############### Parameters describing the discretization
+
+subsection Discretization
+  set Stokes velocity polynomial degree       = 2
+  set Use locally conservative discretization = true
+#  set Use discontinuous composition discretization = true
+end
+
+
+subsection Mesh refinement
+  set Coarsening fraction         = 0
+  set Initial adaptive refinement = 0
+  set Initial global refinement   = 4
+end
+
+############## Parameters related to the compositional fields
+
+subsection Compositional fields
+  set Number of fields = 2
+  set Names of fields = density_comp, density_comp2
+  set Compositional field methods = field, field
+  #set Number of fields = 1
+  #set Names of fields = density_comp
+  #set Compositional field methods = field
+end
+
+subsection Initial composition model
+  set Model name = function
+
+  subsection Function
+    set Variable names      = x, y
+    set Coordinate system   = cartesian
+    set Function expression = sqrt(x^2 + y^2);0
+    #set Function expression = 0
+  end
+end
+
+############### Parameters describing what to do with the solution
+
+subsection Postprocess
+  set List of postprocessors = visualization, SimpleAnnulusPostprocessor
+  
+  subsection Visualization
+    set Output format                 = vtu
+    set Number of grouped files       = 1
+    set Time between graphical output = 0
+    set List of output variables = density, viscosity, partition
+  end
+end
+
+subsection Termination criteria
+  set Checkpoint on termination = true
+  set Termination criteria      = user request
+
+  subsection User request
+    set File name = end
+  end
+end
