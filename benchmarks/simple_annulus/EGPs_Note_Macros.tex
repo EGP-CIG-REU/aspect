@@ -1,0 +1,464 @@
+ % Elbridge Gerry Puckett
+% Department of Mathematics
+% University of California, Davis
+% Davis, California  95616
+
+% Revision History
+%   Saturday,  February 25, 2012 at 13:02 PST
+%   Wednesday, October  31, 2012 at 18:11 PDT
+
+% EGP's Macros for writing notes in general, especially notes associated with the book EGPPC.
+
+% One of the LaTeX manuals cautions against using fiverm. However, perhaps CMR scaled by 50% is
+% acceptable.  I use this font in order to make certain frequently used fractions (e.g., one-half)
+% small so that they be placed in the text without disturbing the line spacing or so that they are
+% better proportioned when placed in a subscript or a superscript.
+
+\font\myfiverm=cmr5 scaled 500       % used for small sub/superscripts
+
+\newcommand{\half}{{\myfiverm \frac{1}{2}}}
+
+% Script font for denoting the Null Space of a matrix A as N(A)
+
+\font\scriptten=cmsy10                           % scaled \magstep0	
+
+% Script N for denoting the Null Space of a matrix A as N(A)
+
+\newcommand{\Null}{\scriptten{\hbox{\char '116}}}    % Script N
+\newcommand{\NullLap}{{\lap{\hbox{\char '116}}}}	 % Script N
+
+% Boldface Roman N, which is the way Strang denotes the Null space of A; i.e., N(A). However Strang also
+% uses N to denote the `Null' matrix of A.
+
+\newcommand{\NullStrang}{{\bf N}}
+
+% Defines \abs{arg1} to be the magnitude of arg1
+
+%\newcommand{\abs}[1]{\, \vert \, #1 \, \vert \,}
+
+% This macro is used to denote a Banach space
+
+\newcommand{\Banach}{\mathcal{B}}
+
+% The Complex numbers (Naoki's \C is defined the same way.)
+
+\newcommand{\C}{\mathbb{C}}
+
+% To denote the (i,j)th cell in the grid \Omega^h
+
+\newcommand{\Cell}{\mathcal{C}}
+
+% We use \Csp to denote the space C^p([a,b]) of p times continuously differentiable functions on
+% the interval [a,b].
+
+\newcommand{\Csp}{{\mathit{C}}}
+
+% From Naoki's "AMS_Math_Symbol_Macros.tex" to provide a macro for d^n f / d n.
+
+\newcommand{\difh}[3]{{\displaystyle\frac{\mathrm{d}^{#1}{#2}}{\mathrm{d}\,{#3}^{#1}}}}
+
+% Use this symbol to indicate that the quantity on the left-hand side of the equal sign is defined by the
+% quantity on the right-hand side of the equal sign. CAUTION! The command "\text" is only available in
+% AMS-TeX, so this will not work unless you are using the "amsart" class file or "\usepackage{amsmath}"
+% or something similar. One puzzling piece of behavior is that sometimes I get the error "\define already
+% defined ...". There was a \define command in AMS-TeX but it has been superseded by "\newcommand". What is
+% puzzling is that - as near as I can tell - this error does not always occur.
+
+% On Thursday, February 07 at 17:24 PST EGP changed \define to \Define.  However, I am keeping \define until
+% I can eliminate all occurrences of it from my LaTeX documents.
+
+\newcommand{\Define}{\; \stackrel{\text{\tiny def}}{=} \;}
+\newcommand{\define}{\; \stackrel{\text{\tiny def}}{=} \;}
+
+% Distance between two gridpoints in the x and y directions
+
+\newcommand{\dx}{{\Delta x}}
+\newcommand{\dy}{{\Delta y}}
+
+% \newcommand{\dx}{{h}}
+% \newcommand{\dy}{{h}}
+
+% These macros make typesetting \dx / 2 and \dy / 2 easier.
+
+\newcommand{\dxhalf}{\frac{\dx}{2}}
+\newcommand{\dyhalf}{\frac{\dy}{2}}
+
+% These macros are used to create a little more space before the dx, dy and dt in an integral.
+
+\newcommand{\Ds}{\, ds}
+\newcommand{\DS}{\, dS}
+\newcommand{\Dt}{\, dt}
+\newcommand{\Dx}{\, dx}
+\newcommand{\Dy}{\, dy}
+
+% This macro is used to create a little more space before the d \xvec in an integral in two or more
+% space dimensions
+
+\newcommand{\Dxvec}{\; d \xvec}
+
+% The time step
+
+\newcommand{\dt}{{\Delta t}}
+\newcommand{\dthalf}{\frac{\dt}{2}}
+\newcommand{\dtprime}{{{\Delta t}^\prime}}
+
+% One of the packages I am using defines \sp as an alternate way to create a superscript.  However, I never
+% use \sp for this purpose, so I have defined it be the smallest unit of space one can place between two
+% characters.
+
+\renewcommand{\sp}{{\mspace{1mu}}}
+
+\newcommand{\eq}{\; = \;}
+\newcommand{\Eq}{\; = \;}
+\newcommand{\EQ}{\; = \;}
+
+\newcommand{\gt}{\;  >  \;}
+\newcommand{\GT}{\;  >  \;}
+\newcommand{\GE}{\; \ge \;}
+
+\newcommand{\lt} {\;  <   \;}
+\newcommand{\LT} {\;  <   \;}
+\newcommand{\LE} {\; \le  \;}
+\newcommand{\LEQ}{\; \leq \;}
+
+\newcommand{\NE} {\; \neq \;}
+\newcommand{\NEQ}{\; \neq \;}
+
+% If and only if ...
+
+\renewcommand{\iff}{\Longleftrightarrow}
+
+% Plus and minus signs with more space on either side.
+
+\newcommand{\minus}{\; - \;}
+\newcommand{\plus }{\; + \;}
+
+\newcommand{\intersect}{\cup}
+\newcommand{\union    }{\cap}
+
+% We use \iu = \iota for the imaginary unit i rather than a lowercase i so that we can use the
+% lowercase i as as subscript for indexing cells and edges in space.
+
+\newcommand{\iu}{\iota}
+
+% These macros are used to create more space between the argument and the vertical lines.
+
+\newcommand{\abs} {\, \vert \,}
+\newcommand{\labs}{   \vert \,}
+\newcommand{\rabs}{\, \vert   }
+
+% This symbol may also be used to denote the definition of some mathematical quantity.
+
+\newcommand{\defined}{\, \equiv \,}
+
+\newcommand{\norm}{{\| \cdot \|}}    % Use this for a generic norm
+\newcommand{\lnorm}{{\| \,}}
+\newcommand{\rnorm}{{\, \|}}
+
+% A little more space in the inner product <f,g>
+
+\newcommand{\lang}{\langle \,}
+\newcommand{\rang}{\, \rangle}
+
+% Various symbols for the real numbers
+
+\newcommand{\R}{\boldsymbol{R}}         % Apparently Strang uses {\boldsymbol{R}} for the real mumbers
+
+\newcommand{\Reals}{\mathbb{R}}         % The real mumbers (\mathbb stands for ``Math Black Board'')
+
+\newcommand{\Real }{{I \! \! R}}	    % EGP's homemade version of the symbol for the real numbers
+
+% The Real Numbers
+
+
+% EGP's `homemade' notation for the real numbers
+
+% \newcommand{\Reals}{{I \! \! R}}
+
+% I used \Rtilde to denote the remainder in a Taylor Series approximation to the function \scalar.
+
+\newcommand{\Rtilde}{\tilde{R}}
+
+% The Integers
+
+\newcommand{\Z}{\mathbb{Z}}
+
+% Defines \ip{arg1}{arg2} to mean inner product
+
+\newcommand{\innerp}[2]{\langle \, #1 , \, #2 \, \rangle}
+
+% Norms ...
+
+\newcommand{\supnorm}[1]{\| \, #1 \, \|_\infty}
+
+% Fourier coefficients of the functions f and g
+% (Or the Fourier Transform of f and g.)
+
+\newcommand{\fhat}{{\hat f}}
+\newcommand{\ghat}{{\hat g}}
+
+% For the modified Fourier transform of the function f
+
+%\newcommand{\ftilde}{{\tilde f}}
+
+% From http://www.physicsforums.com/showthread.php?t=185826 on Wednesday, February 06, 2013 at 20:20 PST
+%
+%   Timo suggested \mathbf, but that doesn't work on some things.
+%   If you have access to the AMSLaTeX macros, (and you should), use \boldsymbol.
+
+%   For fluxes on the edges of cells
+
+\newcommand{\Fvec}{\boldsymbol{F}}
+
+% The spectrally accurate approximation to f
+
+\newcommand{\fS}{f_S}
+
+% Used to denote the matrix corresponding to the standard five point Laplacian in two dimensions multiplied
+% by h^2.
+
+\newcommand{\Atilde}{{\tilde A}}
+
+% In EGP's second and third CAMCoS papers I use this symbol to denote the 5 X 5 block of cells centered on
+% the ijth cell C_{ij}.
+
+\newcommand{\Btilde}{\widetilde B}
+
+% Used to denote constants
+
+\newcommand{\Cbar}{\widebar C}
+\newcommand{\Ctilde}{\widetilde C}
+
+% In order to denote the discrete Fourier coefficients of f
+
+\newcommand{\ftilde}{{\tilde f}}
+
+% In order to denote the M interpolation points on the grid or vectors in C^M
+% (In Part One EGP is not using bold faced symbols to denote vectors.)
+
+\newcommand{\fvec}{{f}}
+\newcommand{\gvec}{{g}}
+
+% The complex conjugates of f and g
+
+\newcommand{\fbar}{{\bar{f}}}
+\newcommand{\gbar}{{\bar{g}}}
+
+\newcommand{\grad}{\nabla}
+
+% \hhalf = h/2 is half a cell width, or, for cell-centered grids, it denotes the
+% center of the first cell on the periodic domain [0,1].
+
+\newcommand{\hhalf}{{\myfiverm \frac{h}{2}}}
+
+% For indices running over the Fourier coefficients and the discrete Fourier coefficients
+
+\newcommand{\jpr}{{j^\prime}}
+\newcommand{\kpr}{{k^\prime}}
+
+% Upper limit on the truncated Fourier series for f
+
+\newcommand{\Mhalf}{{\myfiverm \frac{M}{2}}}
+\newcommand{\Nhalf}{{\myfiverm \frac{N}{2}}}
+
+\newcommand{\thalf}{{\myfiverm \frac{3}{2}}}
+\newcommand{\Thalf}{{\myfiverm \frac{3 \sp M}{2}}}
+
+% The discrete Fourier coefficients of the algebraic error \delta^l = \utilde - u
+
+\newcommand{\dhat}{{\hat{\delta}}}
+
+% Vector of the (j_x, j_y) component of wvec^(\kvec)
+
+\newcommand{\jvec}{{\boldsymbol j}}
+
+% Vector of Fourier wave numbers \kvec = (k_x, k_y)
+
+\newcommand{\kvec}{{\boldsymbol k}}
+
+% The discrete Fourier coefficient of \phi(x) defined using the values of \phi on
+% the grid with N points, [ \phi(x_0), \phi(x_1), \ldots , \phi(x_{N-1}) ]
+
+\newcommand{\phihat}{{\hat{\phi}}}
+
+% The macro \scalar is used to denote a scalar quantity that is being advected in the velocity
+% field \uvec(\xvec,t)
+
+\newcommand{\scalar}{\mathfrak{s}}
+
+% The macro \stilde is used to distinguish the second-order accurate advection algorithm from the
+% the first-order accurate advection algorithm; i.e., CTU.
+
+\newcommand{\stilde}{{\tilde{\mathfrak{s}}}}
+
+% We use this macro to write "the $(i,j)^{th}$ cell in a more succinct form: "the $(\ij)^\th$ cell"
+
+\renewcommand{\th}{{th}}
+
+% The complex conjugate of w
+
+\newcommand{\wbar}{{\bar{w}}}
+
+% Computed solutions to on a grid with % \dx = h at time t^n and t^{n+1}.
+
+\newcommand{\uc}{u}
+\newcommand{\ucn}{\uc^{n}}
+\newcommand{\ucnp}{\uc^{n+1}}
+
+% Exact solution to the model linear advection equation (1.1a,b).
+
+\newcommand{\ue}{v}
+\newcommand{\uen}{v^n}
+\newcommand{\uenp}{v^{n+1}}
+
+% EGP used \utilde to denote the compute approximation to the solution u of a conservation law in
+% the note "Second-Order Accurate Conservative Finite Difference Update"
+
+\newcommand{\utilde}{{\tilde{u}}}
+\newcommand{\utilden}{{\tilde{u}^n}}
+\newcommand{\utildenp}{{\tilde{u}^{n+1}}}
+
+% Boldfaced u, which is typically used to denote a velocity in two or more space dimensions
+
+\newcommand{\uvec}{\boldsymbol{u}}
+
+% A generic vector space V
+
+\newcommand{\Vspace}{\mathscr{V}}
+% \newcommand{\Vspace}{\mathpzc{V}}
+% \newcommand{\Vspace}{\mathcal{V}}
+
+\newcommand{\Avec}{{\boldsymbol A}}
+
+% For von Neumann analysis and the Discrete Fourier Transform basis vectors
+
+\newcommand{\Wvec}{{W}}
+\newcommand{\wvec}{{\boldsymbol w}}
+%\newcommand{\wvec}{{w}}
+
+% The vector (0,0) or (0,0,0)
+
+\newcommand{\zero}{\boldsymbol{0}}
+
+% The vector b
+
+\newcommand{\bvec}{\boldsymbol{b}}
+
+% Useful abbreviations for subscripts and superscripts
+
+\renewcommand{\ij}{{i,j}}
+
+% Indices for the components of Fourier functions such as \wvec^(\kvec) in two
+% dimensions
+
+\newcommand{\jxjy}{{j_x,j_y}}
+
+\newcommand{\im}{{i-1}}
+\newcommand{\ip}{{i+1}}
+\newcommand{\iph}{{i + \half}}
+\newcommand{\imh}{{i - \half}}
+
+\newcommand{\jm}{{j - 1}}
+\newcommand{\jp}{{j + 1}}
+\newcommand{\jph}{{j + \half}}
+\newcommand{\jmh}{{j - \half}}
+
+\newcommand{\imj }{{i-1,j  }}
+\newcommand{\ipj }{{i+1,j  }}
+\newcommand{\ijm }{{i  ,j-1}}
+\newcommand{\ijp }{{i  ,j+1}}
+\newcommand{\imjm}{{i-1,j-1}}
+
+\newcommand{\ijmh}{{i  ,j-\half}}
+\newcommand{\ijph}{{i,j+\half}}
+\newcommand{\imhj}{{i-\half,j}}
+\newcommand{\iphj}{{i+\half,j}}
+
+\newcommand{\np}{{n + 1}}
+\newcommand{\nph}{{n + \half}}
+\newcommand{\nmh}{{n - \half}}
+
+\newcommand{\atilde}{\tilde a}
+\newcommand{\btilde}{\tilde b}
+
+\newcommand{\cbar}{\bar c}
+\newcommand{\ctilde}{\tilde c} % comparison circle
+
+\newcommand{\dr}{\; dr}
+\newcommand{\ds}{\; ds}
+
+\newcommand{\eps}{{\epsilon}}
+
+\newcommand{\gtilde}{\tilde g}
+\newcommand{\Gtilde}{\tilde G}
+
+%\newcommand{\implies}{\Rightarrow}
+\newcommand{\kappatilde}{{{\tilde \kappa}}}
+
+\newcommand{\Lambdatilde}{{\tilde {\Lambda}}}
+\newcommand{\mtilde}{{\tilde {m}}}
+
+\newcommand{\ntilde}{\tilde \boldsymbol{n}}
+\newcommand{\nvec}{\boldsymbol{n}}
+\newcommand{\Nvec}{\boldsymbol{N}}
+
+\newcommand{\ptilde}{{\tilde p}}
+
+% Finite Element Types P_{-s}
+
+\newcommand{\Prm}{\mathrm{P}}
+
+% Finite Element Types Q_{-s}
+
+\newcommand{\Q}{\mathrm{Q}}
+
+% \newcommand{\stilde}{\tilde s}
+\newcommand{\sstar}{s^{*}}
+
+\newcommand{\thetatilde}{{\tilde \theta}}
+
+\newcommand{\taudot}{{\dot \boldsymbol{T}}}
+\newcommand{\tauvec}{{\boldsymbol{T}}}
+\newcommand{\tauvecdot}{{\dot\boldsymbol{T}}}
+
+\newcommand{\Tdot}{{\dot \boldsymbol{T}}}
+\newcommand{\Tvec}{{\boldsymbol{T}}}
+\newcommand{\Tvecdot}{{\dot\boldsymbol{T}}}
+
+\newcommand{\vvec}{\mathbf{v}}
+\newcommand{\V}{\mathbf{V}}
+
+\newcommand{\xbar}{\bar x}
+
+\newcommand{\xdot}{\dot x}
+\newcommand{\ydot}{\dot y}
+
+\newcommand{\xddot}{\ddot x}
+\newcommand{\yddot}{\ddot y}
+
+\newcommand{\xhat}{{\hat x}}
+\newcommand{\xitilde}{{\tilde \xi}}
+
+\newcommand{\xstar}{{x}^{*}}
+\newcommand{\ystar}{{y}^{*}}
+
+\newcommand{\xtilde}{{\tilde x}}
+\newcommand{\ytilde}{{\tilde y}}
+
+\newcommand{\xdtilde}{{\dot{\tilde x}}}
+\newcommand{\ydtilde}{{\dot{\tilde y}}}
+
+\newcommand{\xddtilde}{{\ddot{\tilde x}}}
+\newcommand{\yddtilde}{{\ddot{\tilde y}}}
+
+
+\newcommand{\xvec}{\boldsymbol{x}}
+\newcommand{\xvecdot}{{\dot \boldsymbol{x}}}
+\newcommand{\xvecddot}{{\ddot \boldsymbol{x}}}
+
+\newcommand{\Xvec}{\boldsymbol{X}}
+
+\newcommand{\zetatilde}{\boldsymbol{{\tilde \zeta}}}
+
+\newcommand{\zvec}{\boldsymbol{z}}
+\newcommand{\ztilde}{\boldsymbol{{\tilde z}}} 

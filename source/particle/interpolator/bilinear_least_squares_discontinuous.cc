@@ -18,7 +18,7 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#include <aspect/particle/interpolator/bilinear_least_squares.h>
+#include <aspect/particle/interpolator/bilinear_least_squares_discontinuous.h>
 #include <aspect/postprocess/particles.h>
 #include <aspect/simulator.h>
 
@@ -36,12 +36,12 @@ namespace aspect
     {
       template <int dim>
       std::vector<std::vector<double> >
-      BilinearLeastSquares<dim>::properties_at_points(const ParticleHandler<dim> &particle_handler,
-                                                      const std::vector<Point<dim> > &positions,
-                                                      const ComponentMask &selected_properties,
-                                                      const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const
+      BilinearLeastSquaresDiscontinuous<dim>::properties_at_points(const std::multimap<types::LevelInd, Particle<dim> > &particles,
+                                                                   const std::vector<Point<dim> > &positions,
+                                                                   const ComponentMask &selected_properties,
+                                                                   const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const
       {
-        const unsigned int n_particle_properties = particle_handler.n_properties_per_particle();
+        const unsigned int n_particle_properties = particles.begin()->second.get_properties().size();
 
         const unsigned int property_index = selected_properties.first_selected_component(selected_properties.size());
 
@@ -79,15 +79,16 @@ namespace aspect
         else
           found_cell = cell;
 
-        const typename ParticleHandler<dim>::particle_iterator_range particle_range =
-          particle_handler.particles_in_cell(found_cell);
+        const types::LevelInd cell_index = std::make_pair<unsigned int, unsigned int> (found_cell->level(),found_cell->index());
+        const std::pair<typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator,
+              typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator> particle_range = particles.equal_range(cell_index);
 
 
         std::vector<std::vector<double> > cell_properties(positions.size(),
                                                           std::vector<double>(n_particle_properties,
                                                                               numbers::signaling_nan<double>()));
 
-        const unsigned int n_particles = std::distance(particle_range.begin(),particle_range.end());
+        const unsigned int n_particles = std::distance(particle_range.first,particle_range.second);
 
         AssertThrow(n_particles != 0,
                     ExcMessage("At least one cell contained no particles. The `bilinear'"
@@ -97,24 +98,24 @@ namespace aspect
         // Noticed that the size of matrix A is n_particles x matrix_dimension
         // which usually is not a square matrix. Therefore, we solve Ax=r by
         // solving A^TAx= A^Tr.
-        const unsigned int matrix_dimension = 4;
+        const unsigned int matrix_dimension = 3;
         dealii::LAPACKFullMatrix<double> A(n_particles, matrix_dimension);
         Vector<double> r(n_particles);
         r = 0;
 
         unsigned int index = 0;
         const double cell_diameter = found_cell->diameter();
-        for (typename ParticleHandler<dim>::particle_iterator particle = particle_range.begin();
-             particle != particle_range.end(); ++particle, ++index)
+        for (typename std::multimap<types::LevelInd, Particle<dim> >::const_iterator particle = particle_range.first;
+             particle != particle_range.second; ++particle, ++index)
           {
-            const double particle_property_value = particle->get_properties()[property_index];
+            const double particle_property_value = particle->second.get_properties()[property_index];
             r[index] = particle_property_value;
 
-            const Point<dim> position = particle->get_location();
+            const Point<dim> position = particle->second.get_location();
             A(index,0) = 1;
             A(index,1) = (position[0] - approximated_cell_midpoint[0])/cell_diameter;
             A(index,2) = (position[1] - approximated_cell_midpoint[1])/cell_diameter;
-            A(index,3) = (position[0] - approximated_cell_midpoint[0]) * (position[1] - approximated_cell_midpoint[1])/std::pow(cell_diameter,2);
+            //A(index,3) = (position[0] - approximated_cell_midpoint[0]) * (position[1] - approximated_cell_midpoint[1])/std::pow(cell_diameter,2);
           }
 
         dealii::LAPACKFullMatrix<double> B(matrix_dimension, matrix_dimension);
@@ -140,16 +141,8 @@ namespace aspect
             const Point<dim> support_point = *itr;
             double interpolated_value = c[0] +
                                         c[1]*(support_point[0] - approximated_cell_midpoint[0])/cell_diameter +
-                                        c[2]*(support_point[1] - approximated_cell_midpoint[1])/cell_diameter +
-                                        c[3]*(support_point[0] - approximated_cell_midpoint[0])*(support_point[1] - approximated_cell_midpoint[1])/std::pow(cell_diameter,2);
-
-            // Trigger an assert statement if there is overshoot or undershoot.
-            if (check_for_overshoot_and_undershoot)
-              {
-                AssertThrow(interpolated_value >= global_minimum_particle_properties[property_index] &&
-                            interpolated_value <= global_maximum_particle_properties[property_index],
-                            ExcMessage("Overshoot or undershoot detected"));
-              }
+                                        c[2]*(support_point[1] - approximated_cell_midpoint[1])/cell_diameter; //+
+            // c[3]*(support_point[0] - approximated_cell_midpoint[0])*(support_point[1] - approximated_cell_midpoint[1])/std::pow(cell_diameter,2);
 
             // Overshoot and undershoot correction of interpolated particle property.
             if (use_global_valued_limiter)
@@ -165,7 +158,7 @@ namespace aspect
 
       template <int dim>
       void
-      BilinearLeastSquares<dim>::declare_parameters (ParameterHandler &prm)
+      BilinearLeastSquaresDiscontinuous<dim>::declare_parameters (ParameterHandler &prm)
       {
         prm.enter_subsection("Postprocess");
         {
@@ -173,7 +166,7 @@ namespace aspect
           {
             prm.enter_subsection("Interpolator");
             {
-              prm.enter_subsection("Bilinear least squares");
+              prm.enter_subsection("Bilinear least squares discontinuous");
               {
                 prm.declare_entry ("Global particle property maximum",
                                    boost::lexical_cast<std::string>(std::numeric_limits<double>::max()),
@@ -193,9 +186,7 @@ namespace aspect
                                   Patterns::Bool (),
                                   "Whether to apply a global particle property limiting scheme to the interpolated "
                                   "particle properties.");
-                prm.declare_entry("Check for overshoot and undershoot", "false",
-                                  Patterns::Bool (),
-                                  "Whether to trigger an assert statement if there is overshoot or undershoot.");
+
               }
               prm.leave_subsection();
             }
@@ -208,7 +199,7 @@ namespace aspect
 
       template <int dim>
       void
-      BilinearLeastSquares<dim>::parse_parameters (ParameterHandler &prm)
+      BilinearLeastSquaresDiscontinuous<dim>::parse_parameters (ParameterHandler &prm)
       {
         prm.enter_subsection("Postprocess");
         {
@@ -216,12 +207,10 @@ namespace aspect
           {
             prm.enter_subsection("Interpolator");
             {
-              prm.enter_subsection("Bilinear least squares");
+              prm.enter_subsection("Bilinear least squares discontinuous");
               {
                 use_global_valued_limiter = prm.get_bool("Use limiter");
-                check_for_overshoot_and_undershoot = prm.get_bool("Check for overshoot and undershoot");
-
-                if (use_global_valued_limiter || check_for_overshoot_and_undershoot)
+                if (use_global_valued_limiter)
                   {
                     global_maximum_particle_properties = Utilities::string_to_double(Utilities::split_string_list(prm.get("Global particle property maximum")));
                     global_minimum_particle_properties = Utilities::string_to_double(Utilities::split_string_list(prm.get("Global particle property minimum")));
@@ -258,8 +247,8 @@ namespace aspect
   {
     namespace Interpolator
     {
-      ASPECT_REGISTER_PARTICLE_INTERPOLATOR(BilinearLeastSquares,
-                                            "bilinear least squares",
+      ASPECT_REGISTER_PARTICLE_INTERPOLATOR(BilinearLeastSquaresDiscontinuous,
+                                            "bilinear least squares discontinuous",
                                             "Interpolates particle properties onto a vector of points using a "
                                             "bilinear least squares method. Currently only 2D models are "
                                             "supported. Note that deal.II must be configured with BLAS/LAPACK.")

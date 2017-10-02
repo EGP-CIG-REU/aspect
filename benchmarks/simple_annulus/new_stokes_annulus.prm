@@ -1,0 +1,180 @@
+set Additional shared libraries            = ./libnew_stokes_annulus.so
+
+############### Global parameters
+
+set Dimension                              = 2
+
+set Start time                             = 0
+
+set End time                               = 0
+
+set Output directory                       = output_debug
+
+set Nonlinear solver scheme                = Stokes only
+
+set CFL number                             = 0.9
+
+set Linear solver tolerance                = 1e-14
+
+set Use years in output instead of seconds = false
+
+set Pressure normalization                 = surface
+############### Parameters describing the model
+
+subsection Geometry model
+  set Model name = spherical shell
+
+  subsection Spherical shell
+    set Inner radius = 1
+    set Outer radius = 2
+    set Opening angle = 360
+  end
+end
+
+subsection Model settings
+  set Prescribed velocity boundary indicators = 0: function, 1: function
+  set Tangential velocity boundary indicators =
+  set Zero velocity boundary indicators       =
+end
+
+subsection Boundary velocity model
+  subsection Function
+    set Function constants  = pi=3.1415926
+    set Variable names      = x,y
+    set Function expression = y*sqrt(x^2 + y^2);-x*sqrt(x^2 + y^2)
+  end
+end
+
+subsection Material model
+  set Model name = SimpleAnnulusMaterial
+
+  subsection Simple annulus
+    #Do not change these set of parameters! EGP && HL
+    set Viscosity jump = 1
+    set Reference density = 1
+
+    subsection Density
+      subsection Function
+        set Variable names = x, y
+        set Function expression = ((sqrt(x^2 + y^2))^3)/3
+      end
+    end
+
+    subsection Pressure
+      subsection Function
+        set Variable names = x, y
+        set Function expression = -(((x^2 + y^2)^2)/12) + 4/3
+      end
+    end
+
+    subsection Analytical velocity
+      subsection Function
+        set Variable names = x, y
+        set Function expression = y*sqrt(x^2 + y^2);-x*sqrt(x^2 + y^2)
+      end
+    end
+  end
+end
+
+
+subsection Gravity model
+  set Model name = function
+  subsection Radial constant
+    set Magnitude = 1
+  end
+
+  subsection Function
+    set Variable names      = x,y
+    set Function expression = (-x)/sqrt(x^2+y^2) - ((9*y)/((x^2+y^2)^2));(-y)/sqrt(x^2+y^2) + ((9*x)/((x^2+y^2)^2))
+  end
+end
+
+
+############### Parameters describing the temperature field
+
+subsection Boundary temperature model
+  set List of model names = box
+
+  subsection Box
+    set Bottom temperature = 0
+    set Top temperature    = 0
+  end
+end
+
+
+subsection Initial temperature model
+  set Model name = function
+  subsection Function
+    set Function expression = 0
+  end
+end
+
+subsection Adiabatic conditions model
+  set Model name = function
+
+  subsection Function
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = depth
+  end
+
+end
+
+############### Parameters describing the discretization
+
+subsection Discretization
+  set Stokes velocity polynomial degree       = 2
+  set Use locally conservative discretization = false
+#  set Use discontinuous composition discretization = true
+end
+
+
+subsection Mesh refinement
+  set Coarsening fraction         = 0
+  set Initial adaptive refinement = 0
+  set Initial global refinement   = 5
+end
+
+############### Parameters describing what to do with the solution
+
+subsection Postprocess
+  set List of postprocessors = visualization, SimpleAnnulusPostprocessor #, particles
+ 
+  subsection Particles
+    set Number of particles     = 49152
+    set Particle generator name = reference cell
+    set Time between data output = 0
+#    set Data outut format = ascii
+
+    subsection Generator
+      subsection Reference cell
+        set Number of particles per cell per direction = 4
+      end
+    end
+
+    set List of particle properties = function
+
+    subsection Function
+      set Number of components = 2 
+      set Variable names      = x,y
+      set Function expression = -x*sqrt(x^2+y^2); -y*sqrt(x^2 + y^2)
+    end
+
+  end
+ 
+  subsection Visualization
+    set Output format                 = vtu
+    set Number of grouped files       = 1
+    set Time between graphical output = 0
+    set List of output variables      = density, viscosity, partition, gravity
+  end
+end
+
+subsection Termination criteria
+  set Checkpoint on termination = false
+  set Termination criteria      = user request
+
+  subsection User request
+    set File name = end
+  end
+end

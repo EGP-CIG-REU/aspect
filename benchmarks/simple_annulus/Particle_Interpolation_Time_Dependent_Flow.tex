@@ -1,0 +1,329 @@
+\documentclass[final,10pt,reqno,twoside]{article} % \documentclass[final,10pt,reqno]{amsart}
+
+% The default for the AMS article class is 10pt, final and leqno, although EGP like's the Equation
+% numbers on the right. See Section 8.5 on page 301 of "Math into LaTeX" by George Gratzer for more
+% options.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Particle Interpolation of Time Dependent Flow %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Professor E. G. Puckett & Harsha Lokavarapu
+%
+% Department of Mathematics
+% University of California, Davis
+% Davis, California  95616
+%
+% Created
+%
+%   Wednesday October 26, 2016 at 16:50 PDT
+%
+% Revision History:
+%
+%   Adding content and aggregating data for tabulation
+%
+%   Updated problem #1 and problem #2 descriptions. The tabulated errors are outdated as of 12/21/16.
+%
+%   Added tables and data for Q2_Q1 element for problem #2 on 12/22/16.
+%
+%   Describing the problems for rho=0 and rho=1 in the annulus. Expect to get machine accuracy, for rho = 0:
+%     Q2 x Q1 to Q2 x P-1
+%     Q3 x Q2 to Q3 x P-2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOAD AMS LaTeX Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Using the "amsart" or "amsbook" document class instead of the standard LaTeX "article" document class
+% provides all (or at least most) of the AMS math macros. However, it also puts a colon in the description
+% list environment, which I don't like.
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+
+% Added by EGP for script fonts
+
+\usepackage[mathscr]{euscript}
+
+% Added by EGP for script L for a linear operator: \mathscr{L}
+
+\usepackage{mathrsfs}
+
+% This package provides an arrow, \longrightarrow, that is longer than AMSMATH's \xrightarrow and
+% \xrightarrow.
+
+\usepackage{extarrows} % (extensible arrows)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SET UP PAGE PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% EGP's preferred page style for notes, homework assignments, exams, etc.
+
+% Margins, paragraph indents, space between paragraphs if any, etc. Good references include page 85 of
+% "The LaTeX Companion" by Frank Mittelbach and Michael Goossens and page 260 of "Math Into LaTeX" by
+% George Gratzer.
+
+% Enlarge the width and height of the printed page
+
+\setlength{\textwidth }{7.50 in}
+\setlength{\textheight}{9.25 in}
+
+% Space between the end of the odd and even side margins and the beginning of the text.
+
+\setlength{\oddsidemargin }{0.00 in}
+\setlength{\evensidemargin}{0.00 in}
+
+% The side margins are 1.0 inch plus \hoffset and the top margins is 1.0 inch plus \voffset.
+% According to "The LaTeX Companion" the default values are \hoffset = 00 pt and \voffset = 00 pt.
+
+\setlength{\hoffset}{-0.50 in}
+
+% This is the width of the top margin plus one inch
+
+\setlength{\voffset}{-0.50 in}
+
+% If there is no header in this document, set each of the following values to zero. According to "Math
+% Into LaTeX"  by George Gratzer the default values for LaTeX's article documents are \headsep = 25pt,
+% \headheight = 12pt, and  \topmargin = 16pt.
+
+\setlength{\headsep   }{12pt}
+
+% Package Fancyhdr Warning: \headheight is too small (12.0pt): Make it at least 14.0pt.
+
+\setlength{\headheight}{14pt}
+
+\setlength{\topmargin }{00pt}
+
+% This is the amount of space between the last line on the page and the footer. According to "The LaTeX
+% Companion" and "Math Into LaTeX" the default value is \footskip = 30 pt.
+
+\setlength{\footskip}{0.50 in}
+
+% I like space between paragraphs, since it makes the document more readable. However, this does not seem
+% to change the spacing between paragraphs contained in an item of a list.
+
+\setlength{\parskip}{12pt}
+
+% Comment out the following line to use the default amount to indent the first line of each paragraph.
+
+\setlength{\parindent}{00pt}
+
+% \fboxsep is the distance between the edge of a box and the text the box contains.
+
+\setlength{\fboxsep}{10pt}
+
+% There is no need for BibTeX in this exam so I turned it off, since it creates unwanted files.
+
+\let\nobibtex = t
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Load The GRAPHICX Package %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The best reference I have found for including graphics in figures and especially manipulating captions
+% and subcaptions is "The LaTeX Companion" by Frank Mittelbach and Michel Goossens. The following packages
+% are described there.
+
+% WARNING: PDFTeX does not recognize eps files. They MUST be converted to PDF files.
+
+\usepackage{graphics}
+
+\DeclareGraphicsExtensions{.png}
+
+% This tells LaTeX to look in the subdirectory ./Figures for my PDF files. Note that the folder name must
+% be in braces {./Figures}, even if there is only one folder in the list.
+
+\graphicspath{{./00Figures/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set Up The CHANGES Package %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[draft]{changes}
+
+% Anonymous: To use this feature type \added[]{ ... }
+
+% Footnotes: To put an \added[EGP]{...} comment in a footnote use \added[-]{\footnote{\added[EGP]{ ... }}}.
+% For example, \added[*]{\footnote{\added[EGP]{Double check this equation.}}}
+
+\definechangesauthor[name={Footnotes}, color=red]{*}
+
+\setauthormarkupposition{left}
+
+% To use this feature type \added[Delete]{ ... }
+% Note: Version 1.0.0 can special strike out deleted text. See the manual.
+
+\definechangesauthor[color=green]{Delete}
+
+% To use this feature type \added[id=EGP]{ ... } !!!!
+
+\definechangesauthor[name={Elbridge Gerry Puckett}, color=red]{EGP}
+
+% Test from http://tex.stackexchange.com/questions/65453/track-changes-in-latex/65466#65466, which worked on
+% Friday, January 17, 2014 at 10:58 PST
+
+% \definechangesauthor[name={Per cusse}, color=orange]{per}
+
+% This is \added[id=per,remark={we need this}]{new} text.
+% This is \added[id=per,remark={has to be in it}]{new} text.
+% This is \deleted[id=per,remark=obsolete]{unnecessary}text.
+% This is \replaced[id=per]{nice}{bad} text.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set Up The CHANGES Package %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \usepackage[draft]{changes}
+
+% Anonymous: To use this feature type \added[]{ ... }
+
+% Footnotes: To put an \added[EGP]{...} comment in a footnote use \added[-]{\footnote{\added[EGP]{ ... }}}.
+% For example, \added[*]{\footnote{\added[EGP]{Double check this equation.}}}
+
+% \definechangesauthor[name={Footnotes}, color=red]{*}
+
+% \setauthormarkupposition{left}
+
+% To use this feature type \added[Delete]{ ... }
+% Note: Version 1.0.0 can special strike out deleted text. See the manual.
+
+% \definechangesauthor[color=green]{Delete}
+
+% To use this feature type \added[EGP]{ ... }
+
+% \definechangesauthor[name={Elbridge Gerry Puckett}, color=red]{-EGP}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOAD THE "enumitem" PACKAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+
+% \setenumerate[1]{labelindent=0pt,itemindent=12pt}
+
+\setlength{\labelwidth}{00 pt}
+\setlength{\leftmargin}{0.0in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set Up Running Head and Foot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LaTeX macro package to print the date and the time of day.
+
+% There are various declarations that change the effect of \today. The change can be localized by placing
+% the declaration within a group.
+%
+%  <Day> <Month> <Year> formats:
+%
+%   \longdate   The declaration "\longdate" will redefine \today to produce the current date displayed in
+%               the form
+%
+%               Wednesday 8th March, 2000
+%
+% if the package option dayofweek is used (Default), or
+%
+%               8th March, 2000
+%
+% if the package option nodayofweek is used.
+%
+%   \shortdate  The declaration "\shortdate" will redefine \today to produce the current date displayed in
+%               the form Wed 8th Mar, 2000 if the package option dayofweek is used, or
+%
+%               8th Mar, 2000
+%
+% if the package option nodayofweek is used.
+
+\usepackage[long]{datetime}
+
+% The current time is displayed using the command \currenttime. The format can be changed using the
+% declaration \settimeformat{<style>}, where <style> is the name of the format. Available formats are:
+%
+%   xxivtime     Twenty-four hour time in the form 22:28 (Default)
+%
+%   ampmtime     Twelve hour time in the form 10:28pm
+%
+%   oclock       Displays the current time as a string, e.g. Twenty-Eight minutes past Ten in the afternoon.
+
+\settimeformat{xxivtime}
+
+% This is the day that I wrote the last version of this exam, assuming I remembered to update this date.
+
+\newdate{Date-Written}{01}{09}{2016}
+
+% "fancyhdr" is an easy to use package for making headers and footers.
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+
+% Clear all header and footer fields.
+
+\fancyhead{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% "L" stands for "Left", "C" for "Centered", "R" for "Right", "O" for Odd page and "E" for Even page
+
+\fancyhead[CO]{\textbf{TIME DEPENDENT ACTIVE PARTICLE BENCHMARKS}}
+\fancyhead[CE]{\textbf{TIME DEPENDENT ACTIVE PARTICLE BENCHMARKS}}
+
+% \fancyhead[RO]{\textbf{SUMMER 2016}}
+% \fancyhead[RE]{\textbf{SUMMER 2016}}
+
+% FOOTER
+
+\fancyfoot[LO]{\copyright~HVL~\&~EGP~~~~\emph{Revision~1.01}}
+\fancyfoot[LE]{\copyright~HVL~\&~EGP~~~~\emph{Revision~1.01}}
+
+\fancyfoot[CO]{--~\thepage~--}
+\fancyfoot[CE]{--~\thepage~--}
+
+\fancyfoot[RO]{\today~at~\currenttime}
+\fancyfoot[RE]{\today~at~\currenttime}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOAD EGP's LaTeX MACROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% EGP's Macro definitions for notes
+
+\include{EGPs_Note_Macros}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOAD THE HYPERREF PACKAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The basic usage with the standard settings is straightforward. Just load the package in the preamble, at
+% the end of all the other packages but prior to other settings.
+
+% From the `Introduction' to the hyperref manual: Make sure it comes last of your loaded packages, to give
+% it a fighting chance of not being over-written, since its job is to redefine many LATEX commands.
+% Hopefully you will find that all cross-references work correctly as hypertext. For example, \section
+% commands will produce a bookmark and a link, whereas \section* commands will only show links when paired
+% with a corresponding \addcontentsline command.
+
+\usepackage[bookmarksopen=false]{hyperref}
+
+% Set the internal hyperref links, such as equation numbers, to black for photocopying the exam. Wikibooks
+% has an article on color names at http://en.wikibooks.org/wiki/LaTeX/Colors
+
+\hypersetup{linkcolor=blue}
+
+% bookmarksopen=true means only level 1. % are displayed.% Setup hyperref parameters. See the hyperref manual
+% for details.
+
+\hypersetup{colorlinks=true, urlcolor=blue, pdftitle={2016 REU LaTeXSample}}
+
+% The default values for "bookmarks" is 'false' and for "bookmarksopen" is 'false'
+
+\hypersetup{pdfauthor={\textcopyright\ Professor Elbridge Gerry Puckett}}
+
+% Uncomment if you want the first page to be page number 0.
+
+% \setcounter{page}{0}
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% NO LINE BELOW THE HEADER EXCEPT ON THE COVER PAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \renewcommand{\headrulewidth}{0.0pt}
+
+
+
+
+% I wanted four levels of bookmarks beyond level zero, which apparently is not possible. Therefore, I
+% changed the level 01 bookmarks to level 00, etc.
+
+% \pdfbookmark[0]{Problems}{Problems}
+
+% This cannot appear before the first "\item" inside the first list environment "\begin{equation}"
+
+
+% Set the labels in the first level of the enumerated list below to be \textbf{Problem~0\arabic{enumi}}
+% See page 347 of "Math Into LaTeX".
+
+\renewcommand{\theenumi}{\textbf{ITEM~0\arabic{enumi}}}
+\renewcommand{\labelenumi}{\theenumi}
+\vskip 50pt
