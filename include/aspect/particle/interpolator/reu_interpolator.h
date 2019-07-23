@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _aspect_particle_interpolator_bilinear_least_squares_h
-#define _aspect_particle_interpolator_bilinear_least_squares_h
+#ifndef _aspect_particle_interpolator_reu_interpolator_h
+#define _aspect_particle_interpolator_reu_interpolator_h
 
 #include <aspect/particle/interpolator/interface.h>
 #include <aspect/simulator_access.h>
@@ -37,7 +37,7 @@ namespace aspect
        * @ingroup ParticleInterpolators
        */
       template <int dim>
-      class R_interpolator : public Interface<dim>, public aspect::SimulatorAccess<dim>
+      class ReuInterpolator : public Interface<dim>, public aspect::SimulatorAccess<dim>
       {
         public:
           /**
@@ -73,14 +73,12 @@ namespace aspect
            * undershoot of interpolated particle properties based on global max
            * and global min for each propery.
            */
-          bool use_global_valued_limiter;
+          double radius;
 
           /**
            * For each interpolated particle property, a global max and global
            * min are stored as elements of vectors.
            */
-          std::vector<double> global_maximum_particle_properties;
-          std::vector<double> global_minimum_particle_properties;
       };
     }
   }

@@ -18,7 +18,7 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#include <aspect/particle/interpolator/bilinear_least_squares.h>
+#include <aspect/particle/interpolator/reu_interpolator.h>
 #include <aspect/postprocess/particles.h>
 #include <aspect/simulator.h>
 
@@ -36,7 +36,7 @@ namespace aspect
     {
       template <int dim>
       std::vector<std::vector<double> >
-      R_interpolator<dim>::properties_at_points(const ParticleHandler<dim> &particle_handler,
+      ReuInterpolator<dim>::properties_at_points(const ParticleHandler<dim> &particle_handler,
                                                       const std::vector<Point<dim> > &positions,
                                                       const ComponentMask &selected_properties,
                                                       const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell) const
@@ -144,11 +144,6 @@ namespace aspect
                                         c[3]*(support_point[0] - approximated_cell_midpoint[0])*(support_point[1] - approximated_cell_midpoint[1])/std::pow(cell_diameter,2);
 
             // Overshoot and undershoot correction of interpolated particle property.
-            if (use_global_valued_limiter)
-              {
-                interpolated_value = std::min(interpolated_value, global_maximum_particle_properties[property_index]);
-                interpolated_value = std::max(interpolated_value, global_minimum_particle_properties[property_index]);
-              }
 
             cell_properties[index_positions][property_index] = interpolated_value;
           }
@@ -157,7 +152,7 @@ namespace aspect
 
       template <int dim>
       void
-      R_interpolator<dim>::declare_parameters (ParameterHandler &prm)
+      ReuInterpolator<dim>::declare_parameters (ParameterHandler &prm)
       {
         prm.enter_subsection("Postprocess");
         {
@@ -165,27 +160,11 @@ namespace aspect
           {
             prm.enter_subsection("Interpolator");
             {
-              prm.enter_subsection("Bilinear least squares");
+              prm.enter_subsection("REU");
               {
-                prm.declare_entry ("Global particle property maximum",
-                                   boost::lexical_cast<std::string>(std::numeric_limits<double>::max()),
-                                   Patterns::List(Patterns::Double ()),
-                                   "The maximum global particle property values that will be used as a "
-                                   "limiter for the bilinear least squares interpolation. The number of the input "
-                                   "'Global particle property maximum' values separated by ',' has to be "
-                                   "the same as the number of particle properties.");
-                prm.declare_entry ("Global particle property minimum",
-                                   boost::lexical_cast<std::string>(-std::numeric_limits<double>::max()),
-                                   Patterns::List(Patterns::Double ()),
-                                   "The minimum global particle property that will be used as a "
-                                   "limiter for the bilinear least squares interpolation. The number of the input "
-                                   "'Global particle property minimum' values separated by ',' has to be "
-                                   "the same as the number of particle properties.");
-                prm.declare_entry("Use limiter", "false",
-                                  Patterns::Bool (),
-                                  "Whether to apply a global particle property limiting scheme to the interpolated "
-                                  "particle properties.");
-
+                prm.declare_entry("radius", "1.0",
+                                  Patterns::Double (),
+                                  "Length of the support of the Peskin radial interposation functions");
               }
               prm.leave_subsection();
             }
@@ -198,7 +177,7 @@ namespace aspect
 
       template <int dim>
       void
-      R_interpolator<dim>::parse_parameters (ParameterHandler &prm)
+      ReuInterpolator<dim>::parse_parameters (ParameterHandler &prm)
       {
         prm.enter_subsection("Postprocess");
         {
@@ -206,26 +185,9 @@ namespace aspect
           {
             prm.enter_subsection("Interpolator");
             {
-              prm.enter_subsection("Bilinear least squares");
+              prm.enter_subsection("REU");
               {
-                use_global_valued_limiter = prm.get_bool("Use limiter");
-                if (use_global_valued_limiter)
-                  {
-                    global_maximum_particle_properties = Utilities::string_to_double(Utilities::split_string_list(prm.get("Global particle property maximum")));
-                    global_minimum_particle_properties = Utilities::string_to_double(Utilities::split_string_list(prm.get("Global particle property minimum")));
-
-                    const Postprocess::Particles<dim> &particle_postprocessor =
-                      this->get_postprocess_manager().template get_matching_postprocessor<const Postprocess::Particles<dim> >();
-                    const unsigned int n_property_components = particle_postprocessor.get_particle_world().get_property_manager().get_n_property_components();
-
-                    AssertThrow(global_minimum_particle_properties.size() == n_property_components,
-                                ExcMessage("Make sure that the size of list 'Global minimum particle property' "
-                                           "is equivalent to the number of particle properties."));
-
-                    AssertThrow(global_maximum_particle_properties.size() == n_property_components,
-                                ExcMessage("Make sure that the size of list 'Global maximum particle property' "
-                                           "is equivalent to the number of particle properties."));
-                  }
+                radius = prm.get_double("radius");
               }
               prm.leave_subsection();
             }
@@ -247,8 +209,8 @@ namespace aspect
   {
     namespace Interpolator
     {
-      ASPECT_REGISTER_PARTICLE_INTERPOLATOR(R_interpolator,
-                                            "bilinear least squares",
+      ASPECT_REGISTER_PARTICLE_INTERPOLATOR(ReuInterpolator,
+                                            "reu",
                                             "Interpolates particle properties onto a vector of points using a "
                                             "bilinear least squares method. Currently only 2D models are "
                                             "supported. Note that deal.II must be configured with BLAS/LAPACK.")
