@@ -8191,7 +8191,7 @@ We also make use of the strain rate-based mesh refinement plugin:
 Setting 
 {\tt   set Initial adaptive refinement        = 4}
 yields a series of meshes as shown in Fig. (\ref{fig:meshes}), all produced during the 
-first timestep. As expected, we see that the location of the highest mesh refinement
+first time step. As expected, we see that the location of the highest mesh refinement
 corresponds to the location of a set of conjugated shear bands.
 
 If we now set this parameter to 1 and allow the simulation to evolve
@@ -8204,7 +8204,7 @@ shown in Fig. (\ref{fig:extcompr}).
 \begin{figure}
    \centering
    \includegraphics[width=0.7\textwidth]{cookbooks/crustal_deformation/grids.png}
-   \caption{\it Mesh evolution during the first timestep (refinement is based on strain rate).}
+   \caption{\it Mesh evolution during the first time step (refinement is based on strain rate).}
    \label{fig:meshes}
 \end{figure}
 
@@ -9037,26 +9037,25 @@ We can observe that when the two-layer viscosity model is added, there is only o
 
 One can also model the van Keken problem with the volume-of-fluid (VOF) interface tracking 
 algorithm.
-In fact, this problem is particularly is well-suited to the use of the VOF interface tracking 
-algorithm, since it consists of two distinct, immiscible fluids and interface tracking 
+In fact, this problem is particularly well-suited to being computed with the VOF interface  
+tracking algorithm, since it consists of two distinct, immiscible fluids and interface tracking 
 algorithms are specifically designed not to allow the two fluids to mix.
-In particular, assuming the computation is sufficiently well resolved, the fluids will not mix 
-at sub-grid scales over the duration of the problem.
+In particular, assuming the computation is sufficiently well-resolved, the fluids will not mix 
+at sub-grid scales over the entire duration of the computation.
 Furthermore, since one of the primary aspects of interest in the computation is the form of the 
-interface between the two fluids, one can examine the interface within individual cells or within regions consisting of groups of cells with the VOF method.
+interface between the two fluids, one can use the output of the VOF method to examine the interface within individual cells or within regions consisting of groups of cells.
 
-We do note that one necessary modification to the problem that will not be
-discussed below is a change of the CFL number from $\sigma=1.0$ to
-$\sigma=0.5$, due the the volume of fluid algorithm being an explicit method
-and therefore must have $0<\sigma<1$ for stability.
+We note that one modification of the computational parameters that is required in our VOF computation is that we use a CFL number of $\sigma=0.5$ in all of our computations.
 
-Because we have noted above that the problem is sensitive to initial
-conditions, rather than use a standard initialization for the volume fractions
-by integrating a composition field by quadrature, we instead initialize the
-problem by providing a level set function.
-In particular, this initialization method is done by providing a function which
-is a signed distance level set function, i.e. a function which is positive in
-the region which contains the material while negative elsewhere and the
+Since, as noted above, when the interface is discontinuous, the van Keken problem is a version 
+of the Rayleigh-Taylor\footnote{This is true whether the two fluids have the same viscosity or difference viscosities.} problem and hence, it is unstable at all wavelengths 
+(e.g.~\cite{SC:1961} and therefore, it is very sensitive to the initial conditions.
+Thus, rather than use the standard initialization for the volume fractions, which is by 
+integrating the initial interface over the cell with one material or fluid having the value of 
+$0$ and the other having the value of $1$~\cite{JMR:2019,JMR-EGP:2019} instead we compute the  
+initial volume fractions using a level set function as follows.
+First we compute a function, which is a \textit{signed distance level set function}; i.e. a 
+function that is positive in the region that contains one of the fluids, which we will refer to as fluid~1 and negative elsewhere and the
 magnitude at each point is the distance to the material boundary.
 In this case, the function we provide is only a close approximation to a signed
 distance level set, but it is close enough to function correctly.
