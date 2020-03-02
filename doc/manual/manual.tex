@@ -8830,9 +8830,9 @@ illustrate this.
 
 
 Although van Keken's paper title suggests that the paper is really about
-thermochemical convection, the part we look here can equally be considered as
-thermal or chemical convection: all that is necessary is that we describe the
-fluid's density somehow. We can do that by using an inhomogeneous initial
+thermochemical convection, the part we examine here can equally be considered as
+thermal or chemical convection; all that is necessary is that we describe the
+fluid's density. We can do that by using an inhomogeneous initial
 temperature field, or an inhomogeneous initial composition field. We will use the
 input file in \url{cookbooks/van-keken-discontinuous.prm} as input, the central
 piece of which is as follows (go to the actual input file
@@ -9033,14 +9033,17 @@ Compared to the results of the models using constant viscosity throughout the do
 
 We can observe that when the two-layer viscosity model is added, there is only one apparent peak for each case. The first peaks of the 0.01 viscosity contrast tests appear earlier and are larger in magnitude than those of 0.1 viscosity contrast tests.  There are no secondary plumes and the whole system tends to reach stability after around 500 time steps.
 
-\paragraph{Volume-of-Fluid implementation}
+\paragraph{A Volume-of-Fluid Computation of the van Keken Problem}
 
-The nature of this benchmark problem is suited to the use of the volume of
-fluid interface tracking algorithm.
-In particular, the problem consists of a set of distinct fluids/materials which
-are not expected to mix at sub-mesh scales during the duration of the problem,
-with one of the primary factors of interest being the form of the boundary
-between the two algorithms.
+One can also model the van Keken problem with the volume-of-fluid (VOF) interface tracking 
+algorithm.
+In fact, this problem is particularly is well-suited to the use of the VOF interface tracking 
+algorithm, since it consists of two distinct, immiscible fluids and interface tracking 
+algorithms are specifically designed not to allow the two fluids to mix.
+In particular, assuming the computation is sufficiently well resolved, the fluids will not mix 
+at sub-grid scales over the duration of the problem.
+Furthermore, since one of the primary aspects of interest in the computation is the form of the 
+interface between the two fluids, one can examine the interface within individual cells or within regions consisting of groups of cells with the VOF method.
 
 We do note that one necessary modification to the problem that will not be
 discussed below is a change of the CFL number from $\sigma=1.0$ to
@@ -9064,7 +9067,7 @@ advection algorithm are:
 
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/main.part.prm.out}
 
-In particular, the combinaton of \texttt{Number of initialization samples} with
+In particular, the combination of \texttt{Number of initialization samples} with
 the \texttt{level set} initialization type indicates to do the initialization by
 dividing each cell into a $16\times 16$ set of subcells, and use the level set
 function provided to compute the volume fraction in each subcell based on using
@@ -9119,11 +9122,10 @@ the RMS velocities are nearly indistinguishable.
         higher refinement model. The contour for the higher refinement model(8
         refinements) is bright green, while the lower refinement contour (7
     refinements) is in black.}
-    \label{fig:vof-vk-2}
+    \label{FIG:VOF_van_Keken-02}
 \end{figure}
 
-When examing the final solution, we note that the general structure of the
-solution shown in Figure~\ref{fig:vof-vk-2} matches the expected form, and the
+When examining the final solution, we note that the general structure of the solution shown in Figure~\ref{FIG:VOF_van_Keken-02} matches the expected form, and the
 general type of structure shown in the other versions of this benchmark.
 We also note that the differences in the shape of the interface based on a
 single refinement are minor, though still visible.
