@@ -8191,7 +8191,7 @@ We also make use of the strain rate-based mesh refinement plugin:
 Setting 
 {\tt   set Initial adaptive refinement        = 4}
 yields a series of meshes as shown in Fig. (\ref{fig:meshes}), all produced during the 
-first timestep. As expected, we see that the location of the highest mesh refinement
+first time step. As expected, we see that the location of the highest mesh refinement
 corresponds to the location of a set of conjugated shear bands.
 
 If we now set this parameter to 1 and allow the simulation to evolve
@@ -8204,7 +8204,7 @@ shown in Fig. (\ref{fig:extcompr}).
 \begin{figure}
    \centering
    \includegraphics[width=0.7\textwidth]{cookbooks/crustal_deformation/grids.png}
-   \caption{\it Mesh evolution during the first timestep (refinement is based on strain rate).}
+   \caption{\it Mesh evolution during the first time step (refinement is based on strain rate).}
    \label{fig:meshes}
 \end{figure}
 
@@ -8830,9 +8830,9 @@ illustrate this.
 
 
 Although van Keken's paper title suggests that the paper is really about
-thermochemical convection, the part we look here can equally be considered as
-thermal or chemical convection: all that is necessary is that we describe the
-fluid's density somehow. We can do that by using an inhomogeneous initial
+thermochemical convection, the part we examine here can equally be considered as
+thermal or chemical convection; all that is necessary is that we describe the
+fluid's density. We can do that by using an inhomogeneous initial
 temperature field, or an inhomogeneous initial composition field. We will use the
 input file in \url{cookbooks/van-keken-discontinuous.prm} as input, the central
 piece of which is as follows (go to the actual input file
@@ -9033,45 +9033,60 @@ Compared to the results of the models using constant viscosity throughout the do
 
 We can observe that when the two-layer viscosity model is added, there is only one apparent peak for each case. The first peaks of the 0.01 viscosity contrast tests appear earlier and are larger in magnitude than those of 0.1 viscosity contrast tests.  There are no secondary plumes and the whole system tends to reach stability after around 500 time steps.
 
-\paragraph{Volume-of-Fluid implementation}
+\paragraph{A Volume-of-Fluid Computation of the van Keken Problem}
 
-The nature of this benchmark problem is suited to the use of the volume of
-fluid interface tracking algorithm.
-In particular, the problem consists of a set of distinct fluids/materials which
-are not expected to mix at sub-mesh scales during the duration of the problem,
-with one of the primary factors of interest being the form of the boundary
-between the two algorithms.
+One can also model the van Keken problem with the volume-of-fluid (VOF) interface tracking 
+algorithm in ASPECT.
+In fact, this problem is particularly well-suited to being computed with the VOF method, since 
+it consists of two distinct, immiscible fluids and interface tracking algorithms are 
+specifically designed not to allow the two fluids to mix.
+In particular, assuming the computation is sufficiently well-resolved, the fluids will not mix 
+at sub-grid scales over the entire duration of the computation.
+However note that this implies that all computations of the van Keken problem with the VOF 
+method must necessarily be with discontinuous initial conditions.
+Finally, since one is often interested in a high resolution image of the shape of the interface 
+between the two fluids, one can use the output of the VOF method to examine the interface 
+within individual cells or within regions consisting of groups of cells.
 
-We do note that one necessary modification to the problem that will not be
-discussed below is a change of the CFL number from $\sigma=1.0$ to
-$\sigma=0.5$, due the the volume of fluid algorithm being an explicit method
-and therefore must have $0<\sigma<1$ for stability.
+We note that one modification of the computational parameters that is required in our VOF computation is that we use a CFL number of $\sigma=0.5$ in all of our computations.
 
-Because we have noted above that the problem is sensitive to initial
-conditions, rather than use a standard initialization for the volume fractions
-by integrating a composition field by quadrature, we instead initialize the
-problem by providing a level set function.
-In particular, this initialization method is done by providing a function which
-is a signed distance level set function, i.e. a function which is positive in
-the region which contains the material while negative elsewhere and the
-magnitude at each point is the distance to the material boundary.
-In this case, the function we provide is only a close approximation to a signed
-distance level set, but it is close enough to function correctly.
-The primary advantage this choice allows is that the initialization can far
-more accurately reproduce the sub-grid scale of the initial condition.
-The relevant parameter file sections for this use of the volume-of-fluid
-advection algorithm are:
+Since, as noted above, when the interface is discontinuous, the van Keken problem is a version 
+of the Rayleigh-Taylor\footnote{This is true whether the two fluids have the same viscosity or 
+different viscosities.} problem, it is unstable to perturbations of all wavelengths 
+(e.g.~\cite{SC:1961}), it is therefore, extremely sensitive to the initial conditions.
+Thus, rather than use the standard initialization procedure for the VOF method, which consists 
+of integrating the initial interface over the cell with one material or fluid having the value 
+of $1$ and the other having the value of $0$~\cite{JMR:2019,JMR-EGP:2019}, instead we compute 
+the initial volume fractions using a signed distance function $\phi$ as follows.
+
+First we create the function $\phi$, which has the following two properties: 1) it is positive 
+in the region that contains one of the fluids, which we will refer to as fluid~1, and negative 
+in the complement of this region, which we will refer to as fluid~2, and 2) at each point in 
+the domain the magnitude $| \phi |$ of $\phi$  is the distance to the boundary between the 
+two fluids or materials.
+In the computations shown here, we use an approximation $\tilde{\phi}$ to $\phi$ such that   
+difference between $\tilde{\phi}$ and $\phi$ is small enough for the purposes of making the 
+computations shown here of high-quality.
+The primary advantage of choosing this particular initialization algorithm is that it allows us 
+to more accurately reproduce the initial condition on a sub-grid scale than would otherwise be 
+possible on the coarser grid on which we compute the time evolution of the interface. 
+
+\vspace{06pt}
 
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/main.part.prm.out}
 
-In particular, the combinaton of \texttt{Number of initialization samples} with
-the \texttt{level set} initialization type indicates to do the initialization by
-dividing each cell into a $16\times 16$ set of subcells, and use the level set
-function provided to compute the volume fraction in each subcell based on using
-the provided level set function to approximate the division in the subcell as a
-linear interface.
-As expected from this description, this can be expected to give a much better
-intial condition than a standard simple approximation by quadrature.
+The relevant sections of the parameter file for this type of initialization of the VOF method 
+appears immediately above.
+In particular, the combination of \texttt{Number of initialization samples} with the 
+\texttt{level set} initialization type indicates that our initialization will consist of 
+dividing each grid cell into $16 \times 16$ subcells and the distance to the given initial 
+interface $f(x)$, provided in \texttt{Function expression}, is computed in each of the 256 
+subcells.
+We then use this information to compute a piecewise linear interface approximation to $f(x)$.
+The volume fraction in each subcell is then found in the manner described 
+in~\cite{JMR:2019,JMR-EGP:2019}.
+This initialization procedure provides a much finer and thus, more accurate initial condition 
+than the standard VOF initialization procedure described above.
 
 % AMR section, currently unused so not included
 % Due to the change in the advection algorithm, we also modify the refinement
@@ -9086,23 +9101,25 @@ intial condition than a standard simple approximation by quadrature.
 % 
 % \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/amr.part.prm.out}
 
-While the original visualization configuration is sufficiently functional for
-general use, when making use of volume-of-fluid interface tracking, the ability
-to see the division between the fluids as reconstructed by the algorithm is a
-desirable refinement to the visualization.
-The necessary modifications to the parameter file to include the necessary
-information to draw the reconstructed boundary as a contour line are:
+While the original visualization configuration in a typical parameter file is sufficient for
+most purposes, when using the VOF method one has the ability to see the division between the 
+fluids reconstructed by the VOF algorithm in each cell.
+This is accomplished by plotting the zero contour of the function $\phi$.
+The modifications to the parameter file that are necessary in order to draw the reconstructed 
+boundary as a contour are shown immediately below.
+The full configuration file for this version of the benchmark problem can be found at 
+\url{cookbooks/van-keken-vof.prm}.
 
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/postprocess.part.prm.out}
-
-(The full configuration file for this version of the bechmark problem can be found at \url{cookbooks/van-keken-vof.prm}).
+\noindent
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.5\textwidth]{cookbooks/benchmarks/vof-van-keken/rms_vel_comparison.png}
-    \caption{\it Van Keken benchmark using VOF interface tracking: Evolution of
-        the root mean square velocity as a function of time for different numbers
-    of global mesh refinements.  Compare to Figure~\ref{fig:vk-2}}
+    \caption{\textit{Evolution of the root mean square velocity as a function of time for 
+    different global mesh refinements when we computed the Van Keken benchmark with the VOF 
+    interface tracking algorithm.
+    Compare to Figure~\ref{fig:vk-2}.}}
     \label{fig:vof-vk-1}
 \end{figure}
 
@@ -9119,11 +9136,10 @@ the RMS velocities are nearly indistinguishable.
         higher refinement model. The contour for the higher refinement model(8
         refinements) is bright green, while the lower refinement contour (7
     refinements) is in black.}
-    \label{fig:vof-vk-2}
+    \label{FIG:VOF_van_Keken-02}
 \end{figure}
 
-When examing the final solution, we note that the general structure of the
-solution shown in Figure~\ref{fig:vof-vk-2} matches the expected form, and the
+When examining the final solution, we note that the general structure of the solution shown in Figure~\ref{FIG:VOF_van_Keken-02} matches the expected form, and the
 general type of structure shown in the other versions of this benchmark.
 We also note that the differences in the shape of the interface based on a
 single refinement are minor, though still visible.
