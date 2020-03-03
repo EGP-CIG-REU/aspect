@@ -9044,32 +9044,32 @@ In particular, assuming the computation is sufficiently well-resolved, the fluid
 at sub-grid scales over the entire duration of the computation.
 However note that this implies that all computations of the van Keken problem with the VOF 
 method must necessarily be with discontinuous initial conditions.
-Furthermore, since one of the primary aspects of interest in the computation is the form of the 
-interface between the two fluids, one can use the output of the VOF method to examine the 
-interface within individual cells or within regions consisting of groups of cells.
+Finally, since one is often interested in a high resolution image of the shape of the interface 
+between the two fluids, one can use the output of the VOF method to examine the interface 
+within individual cells or within regions consisting of groups of cells.
 
 We note that one modification of the computational parameters that is required in our VOF computation is that we use a CFL number of $\sigma=0.5$ in all of our computations.
 
 Since, as noted above, when the interface is discontinuous, the van Keken problem is a version 
-of the Rayleigh-Taylor\footnote{This is true whether the two fluids have the same viscosity or different viscosities.} problem and hence, it is unstable to all wavelengths 
-(e.g.~\cite{SC:1961}).
-Therefore, it is very sensitive to the initial conditions.
-Thus, rather than use the standard initialization for the volume fractions, which is by 
-integrating the initial interface over the cell with one material or fluid having the value of 
-$1$ and the other having the value of $0$~\cite{JMR:2019,JMR-EGP:2019} instead we compute the  
-initial volume fractions using a signed distance function $\phi$ as follows.
+of the Rayleigh-Taylor\footnote{This is true whether the two fluids have the same viscosity or 
+different viscosities.} problem, it is unstable to perturbations of all wavelengths 
+(e.g.~\cite{SC:1961}), it is therefore, extremely sensitive to the initial conditions.
+Thus, rather than use the standard initialization procedure for the VOF method, which consists 
+of integrating the initial interface over the cell with one material or fluid having the value 
+of $1$ and the other having the value of $0$~\cite{JMR:2019,JMR-EGP:2019}, instead we compute 
+the initial volume fractions using a signed distance function $\phi$ as follows.
 
 First we create the function $\phi$, which has the following two properties: 1) it is positive 
 in the region that contains one of the fluids, which we will refer to as fluid~1, and negative 
-in the complement of this region, which we will refer to as fluid~2 and 2) at each point in the 
-domain the magnitude $| \phi |$ of $\phi$  is the distance to the boundary between the 
+in the complement of this region, which we will refer to as fluid~2, and 2) at each point in 
+the domain the magnitude $| \phi |$ of $\phi$  is the distance to the boundary between the 
 two fluids or materials.
 In the computations shown here, we use an approximation $\tilde{\phi}$ to $\phi$ such that   
 difference between $\tilde{\phi}$ and $\phi$ is small enough for the purposes of making the 
 computations shown here of high-quality.
 The primary advantage of choosing this particular initialization algorithm is that it allows us 
 to more accurately reproduce the initial condition on a sub-grid scale than would otherwise be 
-possible on the coarser grid on which we will compute the time evolution of the interface. 
+possible on the coarser grid on which we compute the time evolution of the interface. 
 
 \vspace{06pt}
 
@@ -9079,14 +9079,14 @@ The relevant sections of the parameter file for this type of initialization of t
 appears immediately above.
 In particular, the combination of \texttt{Number of initialization samples} with the 
 \texttt{level set} initialization type indicates that our initialization will consist of 
-dividing each grid cell into $16 \times 16$ subcells and distance to the given initial 
-interface $f(x)$ provided in \texttt{Function expression} is computed in each of the 256 
+dividing each grid cell into $16 \times 16$ subcells and the distance to the given initial 
+interface $f(x)$, provided in \texttt{Function expression}, is computed in each of the 256 
 subcells.
 We then use this information to compute a piecewise linear interface approximation to $f(x)$.
 The volume fraction in each subcell is then found in the manner described 
 in~\cite{JMR:2019,JMR-EGP:2019}.
 This initialization procedure provides a much finer and thus, more accurate initial condition 
-than the standard initialization by quadrature, which we described above.
+than the standard VOF initialization procedure described above.
 
 % AMR section, currently unused so not included
 % Due to the change in the advection algorithm, we also modify the refinement
@@ -9102,22 +9102,24 @@ than the standard initialization by quadrature, which we described above.
 % \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/amr.part.prm.out}
 
 While the original visualization configuration in a typical parameter file is sufficient for
-general use, when using the VOF method one has the ability to see the division between the 
+most purposes, when using the VOF method one has the ability to see the division between the 
 fluids reconstructed by the VOF algorithm in each cell.
-
-The modifications to the parameter file, which are necessary in order to draw the reconstructed 
-boundary as a contour are in
+This is accomplished by plotting the zero contour of the function $\phi$.
+The modifications to the parameter file that are necessary in order to draw the reconstructed 
+boundary as a contour are shown immediately below.
+The full configuration file for this version of the benchmark problem can be found at 
+\url{cookbooks/van-keken-vof.prm}.
 
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/postprocess.part.prm.out}
-
-(The full configuration file for this version of the benchmark problem can be found at \url{cookbooks/van-keken-vof.prm}).
+\noindent
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.5\textwidth]{cookbooks/benchmarks/vof-van-keken/rms_vel_comparison.png}
-    \caption{\it Van Keken benchmark using VOF interface tracking: Evolution of
-        the root mean square velocity as a function of time for different numbers
-    of global mesh refinements.  Compare to Figure~\ref{fig:vk-2}}
+    \caption{\textit{Evolution of the root mean square velocity as a function of time for 
+    different global mesh refinements when we computed the Van Keken benchmark with the VOF 
+    interface tracking algorithm.
+    Compare to Figure~\ref{fig:vk-2}.}}
     \label{fig:vof-vk-1}
 \end{figure}
 
