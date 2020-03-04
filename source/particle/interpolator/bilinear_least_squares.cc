@@ -45,8 +45,6 @@ namespace aspect
 
         const unsigned int property_index = selected_properties.first_selected_component(selected_properties.size());
 
-	std::cout << "Property is " << property_index << std::endl;
-
         AssertThrow(property_index != numbers::invalid_unsigned_int,
                     ExcMessage("Internal error: the particle property interpolator was "
                                "called without a specified component to interpolate."));

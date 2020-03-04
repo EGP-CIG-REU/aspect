@@ -9146,6 +9146,36 @@ single refinement are minor, though still visible.
 This is somewhat to be expected as refinement will inherently permit the
 formation of interfaces with sharper curves.
 
+To compare the required time for the VOF computation to that for a DG
+calculation, we ran both on the same cluster at a varying refinement level.
+Average runtimes for global refinements 5 thorugh 9 using one node can be seen
+in Table~\ref{tab:vof-runtime-comparison-table}.
+We note that the use of the VOF advection algorithm significantly reduces the
+required computation time in all cases, frequently requiring less than half the
+time required by the DG advection version.
+
+\begin{table}
+        \center
+        \begin{tabular}{|c|c|cc|}
+            \hline
+            Global Refinements & Number of Processors & VOF & DG \\
+            \hline
+            5 & 4 & 1.33 minutes & 2.57 minutes \\
+            6 & 4 & 8.51 minutes & 19.5 minutes \\
+            7 & 4 & 1.15 hours & 2.49 hours \\
+            8 & 4 & 8.53 hours & 19.6 hours \\
+            9 & 16 & 16.3 hours & 2.72 days \\
+            \hline
+        \end{tabular}
+        \caption{\it Comparison of average runtimes for the van Keken Benchark
+            using VOF and DG, with smoothed initial conditions for DG. These
+            times are for the full computation, ending at $t=2000$ with a CFL
+            number of $\sigma=0.5$ in both cases. All of these tests were run
+            using ASPECT version 2.2.0-pre (master, ef542ecc2) in release mode on
+        the Peloton2 cluster at UC Davis.}
+        \label{tab:vof-runtime-comparison-table}
+\end{table}
+
 The consistency of the results shown here differs noticably from the behavior
 of the same problem when making use of the FEM advection algorithms.
 This change in behavior inherently suggests a need to examine the source of the
