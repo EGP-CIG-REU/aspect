@@ -8805,6 +8805,8 @@ We use bisection to determine $Ra_c$ for specific choices of the domain geometry
 \textit{This section is a co-production of Cedric Thieulot, Juliane Dannberg,
 Timo Heister and Wolfgang Bangerth with an extension to this benchmark provided by the Virginia Tech Department of Geosciences class ``Geodynamics and ASPECT'' co-taught by Scott King and D.~Sarah Stamps.}
 
+\paragraph{Computation of the van Keken Problem with compositional fields}
+\label{paragraph:van-keken compositional fields}
 One of the most widely used benchmarks for mantle convection codes is the
 isoviscous Rayleigh-Taylor case (``case 1a'') published by van Keken \textit{et
 al.} in \cite{KKSCND97}.
@@ -9034,7 +9036,9 @@ Compared to the results of the models using constant viscosity throughout the do
 We can observe that when the two-layer viscosity model is added, there is only one apparent peak for each case. The first peaks of the 0.01 viscosity contrast tests appear earlier and are larger in magnitude than those of 0.1 viscosity contrast tests.  There are no secondary plumes and the whole system tends to reach stability after around 500 time steps.
 
 
-\paragraph{A Volume-of-Fluid Computation of the van Keken Problem}
+\paragraph{Computation of the van Keken Problem with the Volume-of-Fluid Interface Tracking Method}
+\label{paragraph:van-keken VOF interface tracking}
+
 One can also model the van Keken problem with the volume-of-fluid (VOF) interface tracking 
 algorithm in ASPECT.
 In fact, this problem is particularly well-suited to being computed with the VOF method, since 
@@ -9068,12 +9072,16 @@ within individual cells or within regions consisting of groups of cells.
 \begin{figure}
     \centering
     \includegraphics[width=0.4\textwidth]{cookbooks/benchmarks/vof-van-keken/vof_van_keken_refinement_comparison.png}
-    \caption{\it The result of the two computations of the Van Keken benchmark made with the 
-      VOF interface tracking algorithm.
-      The visualization here consists of \textit{two contours} for the reconstructed interface superimposed on red and blue colors, which are the two fluids reprefluid data (red and blue)for the
-        higher refinement model. The contour for the higher refinement model(8
-        refinements) is bright green, while the lower refinement contour (7
-    refinements) is in black.}
+    \caption{\it The result of two computations of the Van Keken problem made with the VOF 
+    interface tracking algorithm  overlaid upon each other.
+    This visualization consists of the \underline{two} zero contours of 
+    $\hat{\phi}^7 \, (t_{end})$ and $\hat{\phi}^8 \, (t_{end})$, where 
+    $\hat{\phi}^7 \, (t_{end})$ is the signed distance function to the reconstructed interface 
+    at the final time $t_{end}$ computed on a uniform grid with a refinement level of 7 and 
+    similarly for $\hat{\phi}^8 \, (t_{end})$.
+    The color of the zero contour for $\hat{\phi}^7 \, (t_{end})$ is black and the color of the 
+    zero contour $\hat{\phi}^8 \, (t_{end})$ is bright green.
+    Compare with the fourth image on the right in Figure~\ref{fig:vk-1}.}
     \label{FIG:VOF_van_Keken-02}
 \end{figure}
 
@@ -9082,9 +9090,10 @@ of the Rayleigh-Taylor\footnote{This is true whether the two fluids have the sam
 different viscosities.} problem, it is unstable to perturbations of all wavelengths 
 (e.g.~\cite{SC:1961}), it is therefore, extremely sensitive to the initial conditions.
 Thus, rather than use the standard initialization procedure for the VOF method, which consists 
-of integrating the initial interface over the cell with one material or fluid having the value 
-of $1$ and the other having the value of $0$~\cite{JMR:2019,JMR-EGP:2019}, instead we compute 
-the initial volume fractions using a signed distance function $\phi$ as follows.
+of integrating the initial interface over each multi-material cell in which one material or 
+fluid has the value of $1$ and the other has the value of $0$~\cite{JMR:2019,JMR-EGP:2019},
+instead we compute the initial volume fractions using a signed distance function $\phi$ as 
+follows.
 
 First we create the function $\phi$, which has the following two properties: 1) it is positive 
 in the region that contains one of the fluids, which we will refer to as fluid~1, and negative 
@@ -9131,7 +9140,8 @@ than the standard VOF initialization procedure described above.
 While the original visualization configuration in a typical parameter file is sufficient for
 most purposes, when using the VOF method one has the ability to see the division between the 
 fluids reconstructed by the VOF algorithm in each cell.
-This is accomplished by plotting the zero contour of the function $\phi$.
+This is accomplished by plotting the zero contour of the computed signed distance function 
+$\hat{\phi}$.
 The modifications to the parameter file that are necessary in order to draw the reconstructed 
 boundary as a contour are shown immediately below.
 The full configuration file for this version of the benchmark problem can be found at 
@@ -9140,12 +9150,13 @@ The full configuration file for this version of the benchmark problem can be fou
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/postprocess.part.prm.out}
 \noindent
 
-We have made a number of computations of the van Keken problem with the VOF method, which are intended to compare directly with the computational results produced using a compositional field to model the two fluids shown above.
-In all of the VOF computations shown here we uses a CFL number of $\sigma=0.5$.
+We made a number of computations of the van Keken problem with the VOF method in order to 
+compare the VOF results directly with the those produced with a compositional field, which were 
+presented in the previous section ~\ref{paragraph:van-keken compositional fields}.
+In all of the computations shown here we used a CFL number of $\sigma=0.5$.
 
-We begin by examining the RMS velocity data shown in Figure~\ref{fig:vof-vk-1},
-and note that other than the case of 5 levels of global refinement the lines for
-the RMS velocities are nearly indistinguishable.
+We begin by examining the RMS velocity data shown in Figure~\ref{fig:vof-vk-1}.
+Note that, other than for the case of 5 levels of global refinement, the curves for the RMS velocities for $6, 7, 8, 9$ levels of refinement are nearly indistinguishable.
 
 When examining the final solution, we note that the general structure of the solution shown in Figure~\ref{FIG:VOF_van_Keken-02} matches the expected form, and the
 general type of structure shown in the other versions of this benchmark.
