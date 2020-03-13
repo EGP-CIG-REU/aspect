@@ -9079,16 +9079,16 @@ For example, compare Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-com
     \centering
     \includegraphics[width=0.4\textwidth]{cookbooks/benchmarks/vof-van-keken/vof_van_keken_refinement_comparison.png}
     \caption{\it The results of two computations of the Van Keken problem made with the VOF 
-    interface tracking algorithm  overlaid upon each other.
-    This visualization consists of the \underline{two} zero contours of 
-    $\hat{\phi}^7 \, (t_{end})$ and $\hat{\phi}^8 \, (t_{end})$, where 
-    $\hat{\phi}^7 \, (t_{end})$ is the signed distance function to the reconstructed interface 
-    at the final time $t_{end}$ computed on a uniform grid with a refinement level of 7 and 
-    similarly for $\hat{\phi}^8 \, (t_{end})$.
-    The color of the zero contour for $\hat{\phi}^7 \, (t_{end})$ is black and the color of the 
-    zero contour $\hat{\phi}^8 \, (t_{end})$ is bright green.
-    Compare with the fourth image on the right in Figure~\ref{fig:vk-1}.
-    \textcolor{red}{Jon, What is the output time?}}
+        interface tracking algorithm  overlaid upon each other at $t_{end}=2000$.
+        This visualization consists of the \underline{two} zero contours of 
+        $\tilde{\phi}^7 \, (t_{end})$ and $\tilde{\phi}^8 \, (t_{end})$, where 
+        $\tilde{\phi}^7 \, (t_{end})$ is field where the zero countour is the reconstructed interface 
+        at the final time $t_{end}$ computed on a uniform grid with a refinement level of 7 and 
+        similarly for $\tilde{\phi}^8 \, (t_{end})$.
+        The color of the zero contour for $\tilde{\phi}^7 \, (t_{end})$ is black and the color of the 
+        zero contour $\tilde{\phi}^8 \, (t_{end})$ is bright green.
+        Compare with the fourth image on the right in Figure~\ref{fig:vk-1}.
+    }
     \label{fig:VOF_van_Keken-02}
 \end{figure}
 
@@ -9146,8 +9146,12 @@ than the standard VOF initialization procedure described above.
 While the visualization configuration in a typical parameter file is sufficient for most 
 purposes, when using the VOF method one has the ability to see the division between the fluids 
 reconstructed by the VOF algorithm in each cell.
-This is accomplished by plotting the zero contour of the computed signed distance function 
-$\hat{\phi}$.
+This is accomplished by plotting the zero contour of a field $\tilde\phi$ that
+is generated to be $0$ at the reconstructed interface, positive in the region
+with fluid~1, and negative in the region with fluid~2.
+However $\tilde{\phi}$ does not satisfy the requirement that the maginitude is
+equal to the distance to the interface as would be required for a signed
+distance function.
 The modifications to the parameter file that are necessary in order to draw the reconstructed 
 boundary as a contour are shown immediately below.
 The full configuration file for this version of the benchmark problem can be found at 
@@ -9199,10 +9203,14 @@ time required by the DG advection version.
             \hline
         \end{tabular}
         \caption{\it Comparison of average runtimes for the van Keken problem with VOF and and a DG computational field, in which the initial conditions for DG smoothed as described in section~\ref{paragraph:van-keken compositional fields} above.
-        The times shown are for the full computation, ending at $t_{end} = 2000$ with a CFL
-        number of $\sigma=0.5$ in both cases. 
-        All of these computations were made with ASPECT version 2.2.0-pre (master, ef542ecc2) in release mode on the Peloton2 cluster at U.C.~Davis.
-            \textcolor{red}{Was their Table~\ref*{tab:runtime-table} made with DG or `regular' compositional fields.}}
+            The times shown are for the full computation, ending at $t_{end} = 2000$ with a CFL
+            number of $\sigma=0.5$ in both cases. 
+            All of these computations were made with ASPECT version 2.2.0-pre (master, ef542ecc2) in release mode on the Peloton2 cluster at U.C.~Davis.
+            We note that the change in the CFL number $\sigma$ and the differing
+            choice of cluster makes a direct quantitative comparison between this
+            table and table~\ref{tab:runtime-table} invalid due to too many
+            confounding factors.
+        }
         \label{tab:vof-runtime-comparison-table}
 \end{table}
 
@@ -9210,11 +9218,6 @@ The consistency of the results shown here differs noticeably from the behavior o
 problem when computed with the FEM and DG advection algorithms.
 We now study one of the possible reasons for these differences; namely, the procedure for 
 defining the initial interface.
-\textcolor{red}{Jon, This isn't true: ``given that both can be expected to converge from 
-consistent initial conditions.'', since the van Keken problem is a version of the 
-Rayleigh-Taylor problem, which is unstable. Read the first chapter or so of 
-Chandrasekhar~\cite{SC:1961}. The RMS velocity may converge.  I am not sure if there is a 
-proof of this one way or the other.}
 As described above, we have designed an approach for setting the initial condition that should 
 reproduce a smooth curve to a high degree of accuracy and, in particular, the curve, which is
 where the discontinuity occurs in the discontinuous initial condition version of this problem.
@@ -9230,10 +9233,12 @@ shown below.
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.5\textwidth]{cookbooks/benchmarks/vof-van-keken/init_diff_rms_vel_comparison.png}
-    \caption{\it Computations of the Van Keken problem made with the VOF interface tracking 
-    algorithm showing the evolution of the RMS velocity as a function of time for small changes in the amplitude $a$ of the cosine function in the initial condition.
-    Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-3}.
-    \textcolor{red}{Jon, Is this for 7 levels of refinement? Also, the legend should be `a = 0.019,' etc.}}
+    \caption{\it Computations of the Van Keken problem made with the VOF
+        interface tracking algorithm showing the evolution of the RMS velocity
+        as a function of time for small changes in the amplitude $a$ of the
+        cosine function in the initial condition at 7 levels of refinement.
+        Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-3}.
+    }
     \label{fig:vof-vk-3}
 \end{figure}
 
@@ -9244,15 +9249,11 @@ Upon examination of Figure~\ref{fig:vof-vk-3}, we see a visible variation in the
 the second peak, although the overall shape of the curve remains consistent with the curves 
 in Figure~\ref{fig:vof-vk-1}.
 The size of this variation in the initial conditions cannot be expected to be reproduced using 
-the standard VOF initialization procedure described above unless the cell size is on the scale 
-of the change in the value of $a$; i.e., $h \, \lessapprox \, \delta a = 0.001$.
+the standard compositional quadrature initialization procedure for VOF unless the cell size is on the scale 
+of the change in the value of $a$; i.e., $h \, \lessapprox \, \Delta a = 0.001$.
 We also note that the smoothing parameter, which would produce a
-$\cdot10^{-3}\leq C \leq 1 - 10^{-3}$ band on the order of the same size as the amplitude 
-variation shown here would be approximately $2.6 \cdot 10^{-4}$.
-\textcolor{red}{Jon, I assume you worked the above order of magnitude calculations out on paper 
-or in LaTeX. May I please see your calculations?  I am so busy right now I don't have time to 
-do this myself. 
-The reviewer(s) may also want to see the calculations.}
+$10^{-3}\leq C \leq 1 - 10^{-3}$ band on the order of the same size as the amplitude 
+variation shown here would be approximately $2.8 \cdot 10^{-4}$.
 This perturbation is much smaller than any of the changes in width of the smoothed regions in 
 the computations shown in Figure~\ref{fig:vk-6}.
 In summary, these results demonstrate the sensitivity of the discontinuous version of the van 
