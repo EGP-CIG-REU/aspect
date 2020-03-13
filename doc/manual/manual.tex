@@ -8949,6 +8949,7 @@ initial conditions instead (see also the file
 \url{cookbooks/van-keken-smooth.prm}):
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/van-keken/smooth.part.prm.out}
 
+
 This replaces the discontinuous initial conditions with a smoothed out version
 with a half width of around 0.01. Using this, the root mean square plot now
 looks as shown in the right panel of Fig.~\ref{fig:vk-2}. Here, the second peak
@@ -9046,25 +9047,30 @@ it consists of two distinct, immiscible fluids and interface tracking algorithms
 specifically designed not to allow the two fluids to mix.
 In particular, assuming the computation is sufficiently well-resolved, the fluids will not mix 
 at sub-grid scales over the entire duration of the computation.
-However note that this implies that all computations of the van Keken problem with the VOF 
+However note that this implies that all computations of the van Keken problem made with the VOF 
 method must necessarily be with discontinuous initial conditions.
 Finally, since one is often interested in a high resolution image of the shape of the interface 
 between the two fluids, one can use the output of the VOF method to examine the interface 
 within individual cells or within regions consisting of groups of cells.
 
-\begin{figure}[h!]
+Another advantage the VOF method has over modeling moving interface problems with compositional 
+fields is that for problems in which the interface occupies a relatively small part of the 
+computational domain, all of the computational work in the VOF method is done in cells that lie 
+in a neighborhood of the interface, rather in the entire computational domain.
+For example, compare Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-comparison-table}.
+
+\begin{figure}[b!]
    \centering
 \includegraphics[width=0.5\textwidth]{cookbooks/benchmarks/vof-van-keken/rms_vel_comparison.png}
-   \caption{Evolution of the root mean square velocity as a function of time with five 
-    different global mesh refinements for computations of the Van Keken problem made with the 
-    VOF interface tracking algorithm.
-    Since the VOF initial conditions are discontinuous, the above results should   
-    \textit{technically} be compared with the computations made with discontinuous initial 
-    conditions on the left in Figure~\ref{fig:vk-2}, although the above results also compare 
-    very favorably with the computations of the Van Keken problem made  with smoothed, 
-    continuous initial conditions for the compositional field on the right in  
-    Figure~\ref{fig:vk-2}.
-    As in Figure~\ref{fig:vk-2} 5 global refinements correspond to a $32 \times 32$ mesh and 9 
+   \caption{Evolution of the root mean square velocity as a function of time for computations 
+    of the Van Keken problem made with the VOF interface tracking algorithm with five 
+    different global mesh refinements.
+    Since the VOF initial conditions are discontinuous, the above results should really be 
+    compared with the computations with discontinuous initial conditions on the left in 
+    Figure~\ref{fig:vk-2}, although the above results also compare extremely favorably with the 
+    computations with smoothed, continuous initial conditions for the compositional field on 
+    the right in Figure~\ref{fig:vk-2}.
+    As in Figure~\ref{fig:vk-2}, 5 global refinements correspond to a $32 \times 32$ mesh and 9 
     global refinements correspond to a $512 \times 512$ mesh.}
     \label{fig:vof-vk-1}
 \end{figure}
@@ -9072,7 +9078,7 @@ within individual cells or within regions consisting of groups of cells.
 \begin{figure}
     \centering
     \includegraphics[width=0.4\textwidth]{cookbooks/benchmarks/vof-van-keken/vof_van_keken_refinement_comparison.png}
-    \caption{\it The result of two computations of the Van Keken problem made with the VOF 
+    \caption{\it The results of two computations of the Van Keken problem made with the VOF 
     interface tracking algorithm  overlaid upon each other.
     This visualization consists of the \underline{two} zero contours of 
     $\hat{\phi}^7 \, (t_{end})$ and $\hat{\phi}^8 \, (t_{end})$, where 
@@ -9081,19 +9087,19 @@ within individual cells or within regions consisting of groups of cells.
     similarly for $\hat{\phi}^8 \, (t_{end})$.
     The color of the zero contour for $\hat{\phi}^7 \, (t_{end})$ is black and the color of the 
     zero contour $\hat{\phi}^8 \, (t_{end})$ is bright green.
-    Compare with the fourth image on the right in Figure~\ref{fig:vk-1}.}
-    \label{FIG:VOF_van_Keken-02}
+    Compare with the fourth image on the right in Figure~\ref{fig:vk-1}.
+    \textcolor{red}{Jon, What is the output time?}}
+    \label{fig:VOF_van_Keken-02}
 \end{figure}
 
 Since, as noted above, when the interface is discontinuous, the van Keken problem is a version 
-of the Rayleigh-Taylor\footnote{This is true whether the two fluids have the same viscosity or 
-different viscosities.} problem, it is unstable to perturbations of all wavelengths 
+of the Rayleigh-Taylor problem,\footnote{This is true whether the two fluids have the same 
+viscosity or different viscosities.} it is unstable to perturbations of all wavelengths 
 (e.g.~\cite{SC:1961}), it is therefore, extremely sensitive to the initial conditions.
 Thus, rather than use the standard initialization procedure for the VOF method, which consists 
 of integrating the initial interface over each multi-material cell in which one material or 
-fluid has the value of $1$ and the other has the value of $0$~\cite{JMR:2019,JMR-EGP:2019},
-instead we compute the initial volume fractions using a signed distance function $\phi$ as 
-follows.
+fluid has the value of $1$ and the other has the value of $0$; i.e., a characteristic function 
+representation of the interface~\cite{JMR:2019,JMR-EGP:2019}, instead we compute the initial volume fractions using a signed distance function $\phi$ as follows.
 
 First we create the function $\phi$, which has the following two properties: 1) it is positive 
 in the region that contains one of the fluids, which we will refer to as fluid~1, and negative 
@@ -9121,7 +9127,7 @@ subcells.
 We then use this information to compute a piecewise linear interface approximation to $f(x)$.
 The volume fraction in each subcell is then found in the manner described 
 in~\cite{JMR:2019,JMR-EGP:2019}.
-This initialization procedure provides a much finer and thus, more accurate initial condition 
+This initialization procedure provides a much finer and thus, more accurate, initial condition 
 than the standard VOF initialization procedure described above.
 
 % AMR section, currently unused so not included
@@ -9137,9 +9143,9 @@ than the standard VOF initialization procedure described above.
 % 
 % \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/amr.part.prm.out}
 
-While the original visualization configuration in a typical parameter file is sufficient for
-most purposes, when using the VOF method one has the ability to see the division between the 
-fluids reconstructed by the VOF algorithm in each cell.
+While the visualization configuration in a typical parameter file is sufficient for most 
+purposes, when using the VOF method one has the ability to see the division between the fluids 
+reconstructed by the VOF algorithm in each cell.
 This is accomplished by plotting the zero contour of the computed signed distance function 
 $\hat{\phi}$.
 The modifications to the parameter file that are necessary in order to draw the reconstructed 
@@ -9151,25 +9157,30 @@ The full configuration file for this version of the benchmark problem can be fou
 \noindent
 
 We made a number of computations of the van Keken problem with the VOF method in order to 
-compare the VOF results directly with the those produced with a compositional field, which were 
-presented in the previous section ~\ref{paragraph:van-keken compositional fields}.
+compare the wall clock times of the VOF results directly with the those computed with 
+compositional field, which are presented in the previous
+section~\ref{paragraph:van-keken compositional fields}.
 In all of the computations shown here we used a CFL number of $\sigma=0.5$.
 
 We begin by examining the RMS velocity data shown in Figure~\ref{fig:vof-vk-1}.
 Other than for the case of 5 levels of uniform global refinement, the curves for the RMS 
-velocities for $6, 7, 8, 9$ levels of refinement are nearly indistinguishable.
+velocities for $6$, $7$, $8$, and $9$ levels of refinement in Figure~\ref{fig:vof-vk-1} are 
+nearly indistinguishable.
 
-When examining the final solution, we note that the general structure of the solution shown in Figure~\ref{FIG:VOF_van_Keken-02} matches the expected form, and the
-general type of structure shown in the other versions of this benchmark.
-We also note that the differences in the shape of the interface based on a
-single refinement are minor, though still visible.
-This is somewhat to be expected as refinement will inherently permit the
-formation of interfaces with sharper curves.
+Upon examining the solution at the final time, we note that the general structure of the 
+solution shown in Figure~\ref{fig:VOF_van_Keken-02} matches the form and the general structure 
+found in other versions of this benchmark such as the fourth image on the right in 
+Figure~\ref{fig:vk-1}.
+We also note that the differences in the shape of the interface based on a single refinement 
+are minor, although still slightly visible.
+This is to be expected as refinement is a perturbation of the initial condition at a smaller 
+wave length.
+
 
 To compare the required time for the VOF computation to that for a DG
-calculation, we ran both on the same cluster at a varying refinement level.
-Average runtimes for global refinements 5 through 9 using one node can be seen
-in Table~\ref{tab:vof-runtime-comparison-table}.
+calculation, we ran both on the same cluster at varying refinement levels.
+Average runtimes for global refinements 5 through 9 using one node with four CPUs are shown in 
+Table~\ref{tab:vof-runtime-comparison-table}.
 We note that the use of the VOF advection algorithm significantly reduces the
 required computation time in all cases, frequently requiring less than half the
 time required by the DG advection version.
@@ -9190,54 +9201,62 @@ time required by the DG advection version.
         \caption{\it Comparison of average runtimes for the van Keken problem with VOF and and a DG computational field, in which the initial conditions for DG smoothed as described in section~\ref{paragraph:van-keken compositional fields} above.
         The times shown are for the full computation, ending at $t_{end} = 2000$ with a CFL
         number of $\sigma=0.5$ in both cases. 
-        All of these computations were made with ASPECT version 2.2.0-pre (master, ef542ecc2) in release mode on the Peloton2 cluster at U.C.~Davis.}
+        All of these computations were made with ASPECT version 2.2.0-pre (master, ef542ecc2) in release mode on the Peloton2 cluster at U.C.~Davis.
+            \textcolor{red}{Was their Table~\ref*{tab:runtime-table} made with DG or `regular' compositional fields.}}
         \label{tab:vof-runtime-comparison-table}
 \end{table}
 
-The consistency of the results shown here differs noticeably from the behavior
-of the same problem when making use of the FEM advection algorithms.
-This change in behavior inherently suggests a need to examine the source of the
-change.
-One of the  most obvious differences between the two approaches chosen, given
-that both can be expected to converge from consistent initial conditions, is
-the nature of the initialization procedure.
-As we have discussed, we have selected an approach which can reasonably be
-expected to consistently reproduce the same discontinuous initial condition
-when refining the model.
-As such, we return to our examination of the initial condition and vary the size
-of the initial interface perturbation in order to examine the sensitivity of
-the problem.
-To easily identify the changes in the configuration, we insert a constant $a$
-into the function for the initial condition, as shown here:
+The consistency of the results shown here differs noticeably from the behavior of the same 
+problem when computed with the FEM and DG advection algorithms.
+We now study one of the possible reasons for these differences; namely, the procedure for 
+defining the initial interface.
+\textcolor{red}{Jon, This isn't true: ``given that both can be expected to converge from 
+consistent initial conditions.'', since the van Keken problem is a version of the 
+Rayleigh-Taylor problem, which is unstable. Read the first chapter or so of 
+Chandrasekhar~\cite{SC:1961}. The RMS velocity may converge.  I am not sure if there is a 
+proof of this one way or the other.}
+As described above, we have designed an approach for setting the initial condition that should 
+reproduce a smooth curve to a high degree of accuracy and, in particular, the curve, which is
+where the discontinuity occurs in the discontinuous initial condition version of this problem.
+
+In order to study this feature of our algorithm, we vary the size of the initial interface 
+perturbation in order to examine the sensitivity of the final results to a small change in the 
+initial conditions.
+Specifically, we vary the amplitude $a$ of the cosine function in the initial conditions, as 
+shown below.
 
 \lstinputlisting[language=prmfile]{cookbooks/benchmarks/vof-van-keken/variation.part.prm.out}
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.5\textwidth]{cookbooks/benchmarks/vof-van-keken/init_diff_rms_vel_comparison.png}
-    \caption{\it Van Keken benchmark using VOF interface tracking: Evolution of
-        the root mean square velocity as a function of time for small modifications
-    to the initial condition.  Compare to Figure~\ref{fig:vk-6}.}
+    \caption{\it Computations of the Van Keken problem made with the VOF interface tracking 
+    algorithm showing the evolution of the RMS velocity as a function of time for small changes in the amplitude $a$ of the cosine function in the initial condition.
+    Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-3}.
+    \textcolor{red}{Jon, Is this for 7 levels of refinement? Also, the legend should be `a = 0.019,' etc.}}
     \label{fig:vof-vk-3}
 \end{figure}
 
-For our examination, we vary the value of $a$ from the initial by $5\%$ of its initial value.
-In particular, we consider the values $a=0.019$, $0.020$, and $0.021$.
-Considering Figure~\ref{fig:vof-vk-3}, we note that we can already observe a
-visible variation in the location of the second peak, though the overall shape
-is consistent.
-The size of this variation in the initial conditions cannot be expected to be
-reproduced using a standard initialization procedure unless the cell size is on
-the scale of the change in the value of $a$, ie $h\lessapprox \Delta a$.
-We also note that the smoothing parameter which would produce a
-$1\cdot10^{-3}\leq C\leq 1-1\cdot10^{-3}$ band on the order of the same size as
-the amplitude variation shown here would be approximately $2.6\cdot10^{-4}$.
-This value is much smaller than any of the examined values for the smoothing
-parameter.
-As such, our results show both the usefulness of the volume of fluid
-algorithm, and the sensitivity of the discontinuous version of the problem to
-minor variations in the initial condition, which is noted above to make its
-usefulness as a benchmark uncertain.
+In these computations we vary the value of $a$ from its usual value of $a = 0.02$ to 
+$5\% = 0.001$ below its usual value to $5\%$ above its usual value in increments of $0.01$.
+In other words, we compare the values for $a  =0.019$, $0.020$, and $0.021$.
+Upon examination of Figure~\ref{fig:vof-vk-3}, we see a visible variation in the location of 
+the second peak, although the overall shape of the curve remains consistent with the curves 
+in Figure~\ref{fig:vof-vk-1}.
+The size of this variation in the initial conditions cannot be expected to be reproduced using 
+the standard VOF initialization procedure described above unless the cell size is on the scale 
+of the change in the value of $a$; i.e., $h \, \lessapprox \, \delta a = 0.001$.
+We also note that the smoothing parameter, which would produce a
+$\cdot10^{-3}\leq C \leq 1 - 10^{-3}$ band on the order of the same size as the amplitude 
+variation shown here would be approximately $2.6 \cdot 10^{-4}$.
+\textcolor{red}{Jon, I assume you worked the above order of magnitude calculations out on paper 
+or in LaTeX. May I please see your calculations?  I am so busy right now I don't have time to 
+do this myself. 
+The reviewer(s) may also want to see the calculations.}
+This perturbation is much smaller than any of the changes in width of the smoothed regions in 
+the computations shown in Figure~\ref{fig:vk-6}.
+In summary, these results demonstrate the sensitivity of the discontinuous version of the van 
+Keken problem to even extremely small variations in the initial conditions.
 
 \subsubsection{The Rayleigh-Taylor instability}
 \label{sec:benchmark-rayleigh-taylor}
