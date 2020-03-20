@@ -9056,7 +9056,7 @@ within individual cells or within regions consisting of groups of cells.
 Another advantage the VOF method has over modeling moving interface problems with compositional 
 fields is that for problems in which the interface occupies a relatively small part of the 
 computational domain, all of the computational work in the VOF method is done in cells that lie 
-in a neighborhood of the interface, rather in the entire computational domain. 
+in a neighborhood of the interface, rather than in the entire computational domain. 
 
 \begin{figure}[b!]
    \centering
@@ -9079,12 +9079,12 @@ in a neighborhood of the interface, rather in the entire computational domain.
     \caption{\it The results of two computations of the Van Keken problem made with the VOF 
         interface tracking algorithm  overlaid upon each other at $t_{end}=2000$.
         This visualization consists of the \underline{two} zero contours of 
-        $\tilde{\phi}^7 \, (t_{end})$ and $\tilde{\phi}^8 \, (t_{end})$, where 
-        $\tilde{\phi}^7 \, (t_{end})$ is field where the zero countour is the reconstructed interface 
+        $\tilde{\psi}^7 \, (t_{end})$ and $\tilde{\psi}^8 \, (t_{end})$, where 
+        $\tilde{\psi}^7 \, (t_{end})$ is field where the zero contour is the reconstructed interface 
         at the final time $t_{end}$ computed on a uniform grid with a refinement level of 7 and 
-        similarly for $\tilde{\phi}^8 \, (t_{end})$.
-        The color of the zero contour for $\tilde{\phi}^7 \, (t_{end})$ is black and the color of the 
-        zero contour $\tilde{\phi}^8 \, (t_{end})$ is bright green.
+        similarly for $\tilde{\psi}^8 \, (t_{end})$.
+        The color of the zero contour for $\tilde{\psi}^7 \, (t_{end})$ is black and the color of the 
+        zero contour $\tilde{\psi}^8 \, (t_{end})$ is bright green.
         Compare with the fourth image on the right in Figure~\ref{fig:vk-1}.
     }
     \label{fig:VOF_van_Keken-02}
@@ -9145,12 +9145,12 @@ than the standard VOF initialization procedure described above.
 While the visualization configuration in a typical parameter file is sufficient for most 
 purposes, when using the VOF method one has the ability to see the division between the fluids 
 reconstructed by the VOF algorithm in each cell.
-This is accomplished by plotting the zero contour of a field $\tilde\phi$ that
+This is accomplished by plotting the zero contour of a field $\tilde\psi$ that
 is generated to be $0$ on the reconstructed interface, positive in the region
 with fluid~1, and negative in the region with fluid~2.
-However $\tilde{\phi}$ does not satisfy the requirement that the maginitude is
-equal to the distance to the interface as would be required for a signed
-distance function.
+However $\tilde{\psi}$ does not satisfy the requirement that the magnitude is
+equal to the distance to the interface as would be required for the signed
+distance function $\tilde{\phi}$.
 The modifications to the parameter file that are necessary in order to draw the reconstructed 
 boundary as a contour are shown immediately below.
 The full configuration file for this version of the benchmark problem can be found at 
@@ -9161,12 +9161,22 @@ The full configuration file for this version of the benchmark problem can be fou
 
 We made a number of computations of the van Keken problem with the VOF method in order to 
 compare the wall clock times of the VOF results directly with the those computed with a DG
-compositional field and the results shown in Table~\ref{tab:runtime-table}.
-In all of the computations shown here we used a CFL number of $\sigma=0.5$.
-However, due to the change in the CFL number from $\sigma = 1.0$ in 
-Table~\ref{tab:runtime-table} to $\sigma = 0.5$ in Table~\ref{tab:vof-runtime-comparison-table} 
-and the difference between HPC clusters we can't make direct quantitative comparison between 
-the data in Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-comparison-table}.
+compositional field.
+We ran both on the same cluster at global refinements 5 through 10 using one node with four CPUs.
+Our results are shown in Table~\ref{tab:vof-runtime-comparison-table}.
+In all of the computations shown in Table~\ref{tab:vof-runtime-comparison-table} we used a CFL 
+number of $\sigma=0.5$.
+Due to the change in the CFL number from $\sigma = 1.0$ in Table~\ref{tab:runtime-table} to 
+$\sigma = 0.5$ in Table~\ref{tab:vof-runtime-comparison-table} and the difference between HPC 
+clusters on which the computational results shown in the two tables were made, we can't make 
+direct quantitative comparison between the data in Tables~\ref{tab:runtime-table} 
+and~\ref{tab:vof-runtime-comparison-table}.
+
+To compare the required time for the VOF computation to that for a DG computation, we ran both 
+on the same cluster at varying refinement levels. 
+Average runtimes for global refinements 5 through 10 using one node with four CPUs are shown in 
+Table~\ref{tab:vof-runtime-comparison-table}.
+We note that the use of the VOF advection algorithm significantly reduces the required computation time in all cases, frequently requiring less than half the time required by the DG computational field.
 
 We now examine the RMS velocity data shown in Figure~\ref{fig:vof-vk-1}.
 Other than for the case of 5 levels of uniform global refinement, the curves for the RMS 
@@ -9182,13 +9192,6 @@ are minor, although still slightly visible.
 This is to be expected as refinement is a perturbation of the initial condition at a smaller 
 wave length.
 
-
-To compare the required time for the VOF computation to that for a DG computation, we ran both 
-on the same cluster at varying refinement levels. 
-Average runtimes for global refinements 5 through 10 using one node with four CPUs are shown in 
-Table~\ref{tab:vof-runtime-comparison-table}.
-We note that the use of the VOF advection algorithm significantly reduces the required computation time in all cases, frequently requiring less than half the time required by the DG computational field.
-
 \begin{table}
   \centering
    \begin{tabular}{|c|c|c|c|}
@@ -9203,7 +9206,7 @@ We note that the use of the VOF advection algorithm significantly reduces the re
           10 & 16           & \phantom{1}5.17 days\phantom{minutess}&>6.00 days\phantom{tess} \\
             \hline
         \end{tabular}
-        \caption{\it Comparison of average runtimes for the van Keken problem with VOF and and a DG computational field, in which the initial conditions for DG smoothed as described in section~\ref{paragraph:van-keken compositional fields} above.
+        \caption{\it Comparison of runtimes for the van Keken problem with VOF and and a DG computational field, in which the initial conditions for DG smoothed as described in section~\ref{paragraph:van-keken compositional fields} above.
             The times shown are for the full computation, ending at $t_{end} = 2000$ with a CFL
             number of $\sigma=0.5$ in both cases. 
             All of these computations were made with ASPECT version 2.2.0-pre (master, ef542ecc2) in release mode on the Peloton2 cluster at U.C.~Davis.
