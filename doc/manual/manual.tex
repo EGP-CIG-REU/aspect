@@ -9162,20 +9162,18 @@ The full configuration file for this version of the benchmark problem can be fou
 We made a number of computations of the van Keken problem with the VOF method in order to 
 compare the wall clock times of the VOF results directly with the those computed with a DG
 compositional field.
-We ran both on the same cluster at global refinements 5 through 10 using one node with four CPUs.
+We ran both on the same cluster at global refinements 5--8 using one node with four CPUs and 
+9--10 using two nodes with 16 CPUs.
 Our results are shown in Table~\ref{tab:vof-runtime-comparison-table}.
 In all of the computations shown in Table~\ref{tab:vof-runtime-comparison-table} we used a CFL 
 number of $\sigma=0.5$.
 Due to the change in the CFL number from $\sigma = 1.0$ in Table~\ref{tab:runtime-table} to 
 $\sigma = 0.5$ in Table~\ref{tab:vof-runtime-comparison-table} and the difference between HPC 
-clusters on which the computational results shown in the two tables were made, we can't make 
+clusters on which the computational results shown in the two tables were made, we can't make a
 direct quantitative comparison between the data in Tables~\ref{tab:runtime-table} 
 and~\ref{tab:vof-runtime-comparison-table}.
 
-To compare the required time for the VOF computation to that for a DG computation, we ran both 
-on the same cluster at varying refinement levels. 
-Average runtimes for global refinements 5 through 10 using one node with four CPUs are shown in 
-Table~\ref{tab:vof-runtime-comparison-table}.
+However, we can compare the required run time for a VOF computation to that for a DG computation.
 We note that the use of the VOF advection algorithm significantly reduces the required computation time in all cases, frequently requiring less than half the time required by the DG computational field.
 
 We now examine the RMS velocity data shown in Figure~\ref{fig:vof-vk-1}.
@@ -9188,7 +9186,7 @@ solution shown in Figure~\ref{fig:VOF_van_Keken-02} matches the form and the gen
 found in other versions of this benchmark such as the fourth image on the right in 
 Figure~\ref{fig:vk-1}.
 We also note that the differences in the shape of the interface based on a single refinement 
-are minor, although still slightly visible.
+as shown in Figure~\ref{fig:VOF_van_Keken-02} are minor, although still slightly visible.
 This is to be expected as refinement is a perturbation of the initial condition at a smaller 
 wave length.
 
@@ -9242,7 +9240,7 @@ shown below.
         interface tracking algorithm showing the evolution of the RMS velocity
         as a function of time for small changes in the amplitude $a$ of the
         cosine function in the initial condition at 7 levels of refinement.
-        Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-}.
+        Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-1}.
     }
     \label{fig:vof-vk-3}
 \end{figure}
