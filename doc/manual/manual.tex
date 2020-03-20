@@ -9056,8 +9056,7 @@ within individual cells or within regions consisting of groups of cells.
 Another advantage the VOF method has over modeling moving interface problems with compositional 
 fields is that for problems in which the interface occupies a relatively small part of the 
 computational domain, all of the computational work in the VOF method is done in cells that lie 
-in a neighborhood of the interface, rather in the entire computational domain.
-For example, compare Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-comparison-table}.
+in a neighborhood of the interface, rather in the entire computational domain. 
 
 \begin{figure}[b!]
    \centering
@@ -9070,8 +9069,7 @@ For example, compare Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-com
     Figure~\ref{fig:vk-2}, although the above results also compare extremely favorably with the 
     computations with smoothed, continuous initial conditions for the compositional field on 
     the right in Figure~\ref{fig:vk-2}.
-    As in Figure~\ref{fig:vk-2}, 5 global refinements correspond to a $32 \times 32$ mesh and 9 
-    global refinements correspond to a $512 \times 512$ mesh.}
+    As in Figure~\ref{fig:vk-2}, 5 global refinements correspond to a $32 \times 32$ mesh and 10 global refinements correspond to a $1024 \times 1024$ mesh.}
     \label{fig:vof-vk-1}
 \end{figure}
 
@@ -9093,9 +9091,10 @@ For example, compare Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-com
 \end{figure}
 
 Since, as noted above, when the interface is discontinuous, the van Keken problem is a version 
-of the Rayleigh-Taylor problem,\footnote{This is true whether the two fluids have the same 
-viscosity or different viscosities.} it is unstable to perturbations of all wavelengths 
-(e.g.~\cite{SC:1961}), it is therefore, extremely sensitive to the initial conditions.
+of the Rayleigh-Taylor problem it is unstable to perturbations of all 
+wavelengths,\footnote{This is true whether the two fluids have the same viscosity or different 
+viscosities.} (e.g. see~\cite{SC:1961}), it is therefore, extremely sensitive to the initial 
+conditions.
 Thus, rather than use the standard initialization procedure for the VOF method, which consists 
 of integrating the initial interface over each multi-material cell in which one material or 
 fluid has the value of $1$ and the other has the value of $0$; i.e., a characteristic function 
@@ -9147,7 +9146,7 @@ While the visualization configuration in a typical parameter file is sufficient 
 purposes, when using the VOF method one has the ability to see the division between the fluids 
 reconstructed by the VOF algorithm in each cell.
 This is accomplished by plotting the zero contour of a field $\tilde\phi$ that
-is generated to be $0$ at the reconstructed interface, positive in the region
+is generated to be $0$ on the reconstructed interface, positive in the region
 with fluid~1, and negative in the region with fluid~2.
 However $\tilde{\phi}$ does not satisfy the requirement that the maginitude is
 equal to the distance to the interface as would be required for a signed
@@ -9161,15 +9160,18 @@ The full configuration file for this version of the benchmark problem can be fou
 \noindent
 
 We made a number of computations of the van Keken problem with the VOF method in order to 
-compare the wall clock times of the VOF results directly with the those computed with 
-compositional field, which are presented in the previous
-section~\ref{paragraph:van-keken compositional fields}.
+compare the wall clock times of the VOF results directly with the those computed with a DG
+compositional field and the results shown in Table~\ref{tab:runtime-table}.
 In all of the computations shown here we used a CFL number of $\sigma=0.5$.
+However, due to the change in the CFL number from $\sigma = 1.0$ in 
+Table~\ref{tab:runtime-table} to $\sigma = 0.5$ in Table~\ref{tab:vof-runtime-comparison-table} 
+and the difference between HPC clusters we can't make direct quantitative comparison between 
+the data in Tables~\ref{tab:runtime-table} and~\ref{tab:vof-runtime-comparison-table}.
 
-We begin by examining the RMS velocity data shown in Figure~\ref{fig:vof-vk-1}.
+We now examine the RMS velocity data shown in Figure~\ref{fig:vof-vk-1}.
 Other than for the case of 5 levels of uniform global refinement, the curves for the RMS 
-velocities for $6$, $7$, $8$, and $9$ levels of refinement in Figure~\ref{fig:vof-vk-1} are 
-nearly indistinguishable.
+velocities for $6$, $7$, $8$, $9$ and $10$ levels of refinement in Figure~\ref{fig:vof-vk-1} 
+are nearly indistinguishable.
 
 Upon examining the solution at the final time, we note that the general structure of the 
 solution shown in Figure~\ref{fig:VOF_van_Keken-02} matches the form and the general structure 
@@ -9181,26 +9183,24 @@ This is to be expected as refinement is a perturbation of the initial condition 
 wave length.
 
 
-To compare the required time for the VOF computation to that for a DG
-calculation, we ran both on the same cluster at varying refinement levels.
-Average runtimes for global refinements 5 through 9 using one node with four CPUs are shown in 
+To compare the required time for the VOF computation to that for a DG computation, we ran both 
+on the same cluster at varying refinement levels. 
+Average runtimes for global refinements 5 through 10 using one node with four CPUs are shown in 
 Table~\ref{tab:vof-runtime-comparison-table}.
-We note that the use of the VOF advection algorithm significantly reduces the
-required computation time in all cases, frequently requiring less than half the
-time required by the DG advection version.
+We note that the use of the VOF advection algorithm significantly reduces the required computation time in all cases, frequently requiring less than half the time required by the DG computational field.
 
 \begin{table}
-        \center
-        \begin{tabular}{|c|c|c|c|}
-            \hline
-            Global Refinement & Number of Processors & VOF & DG \\
-            \hline
-            5 & 4 & \phantom{6}1.33 minutes\phantom{hours} & \phantom{-}2.57 minutes \\
-            6 & 4 & \phantom{6}8.51 minutes\phantom{hours} & 19.5 minutes \\
-            7 & 4 & \phantom{6}1.15 hours\phantom{minutes}   & \phantom{-}2.49 hours \\
-            8 & 4 & \phantom{6}8.53 hours\phantom{minutes}   & 19.6 hours \\
-            9 & 16 &          16.30 hours\phantom{minutes}  & 2.72 days \\
-            10 & 16 &         5.17 days\phantom{minutes}  & >6 days \\
+  \centering
+   \begin{tabular}{|c|c|c|c|}
+     \hline
+      Global Refinement & Number of Processors & VOF & DG \\
+      \hline
+\phantom{1}5 & \phantom{1}4 &\phantom{6}1.33 minutes\phantom{hours} &\phantom{1}2.57 minutes  \\
+\phantom{1}6 & \phantom{1}4 &\phantom{1}8.51 minutes\phantom{hours} & 19.5\phantom{7} minutes \\
+\phantom{1}7 & \phantom{1}4 &\phantom{1}1.15 hours\phantom{minutes} & \phantom{1}2.49 hours\phantom{tes} \\
+\phantom{1}8 & \phantom{1}4 &\phantom{1}8.53 hours\phantom{minutes} & 19.6 hours\phantom{tes} \\
+\phantom{1}9 & 16           &         16.30 hours\phantom{minutes}  & \phantom{1}2.72 days\phantom{tes} \\
+          10 & 16           & \phantom{1}5.17 days\phantom{minutess}&>6.00 days\phantom{tess} \\
             \hline
         \end{tabular}
         \caption{\it Comparison of average runtimes for the van Keken problem with VOF and and a DG computational field, in which the initial conditions for DG smoothed as described in section~\ref{paragraph:van-keken compositional fields} above.
@@ -9215,9 +9215,10 @@ time required by the DG advection version.
         \label{tab:vof-runtime-comparison-table}
 \end{table}
 
-The consistency of the results shown here differs noticeably from the behavior of the same 
-problem when computed with the FEM and DG advection algorithms.
-We now study one of the possible reasons for these differences; namely, the procedure for 
+The consistency of the results shown here differs noticeably from the behavior of the  
+problem with discontinuous initial conditions when computed with the FEM and DG advection 
+algorithms.
+One of the possible reasons for these differences is the procedure for 
 defining the initial interface.
 As described above, we have designed an approach for setting the initial condition that should 
 reproduce a smooth curve to a high degree of accuracy and, in particular, the curve, which is
@@ -9238,7 +9239,7 @@ shown below.
         interface tracking algorithm showing the evolution of the RMS velocity
         as a function of time for small changes in the amplitude $a$ of the
         cosine function in the initial condition at 7 levels of refinement.
-        Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-3}.
+        Compare to Figures~\ref{fig:vk-6} and~\ref{fig:vof-vk-}.
     }
     \label{fig:vof-vk-3}
 \end{figure}
